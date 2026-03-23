@@ -1,0 +1,164 @@
+/* ================================================================
+   DASHBOARD.CSS
+   Estilos exclusivos do dashboard.html (membro)
+   ================================================================ */
+
+/* Variável sidebar e body overrides */
+:root { --sidebar: 220px; }
+body { font-size: 13px; min-height: 100vh; }
+
+/* Sidebar overrides */
+.sidebar-brand { display: flex; align-items: center; gap: .5rem; }
+.nav-item.active.r { border-left: 2px solid var(--red); }
+.nav-item.active.b { border-left: 2px solid var(--blue); }
+
+/* Topbar liga badge */
+.topbar-liga {
+  font-family: var(--font-mono); font-size: 10px; padding: 2px 8px;
+  border-radius: 20px; letter-spacing: .06em;
+}
+.topbar-liga.r { background: rgba(255,31,31,.1); color: rgba(255,120,120,.8); border: 1px solid rgba(255,31,31,.2); }
+.topbar-liga.b { background: rgba(15,111,255,.1); color: rgba(100,160,255,.8); border: 1px solid rgba(15,111,255,.2); }
+
+/* Form overrides para dashboard */
+.form-group { gap: .375rem; }
+.form-label { font-size: 9px; }
+.form-input { font-size: 12px; padding: 9px 12px; }
+.form-textarea { min-height: 80px; }
+
+/* Aulas grid */
+.aulas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.aula-card {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+  padding: .875rem; transition: all .15s; cursor: pointer;
+}
+.aula-card:hover { border-color: var(--border2); background: var(--bg4); }
+.aula-card.next-class { border-color: rgba(15,111,255,.3); }
+.aula-title { font-size: 12px; font-weight: 600; margin-bottom: .5rem; line-height: 1.3; }
+.aula-links { display: flex; gap: .375rem; }
+.aula-link { font-family: var(--font-mono); font-size: 9px; color: var(--muted); text-decoration: none; padding: 2px 6px; border: 1px solid var(--border2); border-radius: 2px; transition: all .15s; }
+.aula-link:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+
+/* Entregas */
+.entrega-box { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 1.125rem; margin-top: .5rem; }
+.entrega-title { font-size: 12px; font-weight: 600; margin-bottom: .5rem; }
+.entrega-input-row { display: flex; gap: .5rem; }
+.entrega-input {
+  flex: 1; background: var(--bg4); border: 1px solid var(--border2); border-radius: 3px;
+  color: var(--text); font-family: var(--font-mono); font-size: 11px;
+  padding: 8px 12px; outline: none; transition: border-color .2s;
+}
+.entrega-input:focus { border-color: rgba(255,255,255,.25); }
+.entrega-input::placeholder { color: var(--muted); }
+.entrega-submit {
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; padding: 8px 16px;
+  border-radius: 3px; border: none; cursor: pointer; background: var(--blue); color: #fff;
+  transition: opacity .2s; white-space: nowrap;
+}
+.entrega-submit:hover { opacity: .88; }
+.entrega-hint { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: .5rem; }
+
+/* Perfil */
+.perfil-grid { display: grid; grid-template-columns: 240px 1fr; gap: 1rem; }
+.perfil-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; text-align: center; }
+.perfil-av-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
+.perfil-av {
+  width: 72px; height: 72px; border-radius: 4px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 28px; color: var(--mid);
+  overflow: hidden; margin: 0 auto;
+}
+.perfil-av img { width: 100%; height: 100%; object-fit: cover; }
+.perfil-name { font-family: var(--font-display); font-size: 20px; letter-spacing: .02em; margin-bottom: .25rem; }
+.perfil-role { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .06em; margin-bottom: 1rem; }
+.perfil-liga-badge { display: inline-block; font-family: var(--font-mono); font-size: 10px; padding: 3px 10px; border-radius: 20px; margin-bottom: 1.25rem; }
+.perfil-liga-badge.b { background: rgba(15,111,255,.1); color: rgba(100,160,255,.8); border: 1px solid rgba(15,111,255,.2); }
+.perfil-liga-badge.r { background: rgba(255,31,31,.1); color: rgba(255,120,120,.8); border: 1px solid rgba(255,31,31,.2); }
+.perfil-stats { display: flex; gap: 0; border-top: 1px solid var(--border); }
+.perfil-stat { flex: 1; padding: .75rem .5rem; border-right: 1px solid var(--border); }
+.perfil-stat:last-child { border-right: none; }
+.perfil-stat-num { font-family: var(--font-display); font-size: 22px; color: var(--text); }
+.perfil-stat-label { font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: .04em; margin-top: 1px; }
+.perfil-form { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; }
+.perfil-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.form-save { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 9px 20px; border-radius: 3px; border: none; cursor: pointer; background: var(--text); color: var(--bg); margin-top: .75rem; transition: opacity .2s; }
+.form-save:hover { opacity: .88; }
+
+/* Cronograma */
+.cronograma { display: flex; flex-direction: column; gap: .375rem; }
+.cron-item {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+  padding: .875rem 1.125rem; display: flex; align-items: center; gap: 1rem;
+  transition: background .15s;
+}
+.cron-item:hover { background: var(--bg3); }
+.cron-item.today { border-color: rgba(15,111,255,.3); }
+.cron-date { font-family: var(--font-mono); font-size: 11px; color: var(--muted); min-width: 80px; }
+.cron-date strong { display: block; font-size: 13px; color: var(--text); }
+.cron-divider { width: 1px; height: 32px; background: var(--border2); flex-shrink: 0; }
+.cron-content { flex: 1; }
+.cron-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.cron-desc { font-size: 11px; color: var(--muted); }
+.cron-liga { margin-left: auto; }
+
+/* Presença do membro */
+.presenca-timeline { display: flex; flex-direction: column; gap: .375rem; }
+.presenca-item {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+  padding: .75rem 1.125rem;
+}
+.presenca-check { width: 20px; height: 20px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.presenca-check.ok { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.25); }
+.presenca-check.no { background: rgba(255,31,31,.1); color: rgba(255,120,120,.7); border: 1px solid rgba(255,31,31,.2); }
+.presenca-date { font-family: var(--font-mono); font-size: 10px; color: var(--muted); min-width: 80px; }
+.presenca-desc { font-size: 12px; color: var(--mid); }
+
+/* Onboarding wizard */
+.onboarding-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+}
+.onboarding-box {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 8px; width: 100%; max-width: 480px;
+  padding: 2.5rem; position: relative;
+}
+.ob-steps { display: flex; gap: .375rem; margin-bottom: 2rem; }
+.ob-step { flex: 1; height: 2px; border-radius: 2px; background: var(--border2); transition: background .3s; }
+.ob-step.done { background: var(--blue); }
+.ob-step.active { background: var(--blue); opacity: .5; }
+.ob-kicker { font-family: var(--font-mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: .75rem; }
+.ob-title { font-family: var(--font-display); font-size: 32px; letter-spacing: .02em; margin-bottom: .625rem; }
+.ob-sub { font-size: 13px; font-weight: 300; color: var(--mid); line-height: 1.7; margin-bottom: 1.75rem; }
+.ob-content { margin-bottom: 1.75rem; }
+.ob-liga-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.ob-liga-card {
+  border: 1px solid var(--border2); border-radius: 4px; padding: 1rem;
+  cursor: pointer; transition: all .2s; background: var(--bg3);
+}
+.ob-liga-card:hover { background: var(--bg4); }
+.ob-liga-card.selected.r { border-color: var(--red); background: rgba(255,31,31,.08); }
+.ob-liga-card.selected.b { border-color: var(--blue); background: rgba(15,111,255,.08); }
+.ob-liga-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: .375rem; }
+.ob-liga-label.r { color: var(--red); }
+.ob-liga-label.b { color: var(--blue); }
+.ob-liga-name { font-family: var(--font-display); font-size: 20px; letter-spacing: .02em; }
+.ob-actions { display: flex; justify-content: space-between; align-items: center; }
+.ob-skip { font-family: var(--font-mono); font-size: 11px; color: var(--muted); cursor: pointer; transition: color .2s; background: none; border: none; }
+.ob-skip:hover { color: var(--text); }
+.ob-next { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 10px 24px; border-radius: 3px; border: none; cursor: pointer; background: var(--blue); color: #fff; transition: opacity .2s; }
+.ob-next:hover { opacity: .88; }
+.ob-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 3px;
+  color: var(--text); font-family: var(--font-body); font-size: 13px;
+  padding: 10px 14px; outline: none; transition: border-color .2s; margin-bottom: .625rem;
+}
+.ob-input:focus { border-color: rgba(255,255,255,.25); }
+
+/* Animação onboarding */
+@keyframes slideIn { from { opacity:0; transform: translateX(16px); } to { opacity:1; transform: translateX(0); } }
+.ob-slide { animation: slideIn .25s ease both; }

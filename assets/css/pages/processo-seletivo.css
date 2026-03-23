@@ -1,0 +1,498 @@
+/* ================================================================
+   PROCESSO-SELETIVO.CSS
+   Estilos exclusivos do processo-seletivo.html e processo-seletivo-aberto.html
+   ================================================================ */
+
+/* Nav active state */
+.nav-links a.active { color: var(--text); }
+
+/* Hero */
+.hero {
+  min-height: 60vh;
+  padding-top: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid {
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 60% at 20% 50%, rgba(255,31,31,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(15,111,255,0.07) 0%, transparent 70%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 5rem 2.5rem 4rem;
+}
+
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .4s ease both;
+}
+
+/* Kicker dots — processo-seletivo.html */
+.kicker-dot-r { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+.kicker-dot-b { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+
+/* Kicker dots — processo-seletivo-aberto.html */
+.kicker-dot { width: 5px; height: 5px; border-radius: 50%; }
+.kicker-dot.r { background: var(--red); }
+.kicker-dot.b { background: var(--blue); }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 10vw, 100px);
+  line-height: .88;
+  letter-spacing: .01em;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .4s ease .1s both;
+}
+
+.hero-sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.75;
+  max-width: 520px;
+  animation: fadeUp .4s ease .2s both;
+}
+
+/* Status Banner */
+.status-banner {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.status-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.status-left { display: flex; align-items: center; gap: 1rem; }
+
+.status-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 3px;
+}
+
+.status-badge.closed {
+  background: rgba(255,255,255,.05);
+  color: var(--muted);
+  border: 1px solid var(--border2);
+}
+
+.status-badge.open {
+  background: rgba(34,197,94,.1);
+  color: #4ade80;
+  border: 1px solid rgba(34,197,94,.2);
+  animation: pulseBadge 2s ease infinite;
+}
+
+/* Status badge — processo-seletivo-aberto.html */
+.status-badge-open {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 3px;
+  background: rgba(34,197,94,.1);
+  color: #4ade80;
+  border: 1px solid rgba(34,197,94,.2);
+  animation: pulseBadge 2s ease infinite;
+}
+
+.status-text { font-size: 14px; color: var(--mid); font-weight: 300; }
+.status-text strong { color: var(--text); font-weight: 600; }
+
+/* Status next — processo-seletivo.html (fechado) */
+.status-next {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  text-align: right;
+}
+
+.status-next strong { color: var(--text); display: block; font-size: 13px; margin-bottom: 2px; }
+
+/* Status deadline — processo-seletivo-aberto.html */
+.status-deadline {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  text-align: right;
+}
+
+.status-deadline strong { color: var(--text); display: block; font-size: 13px; margin-bottom: 2px; }
+
+/* Countdown — processo-seletivo-aberto.html */
+.countdown-section {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.countdown-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.countdown-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.countdown-timer { display: flex; gap: 1rem; align-items: center; }
+.countdown-unit { text-align: center; }
+
+.countdown-num {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 1;
+  color: var(--green);
+}
+
+.countdown-unit-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.countdown-sep {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--border2);
+}
+
+/* Kicker lines — processo-seletivo.html usa classes separadas */
+.kicker-line-r { height: 1px; width: 32px; background: var(--red); }
+.kicker-line-b { height: 1px; width: 32px; background: var(--blue); }
+.kicker-line-w { height: 1px; width: 32px; background: var(--border2); }
+
+/* Etapas */
+.etapas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.etapa-card {
+  background: var(--bg2);
+  padding: 2rem;
+  position: relative;
+  transition: background .2s;
+}
+
+.etapa-card:hover { background: var(--bg3); }
+
+.etapa-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.etapa-card.r::before { background: linear-gradient(90deg, var(--red), transparent); }
+.etapa-card.b::before { background: linear-gradient(90deg, var(--blue), transparent); }
+.etapa-card.w::before { background: linear-gradient(90deg, var(--border2), transparent); }
+.etapa-card.g::before { background: linear-gradient(90deg, var(--green), transparent); }
+
+.etapa-num {
+  font-family: var(--font-display);
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: .75rem;
+  opacity: .15;
+}
+
+.etapa-num.r { color: var(--red); }
+.etapa-num.b { color: var(--blue); }
+.etapa-num.w { color: var(--text); }
+.etapa-num.g { color: var(--green); }
+
+.etapa-title { font-size: 15px; font-weight: 600; margin-bottom: .5rem; }
+.etapa-body { font-size: 13px; font-weight: 300; color: var(--mid); line-height: 1.7; }
+
+/* Perfil */
+.perfil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+.perfil-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all .2s;
+}
+
+.perfil-card:hover { background: var(--bg3); }
+
+.perfil-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+}
+
+.perfil-card.r::before { background: var(--red); }
+.perfil-card.b::before { background: var(--blue); }
+
+.perfil-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.perfil-label.r { color: var(--red); }
+.perfil-label.b { color: var(--blue); }
+
+.perfil-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: .02em;
+  margin-bottom: 1rem;
+}
+
+.perfil-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.perfil-list li {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.6;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.perfil-list li::before { content: '—'; position: absolute; left: 0; color: var(--border2); }
+
+/* Depoimentos — processo-seletivo.html */
+.depo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+
+.depo-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  transition: all .2s;
+}
+
+.depo-card:hover { border-color: var(--border2); background: var(--bg3); }
+
+.depo-quote {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+  font-style: italic;
+}
+
+.depo-quote::before { content: '"'; color: var(--border2); font-size: 20px; font-style: normal; }
+
+.depo-author { display: flex; align-items: center; gap: .75rem; }
+
+.depo-av {
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+.depo-av.r { background: rgba(255,31,31,.1); color: var(--red); border: 1px solid rgba(255,31,31,.2); }
+.depo-av.b { background: rgba(15,111,255,.1); color: var(--blue); border: 1px solid rgba(15,111,255,.2); }
+
+.depo-name { font-size: 12px; font-weight: 600; }
+.depo-role { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .04em; margin-top: 1px; }
+
+/* FAQ — processo-seletivo.html */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.faq-item { background: var(--bg2); overflow: hidden; }
+
+.faq-question {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background .2s;
+  gap: 1rem;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.faq-question:hover { background: var(--bg3); }
+
+.faq-icon {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform .2s;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease, padding .3s ease;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.7;
+  padding: 0 1.5rem;
+}
+
+.faq-item.open .faq-answer { max-height: 200px; padding: 0 1.5rem 1.25rem; }
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+
+/* Formulário */
+.form-section {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.form-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 5rem 2.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+
+.form-submit {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 13px 32px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--green);
+  color: #000;
+}
+
+.form-submit:hover { opacity: .88; transform: translateY(-1px); }
+.form-submit:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: .75rem;
+  flex-wrap: wrap;
+}
+
+.form-note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .04em;
+  margin-top: .75rem;
+}
+
+.form-success {
+  display: none;
+  background: rgba(34,197,94,.08);
+  border: 1px solid rgba(34,197,94,.2);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1rem;
+  font-size: 13px;
+  color: #4ade80;
+}
+
+.form-error-msg {
+  display: none;
+  font-size: 12px;
+  color: rgba(255,100,100,.8);
+  background: rgba(255,31,31,.08);
+  border: 1px solid rgba(255,31,31,.2);
+  border-radius: 3px;
+  padding: .75rem 1rem;
+  margin-top: .75rem;
+  font-family: var(--font-mono);
+}

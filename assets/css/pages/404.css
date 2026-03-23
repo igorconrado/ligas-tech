@@ -1,0 +1,122 @@
+/* ================================================================
+   404.CSS
+   Estilos exclusivos do 404.html
+   ================================================================ */
+
+/* Body override — layout centralizado */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid background */
+.grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 100%);
+}
+
+/* Glows */
+.glow-r {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 60% at 20% 50%, rgba(255,31,31,0.07) 0%, transparent 70%);
+}
+
+.glow-b {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 60% at 80% 50%, rgba(15,111,255,0.07) 0%, transparent 70%);
+}
+
+/* Content */
+.content { position: relative; z-index: 1; max-width: 480px; }
+
+/* Error number */
+.error-num {
+  font-family: var(--font-display);
+  font-size: clamp(120px, 20vw, 200px);
+  line-height: .85;
+  letter-spacing: .02em;
+  margin-bottom: .5rem;
+}
+
+.error-num .r { color: var(--red); text-shadow: 0 0 40px rgba(255,31,31,0.3); }
+.error-num .b { color: var(--blue); text-shadow: 0 0 40px rgba(15,111,255,0.3); }
+.error-num .w { color: rgba(255,255,255,.15); }
+
+/* Error text */
+.error-title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4vw, 36px);
+  letter-spacing: .02em;
+  margin-bottom: .875rem;
+}
+
+.error-sub {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+/* Error links */
+.error-links { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+
+.link-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 11px 24px;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all .2s;
+}
+
+.link-btn.primary { background: var(--text); color: var(--bg); }
+.link-btn.primary:hover { opacity: .88; }
+.link-btn.ghost { background: transparent; border: 1px solid var(--border2); color: var(--mid); }
+.link-btn.ghost:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+
+/* Mono footer */
+.error-mono {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  margin-top: 2rem;
+}
+
+/* Staggered animations */
+.content > * { animation: fadeUp .4s ease both; }
+.content > *:nth-child(1) { animation-delay: .05s; }
+.content > *:nth-child(2) { animation-delay: .1s; }
+.content > *:nth-child(3) { animation-delay: .15s; }
+.content > *:nth-child(4) { animation-delay: .2s; }
+.content > *:nth-child(5) { animation-delay: .25s; }

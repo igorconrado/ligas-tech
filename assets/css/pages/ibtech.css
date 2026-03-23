@@ -1,0 +1,364 @@
+/* ================================================================
+   IBTECH.CSS
+   Estilos exclusivos do ibtech.html
+   ================================================================ */
+
+/* Variável extra */
+:root { --blue2: #003A8C; }
+
+/* Nav active state */
+.nav-links a.active { color: var(--blue); }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  padding-top: 52px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid {
+  mask-image: radial-gradient(ellipse 90% 80% at 70% 50%, black 20%, transparent 100%);
+}
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 70% at 85% 50%, rgba(15,111,255,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 80%, rgba(0,58,140,0.06) 0%, transparent 70%);
+}
+
+.hero-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--blue) 30%, var(--blue) 70%, transparent);
+  z-index: 1;
+}
+
+.hero-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 4rem 5rem 4rem 2.5rem;
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+  gap: 4rem;
+}
+
+.hero-visual {
+  flex: 0 0 320px;
+  animation: fadeUp .4s ease .25s both;
+}
+
+/* Code Window */
+.code-window {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid rgba(15,111,255,0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.code-bar {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+
+.code-dot { width: 10px; height: 10px; border-radius: 50%; }
+.code-dot.r { background: #FF5F57; }
+.code-dot.y { background: #FFBD2E; }
+.code-dot.g { background: #28CA41; }
+
+.code-filename {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: .5rem;
+  letter-spacing: .04em;
+}
+
+.code-body {
+  padding: 1.25rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.c-blue   { color: #6b9fff; }
+.c-green  { color: #4ec994; }
+.c-orange { color: #e6a050; }
+.c-muted  { color: var(--muted); }
+.c-white  { color: var(--text); }
+
+.hero-content { flex: 1; order: -1; }
+
+.hero-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .4s ease both;
+}
+
+.kicker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 6px var(--blue);
+  animation: pulseBlue 2s ease infinite;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 12vw, 120px);
+  line-height: .88;
+  letter-spacing: .01em;
+  margin-bottom: 1.5rem;
+  animation: fadeUp .4s ease .1s both;
+}
+
+.hero-title .blue { color: var(--blue); text-shadow: 0 0 40px rgba(15,111,255,0.35); }
+
+.hero-sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.75;
+  max-width: 440px;
+  margin-bottom: 2.5rem;
+  animation: fadeUp .4s ease .2s both;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  animation: fadeUp .4s ease .3s both;
+}
+
+/* Stats Bar */
+.stats-bar {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+}
+
+.stat-item {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  color: var(--blue);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: .25rem;
+}
+
+/* Kicker line default (ibtech usa azul) */
+.kicker-line { background: var(--blue); }
+
+/* Sobre */
+.sobre-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sobre-card { background: var(--bg2); padding: 2rem; transition: background .2s; }
+.sobre-card:hover { background: var(--bg3); }
+
+.sobre-card-num {
+  font-family: var(--font-display);
+  font-size: 48px;
+  color: rgba(15,111,255,0.12);
+  line-height: 1;
+  margin-bottom: .75rem;
+}
+
+.sobre-card-title { font-size: 15px; font-weight: 600; margin-bottom: .5rem; }
+.sobre-card-body { font-size: 13px; font-weight: 300; color: var(--mid); line-height: 1.7; }
+
+/* Dia a dia */
+.dia-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dia-item {
+  background: var(--bg2);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  transition: background .2s;
+}
+
+.dia-item:hover { background: var(--bg3); }
+
+.dia-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  color: var(--blue);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 40px;
+  opacity: .5;
+}
+
+.dia-content h4 { font-size: 14px; font-weight: 600; margin-bottom: .35rem; }
+.dia-content p { font-size: 13px; font-weight: 300; color: var(--mid); line-height: 1.6; }
+
+/* Projetos */
+.projetos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+
+.projeto-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  transition: all .2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.projeto-card:hover { border-color: rgba(15,111,255,.25); }
+
+.projeto-img {
+  aspect-ratio: 16/9;
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.projeto-body { padding: 1.125rem; flex: 1; display: flex; flex-direction: column; }
+
+.projeto-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(100,160,255,.7);
+  margin-bottom: .35rem;
+}
+
+.projeto-title { font-size: 13px; font-weight: 600; margin-bottom: .35rem; }
+.projeto-desc { font-size: 12px; font-weight: 300; color: var(--mid); line-height: 1.5; flex: 1; }
+
+.projeto-stack { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .75rem; }
+
+.stack-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1px solid rgba(15,111,255,.2);
+  color: rgba(100,160,255,.7);
+  background: rgba(15,111,255,.05);
+  letter-spacing: .03em;
+}
+
+/* CTA Final */
+.cta-section {
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 6rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(15,111,255,0.06) 0%, transparent 70%);
+}
+
+.cta-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: .92;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-section p {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--mid);
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  margin-top: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Animação pulseBlue */
+@keyframes pulseBlue {
+  0%, 100% { box-shadow: 0 0 6px var(--blue); opacity: 1; }
+  50%      { box-shadow: 0 0 12px var(--blue); opacity: .7; }
+}

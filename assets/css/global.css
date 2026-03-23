@@ -1,0 +1,78 @@
+/* ================================================================
+   GLOBAL.CSS
+   Reset, variáveis, estilos base, noise overlay e animações globais
+   ================================================================ */
+
+/* Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Variáveis */
+:root {
+  --red: #FF1F1F;
+  --blue: #0F6FFF;
+  --green: #22C55E;
+  --amber: #F59E0B;
+  --bg: #080808;
+  --bg2: #0F0F0F;
+  --bg3: #141414;
+  --bg4: #1A1A1A;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --text: #EDEDED;
+  --muted: #666;
+  --mid: #999;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Base */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* Noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* Animações globais */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 6px var(--red); }
+  50%      { box-shadow: 0 0 12px var(--red); }
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .65; }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: .4; }
+  50%      { opacity: 1; }
+}
