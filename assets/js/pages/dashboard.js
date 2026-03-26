@@ -152,18 +152,27 @@ function renderizarDashboard(perfil, presencas, aulas) {
     : '<tr><td colspan="3" style="color:var(--muted);text-align:center">Nenhuma entrega</td></tr>';
 
   // Barras de progresso
-  el('prog-presenca-pct').textContent = `${pctPresenca}%`;
-  el('prog-presenca-fill').style.width = `${pctPresenca}%`;
-  el('prog-entregas-pct').textContent = `${pctEntregas}%`;
-  el('prog-entregas-fill').style.width = `${pctEntregas}%`;
-  el('prog-aulas-pct').textContent = `${pctAulas}%`;
-  el('prog-aulas-fill').style.width = `${pctAulas}%`;
+  el('pct-presenca').textContent = `${pctPresenca}%`;
+  el('bar-presenca').style.width = `${pctPresenca}%`;
+  el('pct-entregas').textContent = `${pctEntregas}%`;
+  el('bar-entregas').style.width = `${pctEntregas}%`;
+  el('pct-aulas').textContent = `${pctAulas}%`;
+  el('bar-aulas').style.width = `${pctAulas}%`;
 
   // Perfil stats
   const sp = el('perfil-stat-presenca');
   const se = el('perfil-stat-entregas');
   if (sp) sp.textContent = `${pctPresenca}%`;
   if (se) se.textContent = `${entregues}/${totalEntregas}`;
+
+  // Sidebar stats
+  const sbPresenca = el('sb-presenca');
+  if (sbPresenca) sbPresenca.textContent = `${pctPresenca}%`;
+  const sbProxima = el('sb-proxima');
+  if (sbProxima) {
+    const proxEntrega = aulasComPrazo.find(a => a.statusEntrega !== 'entregue');
+    sbProxima.textContent = proxEntrega ? fmtDate(proxEntrega.prazo_entrega) : 'Em dia';
+  }
 }
 
 // ── Renderizar aulas (tab) ──

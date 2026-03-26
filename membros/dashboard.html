@@ -69,6 +69,16 @@
       </div>
       <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
     </div>
+    <div class="sidebar-stats">
+      <div class="sb-stat">
+        <span class="sb-label">Presença</span>
+        <span class="sb-val" id="sb-presenca">—</span>
+      </div>
+      <div class="sb-stat">
+        <span class="sb-label">Próx. entrega</span>
+        <span class="sb-val" id="sb-proxima">—</span>
+      </div>
+    </div>
   </aside>
 
   <!-- MAIN -->
@@ -98,7 +108,7 @@
             <div class="metric-val b" id="metric-entregas-val">—</div>
             <div class="metric-sub" id="metric-entregas-sub">Carregando...</div>
           </div>
-          <div class="metric">
+          <div class="metric destaque">
             <div class="metric-label">Próximo encontro</div>
             <div class="metric-val w" id="metric-proximo-val" style="font-size:18px;margin-top:4px">—</div>
             <div class="metric-sub" id="metric-proximo-sub">Carregando...</div>
@@ -140,27 +150,27 @@
         <div class="panel-full">
           <div class="panel-head"><div class="panel-title">Progresso no semestre</div></div>
           <div class="panel-body">
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem">
-              <div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:.375rem">
-                  <span style="font-size:11px;color:var(--mid)">Presença</span>
-                  <span id="prog-presenca-pct" style="font-family:var(--font-mono);font-size:11px;color:var(--green)">0%</span>
+            <div class="prog-section">
+              <div class="prog-item">
+                <div class="prog-header">
+                  <span class="prog-title">Presença</span>
+                  <span class="prog-pct" id="pct-presenca">0%</span>
                 </div>
-                <div class="prog-bar"><div class="prog-fill g" id="prog-presenca-fill" style="width:0%"></div></div>
+                <div class="prog-bar"><div class="prog-fill b" id="bar-presenca" style="width:0%"></div></div>
               </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:.375rem">
-                  <span style="font-size:11px;color:var(--mid)">Entregas</span>
-                  <span id="prog-entregas-pct" style="font-family:var(--font-mono);font-size:11px;color:var(--amber)">0%</span>
+              <div class="prog-item">
+                <div class="prog-header">
+                  <span class="prog-title">Entregas</span>
+                  <span class="prog-pct" id="pct-entregas">0%</span>
                 </div>
-                <div class="prog-bar"><div class="prog-fill a" id="prog-entregas-fill" style="width:0%"></div></div>
+                <div class="prog-bar"><div class="prog-fill g" id="bar-entregas" style="width:0%"></div></div>
               </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:.375rem">
-                  <span style="font-size:11px;color:var(--mid)">Aulas concluídas</span>
-                  <span id="prog-aulas-pct" style="font-family:var(--font-mono);font-size:11px;color:var(--blue)">0%</span>
+              <div class="prog-item">
+                <div class="prog-header">
+                  <span class="prog-title">Aulas concluídas</span>
+                  <span class="prog-pct" id="pct-aulas">0%</span>
                 </div>
-                <div class="prog-bar"><div class="prog-fill b" id="prog-aulas-fill" style="width:0%"></div></div>
+                <div class="prog-bar"><div class="prog-fill a" id="bar-aulas" style="width:0%"></div></div>
               </div>
             </div>
           </div>

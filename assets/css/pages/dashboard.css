@@ -20,11 +20,93 @@ body { font-size: 13px; min-height: 100vh; }
 .topbar-liga.r { background: rgba(255,31,31,.1); color: rgba(255,120,120,.8); border: 1px solid rgba(255,31,31,.2); }
 .topbar-liga.b { background: rgba(15,111,255,.1); color: rgba(100,160,255,.8); border: 1px solid rgba(15,111,255,.2); }
 
+/* Card próximo encontro destaque */
+.metric.destaque {
+  border-color: var(--blue);
+  background: linear-gradient(135deg, var(--bg2) 0%, rgba(15,111,255,0.06) 100%);
+  grid-column: span 2;
+}
+.metric.destaque .metric-val {
+  font-size: 22px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* Sidebar stats */
+.sidebar-stats {
+  padding: .75rem 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: .375rem;
+}
+.sb-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sb-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.sb-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text);
+}
+
 /* Form overrides para dashboard */
 .form-group { gap: .375rem; }
 .form-label { font-size: 9px; }
 .form-input { font-size: 12px; padding: 9px 12px; }
 .form-textarea { min-height: 80px; }
+
+/* Progress bars visuais */
+.prog-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.prog-item {
+  display: flex;
+  flex-direction: column;
+  gap: .375rem;
+}
+.prog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.prog-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.prog-pct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.prog-bar {
+  height: 4px;
+  background: var(--bg4);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.prog-fill.g { background: var(--green); }
+.prog-fill.b { background: var(--blue); }
+.prog-fill.r { background: var(--red); }
+.prog-fill.a { background: var(--amber); }
 
 /* Aulas grid */
 .aulas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
