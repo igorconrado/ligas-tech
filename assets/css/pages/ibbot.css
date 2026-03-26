@@ -108,8 +108,8 @@
 
 .robot-placeholder {
   width: 100%;
-  max-width: 440px;
-  aspect-ratio: 4/3;
+  max-width: 460px;
+  aspect-ratio: 3/4;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -121,13 +121,21 @@
   position: relative;
   overflow: hidden;
 }
-
 .robot-placeholder::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--red), transparent 60%);
+  height: 2px;
+  background: linear-gradient(90deg, var(--red), transparent 70%);
+}
+.robot-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255,31,31,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,31,31,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 .robot-icon {
@@ -169,13 +177,34 @@
   animation: pulse 1.5s ease infinite;
 }
 
+.robot-coords {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  z-index: 1;
+}
+.rc-val.r { color: var(--red); }
+
 /* Stats Bar */
 .stats-bar {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--bg);
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 47px,
+    rgba(255,255,255,0.02) 47px,
+    rgba(255,255,255,0.02) 48px
+  );
 }
 
 .stat-item {
@@ -345,9 +374,11 @@
 
 .cta-section h2 {
   font-family: var(--font-display);
-  font-size: clamp(48px, 7vw, 88px);
-  line-height: .88;
-  margin-bottom: .875rem;
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: .84;
+  letter-spacing: -.01em;
+  margin-bottom: 1.25rem;
+  width: 100%;
 }
 
 .cta-meta {
@@ -355,6 +386,19 @@
   font-size: 11px;
   color: var(--muted);
   letter-spacing: .06em;
+}
+
+.footer-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 15vw, 180px);
+  line-height: .85;
+  color: rgba(255,255,255,.03);
+  letter-spacing: -.02em;
+  text-align: center;
+  padding: 2rem 2.5rem 0;
+  border-top: 1px solid var(--border);
+  user-select: none;
+  pointer-events: none;
 }
 
 /* Override pulse animation (ibbot adds opacity) */

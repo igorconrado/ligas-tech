@@ -96,13 +96,25 @@ nav {
   color: var(--bg);
   border: none;
   cursor: pointer;
-  transition: opacity .2s;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: color .3s ease;
+  z-index: 0;
 }
-
-.nav-btn:hover { opacity: .85; }
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  transform: translateX(-101%);
+  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+.nav-btn:hover { color: #fff; opacity: 1; }
+.nav-btn:hover::before { transform: translateX(0); }
 
 /* --------------------------------
    Footer

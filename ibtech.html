@@ -161,7 +161,7 @@
   <p class="section-body">Projetos em andamento e entregues pelos membros da IbTech — com parceiros, em hackathons e por conta própria.</p>
   <div class="projetos-grid">
     <div class="projeto-card">
-      <div class="projeto-img">Screenshot em breve</div>
+      <div class="projeto-img" data-label="em breve"></div>
       <div class="projeto-body">
         <div class="projeto-tag">Parceiro · Em andamento</div>
         <div class="projeto-title">Hackathon Mater Dei</div>
@@ -174,7 +174,7 @@
       </div>
     </div>
     <div class="projeto-card">
-      <div class="projeto-img">Screenshot em breve</div>
+      <div class="projeto-img" data-label="em breve"></div>
       <div class="projeto-body">
         <div class="projeto-tag">Interno · Em andamento</div>
         <div class="projeto-title">Site das Ligas Tech</div>
@@ -187,7 +187,7 @@
       </div>
     </div>
     <div class="projeto-card">
-      <div class="projeto-img">Screenshot em breve</div>
+      <div class="projeto-img" data-label="em breve"></div>
       <div class="projeto-body">
         <div class="projeto-tag">Colaboração · Em andamento</div>
         <div class="projeto-title">Software do Robô IbBot</div>
@@ -226,6 +226,7 @@
     <a href="https://instagram.com/ibtechbh" target="_blank">@ibtechbh</a>
     <a href="/membros/login">Área de Membros</a>
   </div>
+  <div class="footer-wordmark">IBTECH</div>
 </footer>
 
 <div class="cursor" id="cursor"></div>
@@ -253,6 +254,20 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
   }, { threshold: 0.15 });
   reveals.forEach(el => io.observe(el));
+})();
+</script>
+<script>
+(function(){
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.1)';
+      nav.style.background = 'rgba(8,8,8,0.98)';
+    } else {
+      nav.style.borderBottomColor = '';
+      nav.style.background = '';
+    }
+  });
 })();
 </script>
 </body>

@@ -59,6 +59,11 @@
           <span class="status-dot"></span>
           Fase final de construção
         </div>
+        <div class="robot-coords">
+          <span class="rc-line">X: <span class="rc-val r">0.00</span></span>
+          <span class="rc-line">Y: <span class="rc-val r">0.00</span></span>
+          <span class="rc-line">STATUS: <span class="rc-val r">BUILDING</span></span>
+        </div>
       </div>
     </div>
   </div>
@@ -197,6 +202,7 @@
     <a href="https://instagram.com/ibtechbh" target="_blank">@ibtechbh</a>
     <a href="/membros/login">Área de Membros</a>
   </div>
+  <div class="footer-wordmark">IBBOT</div>
 </footer>
 
 <div class="cursor" id="cursor"></div>
@@ -224,6 +230,20 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
   }, { threshold: 0.15 });
   reveals.forEach(el => io.observe(el));
+})();
+</script>
+<script>
+(function(){
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.1)';
+      nav.style.background = 'rgba(8,8,8,0.98)';
+    } else {
+      nav.style.borderBottomColor = '';
+      nav.style.background = '';
+    }
+  });
 })();
 </script>
 </body>
