@@ -41,21 +41,74 @@ diretoria.forEach((d, i) => {
 function openModal(i) {
   const d = diretoria[i];
   const initial = d.nome === 'A definir' ? '?' : d.nome[0];
-  document.getElementById('modal-av').innerHTML = d.foto
-    ? `<img src="${d.foto}" alt="${d.nome}">`
-    : initial;
-  document.getElementById('modal-av').className = `modal-av ${d.liga}`;
+
   document.getElementById('modal-name').textContent = d.nome;
   document.getElementById('modal-role').textContent = d.cargo;
-  document.getElementById('modal-liga').textContent = d.ligaNome;
-  document.getElementById('modal-liga').className = `modal-liga ${d.liga}`;
   document.getElementById('modal-bio').textContent = d.bio || 'Bio em breve.';
 
+  // Define cores baseado na liga
+  const isDouble = d.liga === 'w';
+  const isRed    = d.liga === 'r';
+  const isBlue   = d.liga === 'b';
+
+  // Linha de acento no topo do painel
+  const accent = document.getElementById('dmp-accent');
+  if (isDouble) {
+    accent.style.background = 'linear-gradient(90deg, var(--red) 0%, var(--blue) 100%)';
+  } else if (isRed) {
+    accent.style.background = 'var(--red)';
+  } else {
+    accent.style.background = 'var(--blue)';
+  }
+
+  // Cor do kicker (nome da liga)
+  const kicker = document.getElementById('dmp-kicker');
+  kicker.textContent = d.ligaNome;
+  if (isDouble) {
+    kicker.innerHTML = '<span style="color:var(--red)">IbBot</span> <span style="color:rgba(255,255,255,.2)">&</span> <span style="color:var(--blue)">IbTech</span>';
+  } else if (isRed) {
+    kicker.style.color = 'var(--red)';
+  } else {
+    kicker.style.color = 'var(--blue)';
+  }
+
+  // Avatar
+  const av = document.getElementById('dmp-av');
+  av.innerHTML = d.foto ? `<img src="${d.foto}" alt="${d.nome}">` : initial;
+  if (isDouble) {
+    av.style.background = 'linear-gradient(135deg, rgba(255,31,31,.15) 0%, rgba(15,111,255,.15) 100%)';
+    av.style.color = 'var(--text)';
+    av.style.border = '1px solid rgba(255,255,255,.12)';
+  } else if (isRed) {
+    av.style.background = 'rgba(255,31,31,.12)';
+    av.style.color = 'var(--red)';
+    av.style.border = '1px solid rgba(255,31,31,.2)';
+  } else {
+    av.style.background = 'rgba(15,111,255,.12)';
+    av.style.color = 'var(--blue)';
+    av.style.border = '1px solid rgba(15,111,255,.2)';
+  }
+
+  // Divisor
+  const divider = document.getElementById('dmp-divider');
+  if (isDouble) {
+    divider.style.background = 'linear-gradient(90deg, var(--red), var(--blue))';
+    divider.style.width = '80px';
+  } else if (isRed) {
+    divider.style.background = 'var(--red)';
+    divider.style.width = '40px';
+  } else {
+    divider.style.background = 'var(--blue)';
+    divider.style.width = '40px';
+  }
+
+  // Links — classe de cor baseada na liga
   let links = '';
-  if (d.linkedin) links += `<a class="modal-link b" href="${d.linkedin}" target="_blank">LinkedIn ↗</a>`;
-  if (d.github)   links += `<a class="modal-link" href="${d.github}" target="_blank">GitHub ↗</a>`;
-  if (!d.linkedin && !d.github) links = `<span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Links em breve</span>`;
-  document.getElementById('modal-links').innerHTML = links;
+  const linkClass = isDouble ? 'w' : d.liga;
+  if (d.linkedin) links += `<a class="dmp-link ${linkClass}" href="${d.linkedin}" target="_blank" rel="noopener">LinkedIn ↗</a>`;
+  if (d.github)   links += `<a class="dmp-link" href="${d.github}" target="_blank" rel="noopener">GitHub ↗</a>`;
+  if (!d.linkedin && !d.github) links = `<span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.04em">Links em breve</span>`;
+  document.getElementById('dmp-links').innerHTML = links;
 
   document.getElementById('dir-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
