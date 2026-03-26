@@ -8,7 +8,7 @@ export async function getMeuPerfil() {
     .from('membros')
     .select('*, ligas(nome, cor)')
     .eq('usuario_id', user.id)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return data;
@@ -49,14 +49,14 @@ export async function completarOnboarding(dados) {
 
   const { data, error } = await supabase
     .from('membros')
-    .update({
+    .upsert({
+      usuario_id: user.id,
       nome: dados.nome,
       linkedin: dados.linkedin || null,
       github: dados.github || null,
       bio: dados.bio || null,
       onboarding_completo: true
-    })
-    .eq('usuario_id', user.id)
+    }, { onConflict: 'usuario_id' })
     .select()
     .single();
 
