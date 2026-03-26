@@ -50,6 +50,26 @@ nav {
   transition: color .2s;
 }
 
+.nav-links a {
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--text);
+  transition: width 0.2s ease;
+}
+.nav-links a:hover::after { width: 100%; }
+.nav-links a.active { color: var(--text); }
+.nav-links a.active::after {
+  width: 100%;
+  background: var(--nav-accent, var(--text));
+}
+
 .nav-links a:hover  { color: var(--text); }
 
 .nav-right { display: flex; align-items: center; gap: .75rem; }
@@ -137,10 +157,16 @@ footer {
 }
 
 .cta-r       { background: var(--red); color: #fff; border: none; }
-.cta-r:hover { opacity: .88; transform: translateY(-1px); }
+.cta-r:hover {
+  box-shadow: 0 0 24px rgba(255,31,31,0.45);
+  transform: translateY(-1px);
+}
 
 .cta-b       { background: var(--blue); color: #fff; border: none; }
-.cta-b:hover { opacity: .88; transform: translateY(-1px); }
+.cta-b:hover {
+  box-shadow: 0 0 24px rgba(15,111,255,0.45);
+  transform: translateY(-1px);
+}
 
 .cta-ghost       { background: transparent; border: 1px solid var(--border2); color: var(--mid); }
 .cta-ghost:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
@@ -503,3 +529,13 @@ footer {
    -------------------------------- */
 .aula-num { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .375rem; }
 .aula-meta { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

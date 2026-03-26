@@ -42,6 +42,7 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   overflow-x: hidden;
+  cursor: none;
 }
 
 /* Noise overlay */
@@ -75,4 +76,24 @@ body::before {
 @keyframes scrollPulse {
   0%, 100% { opacity: .4; }
   50%      { opacity: 1; }
+}
+
+.cursor {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s ease, background 0.18s ease, opacity 0.18s ease;
+}
+.cursor.is-blue { background: var(--blue); }
+.cursor.is-link { transform: translate(-50%, -50%) scale(3.5); opacity: 0.35; }
+.cursor.is-hidden { opacity: 0; }
+
+@keyframes marqueePan {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }

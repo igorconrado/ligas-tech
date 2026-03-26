@@ -80,10 +80,10 @@
 
 <!-- STATS -->
 <div class="stats-bar">
-  <div class="stat-item"><div class="stat-num">17</div><div class="stat-label">Membros ativos</div></div>
-  <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Aulas concluídas</div></div>
-  <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Trilhas de capacitação</div></div>
-  <div class="stat-item"><div class="stat-num">1</div><div class="stat-label">Hackathon em andamento</div></div>
+  <div class="stat-item"><div class="stat-prefix">const members =</div><div class="stat-num">17</div><div class="stat-label">Membros ativos</div></div>
+  <div class="stat-item"><div class="stat-prefix">const aulas =</div><div class="stat-num">2</div><div class="stat-label">Aulas concluídas</div></div>
+  <div class="stat-item"><div class="stat-prefix">const projetos =</div><div class="stat-num">3</div><div class="stat-label">Trilhas de capacitação</div></div>
+  <div class="stat-item"><div class="stat-prefix">const semestre =</div><div class="stat-num">1</div><div class="stat-label">Hackathon em andamento</div></div>
 </div>
 
 <!-- SOBRE -->
@@ -225,5 +225,32 @@
   </div>
 </footer>
 
+<div class="cursor" id="cursor"></div>
+<script>
+(function(){
+  const c = document.getElementById('cursor');
+  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
+  document.addEventListener('mousemove', e => {
+    c.style.left = e.clientX + 'px';
+    c.style.top  = e.clientY + 'px';
+  });
+  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
+  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
+  document.querySelectorAll('a, button, [onclick], label, .dir-card, .faq-item').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
+  });
+  document.querySelectorAll('.cta-b, .split-card.b, .nav-links a[href*="ibtech"]').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-blue'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-blue'));
+  });
+  const reveals = document.querySelectorAll('.section-kicker, .section-title, .section-body');
+  reveals.forEach(el => el.classList.add('reveal'));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: 0.15 });
+  reveals.forEach(el => io.observe(el));
+})();
+</script>
 </body>
 </html>

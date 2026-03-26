@@ -41,23 +41,24 @@
     <div class="hero-eyebrow">
       <span class="eyebrow-dot r"></span>
       Robótica Autônoma
-      <span style="color:rgba(255,255,255,.1)">·</span>
+      <span style="color:rgba(255,255,255,.08)">·</span>
       Desenvolvimento de Software
       <span class="eyebrow-dot b"></span>
     </div>
     <h1 class="hero-title">
       <span class="line1"><span class="t-ib">IB</span><span class="t-bot">BOT</span></span>
-      <span class="line2"><span class="t-sep">&amp;</span> <span class="t-ib">IB</span><span class="t-tech">TECH</span></span>
+      <span class="line2">
+        <span class="t-sep">&amp;</span>
+        <span class="t-ib">IB</span><span class="t-tech">TECH</span>
+      </span>
     </h1>
-    <p class="hero-sub">Duas ligas. Hardware que se move, software que pensa. Formando engenheiros que constroem o que ainda não existe.</p>
-    <div class="hero-ctas">
-      <a class="cta-r" href="/ibbot">Conhecer a IbBot</a>
-      <a class="cta-b" href="/ibtech">Conhecer a IbTech</a>
-      <a class="cta-ghost" href="/processo-seletivo">Processo Seletivo 2026.1</a>
-    </div>
-    <div class="scroll-hint">
-      <div class="scroll-line"></div>
-      <span>scroll</span>
+    <div class="hero-bottom">
+      <p class="hero-sub">Duas ligas. Hardware que se move, software que pensa. Formando engenheiros que constroem o que ainda não existe.</p>
+      <div class="hero-ctas">
+        <a class="cta-r" href="/ibbot">IbBot →</a>
+        <a class="cta-b" href="/ibtech">IbTech →</a>
+        <a class="cta-ghost" href="/processo-seletivo">Processo Seletivo</a>
+      </div>
     </div>
   </div>
 </div>
@@ -106,13 +107,28 @@
 
 <!-- MANIFESTO -->
 <div class="manifesto-section">
-  <p class="manifesto-text">
-    <span class="acc-r">Hardware</span> que obedece.<br>
-    <span class="acc-b">Software</span> que escala.<br>
-    Enquanto outros estudam sobre engenharia,<br>
-    nós construímos o que o mercado pede.
-    <span class="dim">Ibmec BH · IbBot · IbTech.</span>
-  </p>
+  <div class="marquee-track">
+    <div class="marquee-inner">
+      <span class="marquee-text"><span class="acc-r">Hardware</span> que obedece.</span>
+      <span class="marquee-sep">✦</span>
+      <span class="marquee-text"><span class="acc-b">Software</span> que escala.</span>
+      <span class="marquee-sep">✦</span>
+      <span class="marquee-text">Enquanto outros estudam, nós construímos.</span>
+      <span class="marquee-sep">✦</span>
+      <span class="marquee-text">Ibmec BH · <span class="acc-r">IbBot</span> · <span class="acc-b">IbTech</span></span>
+      <span class="marquee-sep">✦</span>
+    </div>
+    <div class="marquee-inner" aria-hidden="true">
+      <span class="marquee-text"><span class="acc-r">Hardware</span> que obedece.</span>
+      <span class="marquee-sep">✦</span>
+      <span class="marquee-text"><span class="acc-b">Software</span> que escala.</span>
+      <span class="marquee-sep">✦</span>
+      <span class="marquee-text">Enquanto outros estudam, nós construímos.</span>
+      <span class="marquee-sep">✦</span>
+      <span class="marquee-text">Ibmec BH · <span class="acc-r">IbBot</span> · <span class="acc-b">IbTech</span></span>
+      <span class="marquee-sep">✦</span>
+    </div>
+  </div>
 </div>
 
 <!-- DIRETORIA -->
@@ -166,5 +182,33 @@
 </footer>
 
 <script type="module" src="/assets/js/pages/home.js"></script>
+
+<div class="cursor" id="cursor"></div>
+<script>
+(function(){
+  const c = document.getElementById('cursor');
+  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
+  document.addEventListener('mousemove', e => {
+    c.style.left = e.clientX + 'px';
+    c.style.top  = e.clientY + 'px';
+  });
+  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
+  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
+  document.querySelectorAll('a, button, [onclick], label, .dir-card, .faq-item').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
+  });
+  document.querySelectorAll('.cta-b, .split-card.b, .nav-links a[href*="ibtech"]').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-blue'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-blue'));
+  });
+  const reveals = document.querySelectorAll('.section-kicker, .section-title, .section-body');
+  reveals.forEach(el => el.classList.add('reveal'));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: 0.15 });
+  reveals.forEach(el => io.observe(el));
+})();
+</script>
 </body>
 </html>
