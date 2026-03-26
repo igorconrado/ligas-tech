@@ -1,216 +1,241 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IbBot & IbTech — Ligas Tech Ibmec BH</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/global.css">
-<link rel="stylesheet" href="/assets/css/components.css">
-<link rel="stylesheet" href="/assets/css/pages/home.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IbBot & IbTech — Ligas Tech Ibmec BH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/home.css">
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="/">
-    <span class="logo-ib">Ib</span><span class="logo-bot">Bot</span>
-    <span class="slash">/</span>
-    <span class="logo-ib">Ib</span><span class="logo-tech">Tech</span>
-  </a>
-  <div class="nav-links">
-    <a href="/ibbot">IbBot</a>
-    <a href="/ibtech">IbTech</a>
-    <a href="/#diretoria">Diretoria</a>
-    <a href="/processo-seletivo">Processo Seletivo</a>
-  </div>
-  <div class="nav-right">
-    <span class="nav-tag">Ibmec BH · 2026</span>
-    <a class="nav-btn" href="/membros/login">Área de Membros →</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-glow-r"></div>
-  <div class="hero-glow-b"></div>
-  <div class="hero-line"></div>
-  <div class="hero-inner">
-    <div class="hero-eyebrow">
-      <span class="eyebrow-dot r"></span>
-      Robótica Autônoma
-      <span style="color:rgba(255,255,255,.08)">·</span>
-      Desenvolvimento de Software
-      <span class="eyebrow-dot b"></span>
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="/">
+      <span class="logo-ib">Ib</span><span class="logo-bot">Bot</span>
+      <span class="slash">/</span>
+      <span class="logo-ib">Ib</span><span class="logo-tech">Tech</span>
+    </a>
+    <div class="nav-links">
+      <a href="/ibbot">IbBot</a>
+      <a href="/ibtech">IbTech</a>
+      <a href="/diretoria">Diretoria</a>
+      <a href="/processo-seletivo">Processo Seletivo</a>
     </div>
-    <h1 class="hero-title">
-      <span class="line1"><span class="t-ib">IB</span><span class="t-bot">BOT</span></span>
-      <span class="line2">
-        <span class="t-sep">&amp;</span>
-        <span class="t-ib">IB</span><span class="t-tech">TECH</span>
-      </span>
-    </h1>
-    <div class="hero-bottom">
-      <p class="hero-sub">Duas ligas. Hardware que se move, software que pensa. Formando engenheiros que constroem o que ainda não existe.</p>
-      <div class="hero-ctas">
-        <a class="cta-r" href="/ibbot">IbBot →</a>
-        <a class="cta-b" href="/ibtech">IbTech →</a>
-        <a class="cta-ghost" href="/processo-seletivo">Processo Seletivo</a>
+    <div class="nav-right">
+      <span class="nav-tag">Ibmec BH · 2026</span>
+      <a class="nav-btn" href="/membros/login">Área de Membros →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow-r"></div>
+    <div class="hero-glow-b"></div>
+    <div class="hero-line"></div>
+    <div class="hero-inner">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot r"></span>
+        Robótica Autônoma
+        <span style="color:rgba(255,255,255,.08)">·</span>
+        Desenvolvimento de Software
+        <span class="eyebrow-dot b"></span>
+      </div>
+      <h1 class="hero-title">
+        <span class="line1"><span class="t-ib">IB</span><span class="t-bot">BOT</span></span>
+        <span class="line2">
+          <span class="t-sep">&amp;</span>
+          <span class="t-ib">IB</span><span class="t-tech">TECH</span>
+        </span>
+      </h1>
+      <div class="hero-bottom">
+        <p class="hero-sub">Duas ligas. Hardware que se move, software que pensa. Formando engenheiros que constroem antes de se formar.</p>
+        <div class="hero-ctas">
+          <a class="cta-r" href="/ibbot">IbBot →</a>
+          <a class="cta-b" href="/ibtech">IbTech →</a>
+          <a class="cta-ghost" href="/processo-seletivo">Processo Seletivo</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- STATS -->
-<div class="ticker">
-  <div class="tick-item"><div class="tick-num r" id="n1">0</div><div class="tick-label">Membros ativos</div></div>
-  <div class="tick-item"><div class="tick-num b" id="n2">0</div><div class="tick-label">Ligas ativas</div></div>
-  <div class="tick-item"><div class="tick-num w" id="n3">0</div><div class="tick-label">Diretores</div></div>
-  <div class="tick-item"><div class="tick-num r" id="n4">0</div><div class="tick-label">Fases do roadmap</div></div>
-  <div class="tick-item"><div class="tick-num b" id="n5">0</div><div class="tick-label">Semestres de operação</div></div>
-</div>
+  <!-- STATS -->
+  <div class="ticker">
+    <div class="tick-item">
+      <div class="tick-num r" id="n1">0</div>
+      <div class="tick-label">membros nas ligas</div>
+    </div>
+    <div class="tick-item">
+      <div class="tick-num b" id="n2">0</div>
+      <div class="tick-label">ligas ativas</div>
+    </div>
+    <div class="tick-item">
+      <div class="tick-num w" id="n3">0</div>
+      <div class="tick-label">diretores</div>
+    </div>
+    <div class="tick-item">
+      <div class="tick-num r" id="n4">0</div>
+      <div class="tick-label">fases no roadmap</div>
+    </div>
+    <div class="tick-item">
+      <div class="tick-num b" id="n5">0</div>
+      <div class="tick-label">semestre de operação</div>
+    </div>
+  </div>
 
-<!-- LIGAS -->
-<div class="section">
-  <div class="section-kicker"><span class="kicker-line r"></span> As Ligas</div>
-  <h2 class="section-title">HARDWARE.<br>SOFTWARE.<br>UMA TRIBO.</h2>
-  <p class="section-body">A IbBot constrói soluções de hardware autônomo. A IbTech desenvolve software real — produtos, SaaS e sistemas que chegam ao mercado. Duas ligas independentes que, quando colaboram, entregam mais.</p>
-  <div class="split-grid">
-    <div class="split-card r">
-      <div class="split-bg-char">B</div>
-      <div class="split-label r">IbBot — Robótica</div>
-      <div class="split-h">Robótica<br>Autônoma</div>
-      <p class="split-p">Construção de robôs físicos do zero — estrutura mecânica, eletrônica embarcada e lógica de controle. Encontros às terças na Sala Maker.</p>
-      <div class="split-tags">
-        <span class="stag r">Hardware</span>
-        <span class="stag r">Mecânica</span>
-        <span class="stag r">Eletrônica</span>
-        <span class="stag r">Terças-feiras</span>
+  <!-- LIGAS -->
+  <div class="section">
+    <div class="section-kicker"><span class="kicker-line r"></span> As Ligas</div>
+    <h2 class="section-title">HARDWARE.<br>SOFTWARE.<br>UMA TRIBO.</h2>
+    <p class="section-body">A IbBot constrói soluções de hardware autônomo. A IbTech desenvolve software real —
+      produtos, SaaS e sistemas que chegam ao mercado. Duas ligas independentes que, quando colaboram, entregam mais.
+    </p>
+    <div class="split-grid">
+      <div class="split-card r">
+        <div class="split-bg-char">B</div>
+        <div class="split-label r">IbBot — Robótica</div>
+        <div class="split-h">ROBÓTICA<br>AUTÔNOMA</div>
+        <p class="split-p">Do chassi ao firmware — tudo construído pelos membros. A IbBot projeta, monta e programa robôs que funcionam de verdade.</p>
+        <div class="split-tags">
+          <span class="stag r">Hardware</span>
+          <span class="stag r">Firmware</span>
+          <span class="stag r">Mecânica</span>
+          <span class="stag r">Terças-feiras</span>
+        </div>
+      </div>
+      <div class="split-card b">
+        <div class="split-bg-char">T</div>
+        <div class="split-label b">IbTech — Software</div>
+        <div class="split-h">DESENVOLVIMENTO<br>DE SOFTWARE</div>
+        <p class="split-p">Stack moderna, projetos com parceiros, entregas reais. A IbTech forma devs com portfólio antes de entrar no mercado.</p>
+        <div class="split-tags">
+          <span class="stag b">Frontend</span>
+          <span class="stag b">Backend</span>
+          <span class="stag b">Dados</span>
+          <span class="stag b">Quintas-feiras</span>
+        </div>
       </div>
     </div>
-    <div class="split-card b">
-      <div class="split-bg-char">T</div>
-      <div class="split-label b">IbTech — Software</div>
-      <div class="split-h">Desenvolvimento<br>de Software</div>
-      <p class="split-p">Frontend, backend, dados e o software embarcado do robô. Capacitação técnica real com entregas via GitHub. Encontros às quintas.</p>
-      <div class="split-tags">
-        <span class="stag b">Frontend</span>
-        <span class="stag b">Backend</span>
-        <span class="stag b">Dados</span>
-        <span class="stag b">Quintas-feiras</span>
+  </div>
+
+  <!-- MANIFESTO -->
+  <div class="manifesto-section">
+    <div class="marquee-track">
+      <div class="marquee-inner">
+        <span class="marquee-text"><span class="acc-r">Hardware</span> que obedece.</span>
+        <span class="marquee-sep">✦</span>
+        <span class="marquee-text"><span class="acc-b">Software</span> que escala.</span>
+        <span class="marquee-sep">✦</span>
+        <span class="marquee-text">Enquanto outros estudam, nós construímos.</span>
+        <span class="marquee-sep">✦</span>
+        <span class="marquee-text">Ibmec BH · <span class="acc-r">IbBot</span> · <span
+            class="acc-b">IbTech</span></span>
+        <span class="marquee-sep">✦</span>
+      </div>
+      <div class="marquee-inner" aria-hidden="true">
+        <span class="marquee-text"><span class="acc-r">Hardware</span> que obedece.</span>
+        <span class="marquee-sep">✦</span>
+        <span class="marquee-text"><span class="acc-b">Software</span> que escala.</span>
+        <span class="marquee-sep">✦</span>
+        <span class="marquee-text">Enquanto outros estudam, nós construímos.</span>
+        <span class="marquee-sep">✦</span>
+        <span class="marquee-text">Ibmec BH · <span class="acc-r">IbBot</span> · <span
+            class="acc-b">IbTech</span></span>
+        <span class="marquee-sep">✦</span>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MANIFESTO -->
-<div class="manifesto-section">
-  <div class="marquee-track">
-    <div class="marquee-inner">
-      <span class="marquee-text"><span class="acc-r">Hardware</span> que obedece.</span>
-      <span class="marquee-sep">✦</span>
-      <span class="marquee-text"><span class="acc-b">Software</span> que escala.</span>
-      <span class="marquee-sep">✦</span>
-      <span class="marquee-text">Enquanto outros estudam, nós construímos.</span>
-      <span class="marquee-sep">✦</span>
-      <span class="marquee-text">Ibmec BH · <span class="acc-r">IbBot</span> · <span class="acc-b">IbTech</span></span>
-      <span class="marquee-sep">✦</span>
-    </div>
-    <div class="marquee-inner" aria-hidden="true">
-      <span class="marquee-text"><span class="acc-r">Hardware</span> que obedece.</span>
-      <span class="marquee-sep">✦</span>
-      <span class="marquee-text"><span class="acc-b">Software</span> que escala.</span>
-      <span class="marquee-sep">✦</span>
-      <span class="marquee-text">Enquanto outros estudam, nós construímos.</span>
-      <span class="marquee-sep">✦</span>
-      <span class="marquee-text">Ibmec BH · <span class="acc-r">IbBot</span> · <span class="acc-b">IbTech</span></span>
-      <span class="marquee-sep">✦</span>
-    </div>
+  <!-- DIRETORIA -->
+  <div class="section" id="diretoria">
+    <div class="section-kicker"><span class="kicker-line b"></span> Diretoria 2026.1</div>
+    <h2 class="section-title">QUEM CONSTRÓI<br>AS LIGAS.</h2>
+    <p class="section-body">Nove diretores, cada um responsável por uma frente das ligas. Clique em qualquer card pra
+      conhecer melhor.</p>
+    <div class="dir-wrap" id="dir-wrap"></div>
   </div>
-</div>
 
-<!-- DIRETORIA -->
-<div class="section" id="diretoria">
-  <div class="section-kicker"><span class="kicker-line b"></span> Diretoria 2026.1</div>
-  <h2 class="section-title">QUEM CONSTRÓI<br>AS LIGAS.</h2>
-  <p class="section-body">Nove diretores, cada um responsável por uma frente das ligas. Clique em qualquer card pra conhecer melhor.</p>
-  <div class="dir-wrap" id="dir-wrap"></div>
-</div>
-
-<!-- MODAL DIRETOR -->
-<div class="dir-modal" id="dir-modal" onclick="if(event.target===this)closeModal()">
-  <div class="dir-modal-box">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-top">
-      <div class="modal-av" id="modal-av"></div>
-      <div>
-        <div class="modal-name" id="modal-name"></div>
-        <div class="modal-role" id="modal-role"></div>
-        <div class="modal-liga" id="modal-liga"></div>
+  <!-- MODAL DIRETOR -->
+  <div class="dir-modal" id="dir-modal" onclick="if(event.target===this)closeModal()">
+    <div class="dir-modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-top">
+        <div class="modal-av" id="modal-av"></div>
+        <div>
+          <div class="modal-name" id="modal-name"></div>
+          <div class="modal-role" id="modal-role"></div>
+          <div class="modal-liga" id="modal-liga"></div>
+        </div>
       </div>
+      <p class="modal-bio" id="modal-bio"></p>
+      <div class="modal-links" id="modal-links"></div>
     </div>
-    <p class="modal-bio" id="modal-bio"></p>
-    <div class="modal-links" id="modal-links"></div>
   </div>
-</div>
 
-<!-- CTA FINAL -->
-<div class="cta-section">
-  <div>
-    <h2>FAZ PARTE DA<br><span style="color:var(--text)">IBMEC</span> BH?</h2>
-    <p>O processo seletivo acontece todo semestre. Venha construir com a gente.</p>
+  <!-- CTA FINAL -->
+  <div class="cta-section">
+    <div>
+      <h2>FAZ PARTE DA<br><span style="color:var(--text)">IBMEC</span> BH?</h2>
+      <p>Processo seletivo previsto para agosto de 2026. Entre para a lista e seja avisado.</p>
+    </div>
+    <div class="cta-pair">
+      <a class="cta-r" href="/processo-seletivo" style="font-size:13px;padding:14px 32px">Entrar na IbBot →</a>
+      <a class="cta-b" href="/processo-seletivo" style="font-size:13px;padding:14px 32px">Entrar na IbTech →</a>
+    </div>
   </div>
-  <div class="cta-pair">
-    <a class="cta-r" href="/processo-seletivo" style="font-size:13px;padding:14px 32px">Entrar na IbBot →</a>
-    <a class="cta-b" href="/processo-seletivo" style="font-size:13px;padding:14px 32px">Entrar na IbTech →</a>
-  </div>
-</div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-l">
-    <span style="color:var(--text)">Ib</span><span style="color:var(--red)">Bot</span>
-    <span style="color:rgba(255,255,255,.1);margin:0 .3em">/</span>
-    <span style="color:var(--text)">Ib</span><span style="color:var(--blue)">Tech</span>
-    <span style="color:var(--muted);margin-left:.75rem">— Ibmec BH © 2026</span>
-  </div>
-  <div class="footer-r">
-    <a href="https://instagram.com/ibbotbh" target="_blank">@ibbotbh</a>
-    <a href="https://instagram.com/ibtechbh" target="_blank">@ibtechbh</a>
-    <a href="/membros/login">Área de Membros</a>
-  </div>
-</footer>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-l">
+      <span style="color:var(--text)">Ib</span><span style="color:var(--red)">Bot</span>
+      <span style="color:rgba(255,255,255,.1);margin:0 .3em">/</span>
+      <span style="color:var(--text)">Ib</span><span style="color:var(--blue)">Tech</span>
+      <span style="color:var(--muted);margin-left:.75rem">— Ibmec BH © 2026</span>
+    </div>
+    <div class="footer-r">
+      <a href="https://instagram.com/ibbotbh" target="_blank">@ibbotbh</a>
+      <a href="https://instagram.com/ibtechbh" target="_blank">@ibtechbh</a>
+      <a href="/membros/login">Área de Membros</a>
+    </div>
+  </footer>
 
-<script type="module" src="/assets/js/pages/home.js"></script>
+  <script type="module" src="/assets/js/pages/home.js"></script>
 
-<div class="cursor" id="cursor"></div>
-<script>
-(function(){
-  const c = document.getElementById('cursor');
-  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
-  document.addEventListener('mousemove', e => {
-    c.style.left = e.clientX + 'px';
-    c.style.top  = e.clientY + 'px';
-  });
-  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
-  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
-  document.querySelectorAll('a, button, [onclick], label, .dir-card, .faq-item').forEach(el => {
-    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
-    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
-  });
-  document.querySelectorAll('.cta-b, .split-card.b, .nav-links a[href*="ibtech"]').forEach(el => {
-    el.addEventListener('mouseenter', () => c.classList.add('is-blue'));
-    el.addEventListener('mouseleave', () => c.classList.remove('is-blue'));
-  });
-  const reveals = document.querySelectorAll('.section-kicker, .section-title, .section-body');
-  reveals.forEach(el => el.classList.add('reveal'));
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
-  }, { threshold: 0.15 });
-  reveals.forEach(el => io.observe(el));
-})();
-</script>
+  <div class="cursor" id="cursor"></div>
+  <script>
+    (function () {
+      const c = document.getElementById('cursor');
+      if (!c || window.matchMedia('(pointer: coarse)').matches) return;
+      document.addEventListener('mousemove', e => {
+        c.style.left = e.clientX + 'px';
+        c.style.top = e.clientY + 'px';
+      });
+      document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
+      document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
+      document.querySelectorAll('a, button, [onclick], label, .dir-card, .faq-item').forEach(el => {
+        el.addEventListener('mouseenter', () => c.classList.add('is-link'));
+        el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
+      });
+      document.querySelectorAll('.cta-b, .split-card.b, .nav-links a[href*="ibtech"]').forEach(el => {
+        el.addEventListener('mouseenter', () => c.classList.add('is-blue'));
+        el.addEventListener('mouseleave', () => c.classList.remove('is-blue'));
+      });
+      const reveals = document.querySelectorAll('.section-kicker, .section-title, .section-body');
+      reveals.forEach(el => el.classList.add('reveal'));
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+      }, { threshold: 0.15 });
+      reveals.forEach(el => io.observe(el));
+    })();
+  </script>
 </body>
+
 </html>
