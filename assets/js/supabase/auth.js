@@ -16,13 +16,13 @@ export async function emailAutorizado(email) {
 
 export async function emailTemConta(email) {
   const { data, error } = await supabase
-    .from('usuarios')
-    .select('id')
+    .from('emails_autorizados')
+    .select('tem_conta')
     .eq('email', email.trim().toLowerCase())
     .single();
 
   if (error || !data) return false;
-  return true;
+  return data.tem_conta === true;
 }
 
 export async function criarConta(email, senha) {
@@ -49,6 +49,12 @@ export async function criarConta(email, senha) {
       role: 'membro',
       liga_id: null
     });
+
+  // 4. Marca que essa pessoa já criou a conta
+  await supabase
+    .from('emails_autorizados')
+    .update({ tem_conta: true })
+    .eq('email', email.trim().toLowerCase());
 
   return login;
 }
