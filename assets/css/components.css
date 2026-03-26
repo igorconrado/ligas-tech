@@ -530,6 +530,13 @@ footer {
 .aula-num { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .375rem; }
 .aula-meta { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
 
+@media (max-width: 768px) {
+  nav { padding: 0 1.25rem; }
+  .nav-links { display: none; }
+  .nav-tag { display: none; }
+  .section { padding: 3.5rem 1.25rem; }
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(20px);

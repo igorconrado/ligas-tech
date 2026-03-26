@@ -58,15 +58,16 @@ body {
 /* Error number */
 .error-num {
   font-family: var(--font-display);
-  font-size: clamp(120px, 20vw, 200px);
-  line-height: .85;
-  letter-spacing: .02em;
+  font-size: clamp(140px, 28vw, 300px);
+  line-height: .82;
+  letter-spacing: -.03em;
+  background: linear-gradient(135deg, var(--red) 0%, rgba(255,31,31,.3) 40%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: .5rem;
+  display: block;
 }
-
-.error-num .r { color: var(--red); text-shadow: 0 0 40px rgba(255,31,31,0.3); }
-.error-num .b { color: var(--blue); text-shadow: 0 0 40px rgba(15,111,255,0.3); }
-.error-num .w { color: rgba(255,255,255,.15); }
 
 /* Error text */
 .error-title {

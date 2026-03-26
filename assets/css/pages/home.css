@@ -521,3 +521,19 @@
 .modal-link.r:hover { background: rgba(255,31,31,.08); }
 .modal-link.b { border-color: rgba(15,111,255,.25); color: rgba(100,160,255,.8); }
 .modal-link.b:hover { background: rgba(15,111,255,.08); }
+
+#diretoria { padding-top: 5rem; }
+
+@media (max-width: 768px) {
+  .hero-inner { padding: 0 1.25rem 3rem; }
+  .hero-bottom { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero-ctas { justify-content: flex-start; }
+  .ticker { grid-template-columns: repeat(3, 1fr); }
+  .tick-item:nth-child(4),
+  .tick-item:nth-child(5) { display: none; }
+  .split-grid { grid-template-columns: 1fr; margin: 0 -1.25rem; }
+  .dir-wrap { grid-template-columns: repeat(2, 1fr); }
+  .dir-card:nth-child(n) { grid-column: span 1; }
+  .cta-section { grid-template-columns: 1fr; gap: 2rem; }
+  .cta-pair { align-items: flex-start; }
+}
