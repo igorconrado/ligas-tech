@@ -86,3 +86,18 @@ export async function requireAuth() {
   }
   return session;
 }
+
+export async function getDashboardUrl() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return '/membros/login';
+
+  const { data } = await supabase
+    .from('usuarios')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  return data?.role === 'diretoria'
+    ? '/membros/dashboard-diretoria'
+    : '/membros/dashboard';
+}
