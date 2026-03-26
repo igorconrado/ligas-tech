@@ -1,52 +1,487 @@
 // ── Dashboard Membro page ──
 import { formatDate } from '/assets/js/global.js';
+import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
+import { getMeuPerfil, completarOnboarding, atualizarPerfil } from '/assets/js/supabase/membros.js';
+import { getAulasComEntregas, submeterEntrega } from '/assets/js/supabase/aulas.js';
+import { getMinhasPresencas, registrarPresenca, calcularAlertaFrequencia } from '/assets/js/supabase/presenca.js';
+import { getAvisos } from '/assets/js/supabase/avisos.js';
 
-// Data atual
+// ── Auth guard ──
+const session = await requireAuth();
+if (!session) throw new Error('Não autenticado');
+
+// ── State ──
+let perfilAtual = null;
+let aulasAtuais = [];
+let currentStep = 0;
+
+// ── Data atual ──
 document.getElementById('topbar-date').textContent = formatDate();
 
-// Tabs
+// ── Tabs ──
 function showTab(name, el) {
   document.querySelectorAll('.tab-page').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(i => {
-    i.classList.remove('active', 'r', 'b');
-  });
-  if (el) {
-    el.classList.add('active', 'b');
-  }
+  document.getElementById('tab-' + name)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active', 'r', 'b'));
+  if (el) el.classList.add('active', 'b');
   const titles = { dashboard: 'Dashboard', aulas: 'Aulas', entregas: 'Entregas', presenca: 'Presença', cronograma: 'Cronograma', perfil: 'Perfil' };
   document.getElementById('topbar-title').textContent = titles[name] || name;
 }
 
-// Entrega
-function submitEntrega() {
-  const input = document.getElementById('repo-input');
-  const fb = document.getElementById('entrega-feedback');
-  const url = input.value.trim();
+// ── Helpers ──
+function fmtDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+}
+
+function ligaCor(perfil) {
+  const nome = perfil?.ligas?.nome?.toLowerCase() || '';
+  if (nome.includes('ibbot')) return 'r';
+  if (nome.includes('ibtech')) return 'b';
+  return 'w';
+}
+
+function el(id) { return document.getElementById(id); }
+
+// ── Atualizar header/sidebar com perfil ──
+function atualizarHeaderMembro(perfil) {
+  const nome = perfil.nome || 'Membro';
+  const inicial = nome[0]?.toUpperCase() || 'M';
+  const ligaNome = perfil.ligas?.nome || '';
+  const cor = ligaCor(perfil);
+
+  el('sidebar-name').textContent = nome;
+  el('sidebar-role').textContent = `Membro · ${ligaNome}`;
+  el('sidebar-av').textContent = inicial;
+
+  el('topbar-liga').textContent = ligaNome;
+  el('topbar-liga').className = `topbar-liga ${cor}`;
+
+  el('perfil-name-display').textContent = nome;
+  el('perfil-av-text').textContent = inicial;
+  el('p-nome').value = nome;
+  el('p-linkedin').value = perfil.linkedin || '';
+  el('p-github').value = perfil.github || '';
+  el('p-bio').value = perfil.bio || '';
+
+  const emailField = el('perfil-email');
+  if (emailField) emailField.value = session.user.email;
+
+  const badge = el('perfil-liga-badge');
+  if (badge) { badge.textContent = ligaNome; badge.className = `perfil-liga-badge ${cor}`; }
+}
+
+// ── Renderizar dashboard (métricas + resumos) ──
+function renderizarDashboard(perfil, presencas, aulas) {
+  const presentes = presencas.filter(p => p.status === 'presente').length;
+  const totalEncontros = presencas.length;
+  const pctPresenca = totalEncontros > 0 ? Math.round((presentes / totalEncontros) * 100) : 0;
+
+  const aulasComPrazo = aulas.filter(a => a.prazo_entrega);
+  const entregues = aulas.filter(a => a.entrega).length;
+  const totalEntregas = aulasComPrazo.length;
+  const pctEntregas = totalEntregas > 0 ? Math.round((entregues / totalEntregas) * 100) : 0;
+  const pendentes = totalEntregas - entregues;
+
+  const now = new Date();
+  const aulasPassadas = aulas.filter(a => new Date(a.data) < now);
+  const pctAulas = aulas.length > 0 ? Math.round((aulasPassadas.length / aulas.length) * 100) : 0;
+  const proxima = aulas.find(a => new Date(a.data) >= now);
+
+  // Métricas
+  el('metric-presenca-val').textContent = `${pctPresenca}%`;
+  el('metric-presenca-val').className = `metric-val ${pctPresenca >= 75 ? 'g' : 'a'}`;
+  el('metric-presenca-sub').textContent = `${presentes} de ${totalEncontros} encontros`;
+
+  el('metric-entregas-val').textContent = `${entregues} / ${totalEntregas}`;
+  el('metric-entregas-val').className = `metric-val ${pendentes === 0 ? 'g' : 'b'}`;
+  el('metric-entregas-sub').textContent = pendentes > 0 ? `${pendentes} pendente${pendentes > 1 ? 's' : ''}` : 'Tudo em dia';
+
+  if (proxima) {
+    const dia = new Date(proxima.data).toLocaleDateString('pt-BR', { weekday: 'long' });
+    el('metric-proximo-val').textContent = dia.charAt(0).toUpperCase() + dia.slice(1);
+    el('metric-proximo-sub').textContent = `${fmtDate(proxima.data)} · Aula ${String(proxima.numero).padStart(2, '0')}`;
+  } else {
+    el('metric-proximo-val').textContent = '—';
+    el('metric-proximo-sub').textContent = 'Nenhuma agendada';
+  }
+
+  // Semestre
+  const month = now.getMonth() + 1;
+  el('metric-semestre-val').textContent = `${now.getFullYear()}.${month <= 6 ? 1 : 2}`;
+
+  // Próximas aulas
+  const proximas = aulas.filter(a => new Date(a.data) >= now).slice(0, 3);
+  el('tbody-proximas-aulas').innerHTML = proximas.length
+    ? proximas.map((a, i) => `<tr>
+        <td>Aula ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
+        <td style="color:var(--mid)">${fmtDate(a.data)}</td>
+        <td><span class="pill ${i === 0 ? 'next' : 'planned'}">${i === 0 ? 'Próxima' : 'Planejada'}</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="3" style="color:var(--muted);text-align:center">Nenhuma aula próxima</td></tr>';
+
+  // Entregas resumo
+  const entregasRecentes = aulasComPrazo.slice(-3);
+  el('tbody-dash-entregas').innerHTML = entregasRecentes.length
+    ? entregasRecentes.map(a => {
+        let pill, label;
+        if (a.statusEntrega === 'entregue') { pill = 'ok'; label = 'Entregue'; }
+        else if (a.statusEntrega === 'atrasada') { pill = 'late'; label = 'Atrasada'; }
+        else { pill = 'planned'; label = 'Pendente'; }
+        return `<tr>
+          <td>Aula ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
+          <td style="color:${a.statusEntrega === 'atrasada' ? 'rgba(255,120,120,.7)' : 'var(--mid)'}">${fmtDate(a.prazo_entrega)}</td>
+          <td><span class="pill ${pill}">${label}</span></td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="3" style="color:var(--muted);text-align:center">Nenhuma entrega</td></tr>';
+
+  // Barras de progresso
+  el('prog-presenca-pct').textContent = `${pctPresenca}%`;
+  el('prog-presenca-fill').style.width = `${pctPresenca}%`;
+  el('prog-entregas-pct').textContent = `${pctEntregas}%`;
+  el('prog-entregas-fill').style.width = `${pctEntregas}%`;
+  el('prog-aulas-pct').textContent = `${pctAulas}%`;
+  el('prog-aulas-fill').style.width = `${pctAulas}%`;
+
+  // Perfil stats
+  const sp = el('perfil-stat-presenca');
+  const se = el('perfil-stat-entregas');
+  if (sp) sp.textContent = `${pctPresenca}%`;
+  if (se) se.textContent = `${entregues}/${totalEntregas}`;
+}
+
+// ── Renderizar aulas (tab) ──
+function renderizarAulas(aulas) {
+  const grid = el('aulas-grid');
+  if (!grid) return;
+
+  const now = new Date();
+  const ligaNome = perfilAtual?.ligas?.nome || '';
+  const ht = el('aulas-header-title');
+  const hs = el('aulas-header-sub');
+  if (ht) ht.textContent = `Aulas — ${ligaNome}`;
+  if (hs) hs.textContent = `Semestre ${now.getFullYear()}.${now.getMonth() < 6 ? 1 : 2} · ${aulas.length} aulas planejadas`;
+
+  const futuras = aulas.filter(a => new Date(a.data) >= now);
+
+  grid.innerHTML = aulas.map(a => {
+    const data = new Date(a.data);
+    const passada = data < now;
+    const isProxima = futuras[0]?.id === a.id;
+
+    let pillClass, pillLabel;
+    if (passada) { pillClass = 'ok'; pillLabel = 'Concluída'; }
+    else if (isProxima) { pillClass = 'next'; pillLabel = `Próxima · ${fmtDate(a.data)}`; }
+    else { pillClass = 'planned'; pillLabel = 'Planejada'; }
+
+    const links = (a.link_slides || a.link_material) ? `<div class="aula-links">
+      ${a.link_slides ? `<a class="aula-link" href="${a.link_slides}" target="_blank">Slides</a>` : ''}
+      ${a.link_material ? `<a class="aula-link" href="${a.link_material}" target="_blank">Material</a>` : ''}
+    </div>` : '';
+
+    return `<div class="aula-card${isProxima ? ' next-class' : ''}">
+      <div class="aula-num">Aula ${String(a.numero).padStart(2, '0')}</div>
+      <div class="aula-title">${a.titulo}</div>
+      <div class="aula-meta">
+        <span class="pill ${pillClass}">${pillLabel}</span>
+        ${links}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Renderizar entregas (tab) ──
+function renderizarEntregas(aulas) {
+  const tbody = el('tbody-entregas');
+  const box = el('entrega-box');
+  if (!tbody) return;
+
+  const aulasComPrazo = aulas.filter(a => a.prazo_entrega);
+
+  tbody.innerHTML = aulasComPrazo.length
+    ? aulasComPrazo.map(a => {
+        let pillClass, pillLabel;
+        if (a.statusEntrega === 'entregue') { pillClass = 'ok'; pillLabel = 'Entregue'; }
+        else if (a.statusEntrega === 'atrasada') { pillClass = 'late'; pillLabel = 'Atrasada'; }
+        else { pillClass = 'planned'; pillLabel = 'Pendente'; }
+
+        const repo = a.entrega?.repo_url
+          ? `<a href="${a.entrega.repo_url}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:11px;text-decoration:none">${a.entrega.repo_url.replace('https://github.com/', '')} ↗</a>`
+          : '<span style="color:var(--muted);font-size:11px">—</span>';
+
+        return `<tr>
+          <td style="font-weight:500">Aula ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
+          <td style="color:${a.statusEntrega === 'atrasada' ? 'rgba(255,120,120,.7)' : 'var(--mid)'}">${fmtDate(a.prazo_entrega)}</td>
+          <td>${repo}</td>
+          <td><span class="pill ${pillClass}">${pillLabel}</span></td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="4" style="color:var(--muted);text-align:center">Nenhuma entrega disponível</td></tr>';
+
+  // Form de entrega — mostra pra primeira aula pendente
+  const pendente = aulasComPrazo.find(a => a.statusEntrega !== 'entregue');
+  if (box && pendente) {
+    box.style.display = '';
+    el('entrega-title').textContent = `Enviar entrega — Aula ${String(pendente.numero).padStart(2, '0')}`;
+    box.dataset.aulaId = pendente.id;
+    el('repo-input').disabled = false;
+    el('repo-input').value = '';
+    const btn = box.querySelector('.entrega-submit');
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.textContent = 'Enviar →'; }
+    el('entrega-feedback').style.display = 'none';
+  } else if (box) {
+    box.style.display = 'none';
+  }
+}
+
+// ── Renderizar presença (tab) ──
+function renderizarPresencas(presencas, alerta) {
+  const timeline = el('presenca-timeline');
+  if (!timeline) return;
+
+  const presentes = presencas.filter(p => p.status === 'presente').length;
+  const total = presencas.length;
+  const pct = total > 0 ? Math.round((presentes / total) * 100) : 0;
+
+  const hs = el('presenca-header-sub');
+  if (hs) hs.textContent = `${pct}% de presença · ${presentes} de ${total} encontros`;
+
+  const pctEl = el('presenca-percent');
+  if (pctEl) pctEl.textContent = `${pct}%`;
+
+  const labelEl = el('presenca-percent-label');
+  if (labelEl) {
+    if (alerta.status === 'risco') labelEl.textContent = 'Em risco';
+    else if (alerta.status === 'atencao') labelEl.textContent = 'Atenção';
+    else labelEl.textContent = 'Regular';
+  }
+
+  const box = el('presenca-percent-box');
+  if (box && pctEl) {
+    const colors = {
+      risco:   { bg: 'rgba(255,120,120,.08)', border: 'rgba(255,120,120,.2)', text: 'rgba(255,120,120,.8)' },
+      atencao: { bg: 'rgba(251,191,36,.08)',  border: 'rgba(251,191,36,.2)',  text: 'var(--amber)' },
+      ok:      { bg: 'rgba(34,197,94,.08)',   border: 'rgba(34,197,94,.2)',   text: 'var(--green)' },
+    };
+    const c = colors[alerta.status] || colors.ok;
+    box.style.background = c.bg;
+    box.style.borderColor = c.border;
+    pctEl.style.color = c.text;
+  }
+
+  const sorted = [...presencas].sort((a, b) =>
+    new Date(a.encontros?.data || 0) - new Date(b.encontros?.data || 0)
+  );
+
+  timeline.innerHTML = sorted.length
+    ? sorted.map(p => {
+        const ok = p.status === 'presente';
+        return `<div class="presenca-item">
+          <div class="presenca-check ${ok ? 'ok' : 'no'}">${ok ? '✓' : '✕'}</div>
+          <div class="presenca-date">${fmtDate(p.encontros?.data)}</div>
+          <div class="presenca-desc">${p.encontros?.titulo || '—'}</div>
+          <span class="pill ${ok ? 'ok' : 'late'}" style="margin-left:auto">${ok ? 'Presente' : 'Ausente'}</span>
+        </div>`;
+      }).join('')
+    : '<div style="color:var(--muted);text-align:center;padding:2rem 0">Nenhum registro de presença</div>';
+}
+
+// ── Renderizar avisos ──
+function renderizarAvisos(avisos) {
+  // Placeholder — avisos podem ser exibidos futuramente no dashboard
+}
+
+// ── Onboarding ──
+const onboardingSteps = [
+  { kicker: 'Passo 1 de 3', title: 'BEM-VINDO.', sub: 'Esse é o portal das ligas. Aqui você acompanha suas aulas, entregas e presença. Vamos configurar seu perfil em 3 passos rápidos.', content: '', next: 'Começar →' },
+  { kicker: 'Passo 2 de 3', title: 'SEU NOME.', sub: 'Como você quer que apareça no portal?', content: 'nome', next: 'Continuar →' },
+  { kicker: 'Passo 3 de 3', title: 'SEUS LINKS.', sub: 'LinkedIn e GitHub são opcionais, mas aparecem pro time.', content: 'links', next: 'Entrar no portal →' },
+];
+
+function renderStep(i) {
+  const s = onboardingSteps[i];
+  document.querySelectorAll('.ob-step').forEach((step, idx) => {
+    step.classList.remove('done', 'active');
+    if (idx < i) step.classList.add('done');
+    if (idx === i) step.classList.add('active');
+  });
+
+  let contentHtml = '';
+  if (s.content === 'nome') {
+    contentHtml = '<input class="ob-input" id="ob-nome" placeholder="Seu nome completo">';
+  } else if (s.content === 'links') {
+    contentHtml = `
+      <input class="ob-input" id="ob-linkedin" placeholder="linkedin.com/in/usuario (opcional)" type="url">
+      <input class="ob-input" id="ob-github" placeholder="github.com/usuario (opcional)" type="url">`;
+  }
+
+  el('ob-content').innerHTML = `
+    <div class="ob-slide">
+      <div class="ob-kicker">${s.kicker}</div>
+      <div class="ob-title">${s.title}</div>
+      <div class="ob-sub">${s.sub}</div>
+      ${contentHtml ? `<div class="ob-content">${contentHtml}</div>` : ''}
+      <div id="ob-error" style="display:none;color:rgba(255,120,120,.8);font-size:12px;margin-bottom:.75rem"></div>
+      <div class="ob-actions">
+        <button class="ob-skip" onclick="skipOnboarding()">Pular</button>
+        <button class="ob-next" onclick="nextStep()">${s.next}</button>
+      </div>
+    </div>`;
+}
+
+function nextStep() {
+  if (currentStep === onboardingSteps.length - 1) { salvarOnboarding(); return; }
+  currentStep++;
+  renderStep(currentStep);
+}
+
+function mostrarOnboarding() {
+  el('onboarding').style.display = '';
+  currentStep = 0;
+  renderStep(0);
+}
+
+function fecharOnboarding() {
+  el('onboarding').style.display = 'none';
+}
+
+function mostrarErroOnboarding(msg) {
+  const err = el('ob-error');
+  if (err) { err.textContent = msg; err.style.display = 'block'; }
+}
+
+async function salvarOnboarding() {
+  const nome = el('ob-nome')?.value?.trim();
+  if (!nome) return mostrarErroOnboarding('Digite seu nome completo.');
+
+  try {
+    await completarOnboarding({
+      nome,
+      linkedin: el('ob-linkedin')?.value?.trim() || null,
+      github: el('ob-github')?.value?.trim() || null,
+    });
+    fecharOnboarding();
+    inicializar();
+  } catch (e) {
+    mostrarErroOnboarding('Erro ao salvar. Tente novamente.');
+  }
+}
+
+async function skipOnboarding() {
+  try {
+    await completarOnboarding({ nome: session.user.email.split('@')[0] });
+    fecharOnboarding();
+    inicializar();
+  } catch (e) {
+    fecharOnboarding();
+  }
+}
+
+// ── Handlers ──
+
+async function handleSubmeterEntrega() {
+  const input = el('repo-input');
+  const fb = el('entrega-feedback');
+  const box = el('entrega-box');
+  const url = input?.value?.trim();
+  const aulaId = box?.dataset.aulaId;
+
   if (!url || !url.includes('github.com')) {
     fb.style.display = 'block';
     fb.style.color = 'rgba(255,120,120,.8)';
     fb.textContent = 'Link inválido. Use um repositório público do GitHub.';
     return;
   }
-  fb.style.display = 'block';
-  fb.style.color = '#4ade80';
-  fb.textContent = '✓ Entrega registrada. A diretoria foi notificada.';
-  input.disabled = true;
-  document.querySelector('.entrega-submit').disabled = true;
-  document.querySelector('.entrega-submit').style.opacity = '.4';
+
+  const btn = box.querySelector('.entrega-submit');
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    await submeterEntrega(aulaId, url);
+
+    fb.style.display = 'block';
+    fb.style.color = '#4ade80';
+    fb.textContent = '✓ Entrega registrada. A diretoria foi notificada.';
+    input.disabled = true;
+    btn.style.opacity = '.4';
+
+    aulasAtuais = await getAulasComEntregas();
+    renderizarEntregas(aulasAtuais);
+    const presencas = await getMinhasPresencas();
+    renderizarDashboard(perfilAtual, presencas, aulasAtuais);
+  } catch (e) {
+    fb.style.display = 'block';
+    fb.style.color = 'rgba(255,120,120,.8)';
+    fb.textContent = e.message || 'Erro ao enviar entrega.';
+    btn.disabled = false;
+    btn.textContent = 'Enviar →';
+  }
 }
 
-// Salvar perfil
-function savePerfil() {
-  const nome = document.getElementById('p-nome').value;
-  document.getElementById('perfil-name-display').textContent = nome;
-  document.getElementById('sidebar-name').textContent = nome;
-  document.getElementById('perfil-av-text').textContent = nome[0];
-  document.getElementById('sidebar-av').textContent = nome[0];
+async function handleRegistrarPresenca() {
+  const input = el('presenca-codigo');
+  const fb = el('presenca-feedback');
+  const codigo = input?.value?.trim();
+
+  if (!codigo) {
+    fb.style.display = 'block';
+    fb.style.color = 'rgba(255,120,120,.8)';
+    fb.textContent = 'Digite o código de presença.';
+    return;
+  }
+
+  const btn = el('btn-presenca');
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Registrando...';
+
+    await registrarPresenca(codigo);
+
+    fb.style.display = 'block';
+    fb.style.color = '#4ade80';
+    fb.textContent = '✓ Presença registrada!';
+    input.value = '';
+    input.disabled = true;
+    btn.style.opacity = '.4';
+
+    const presencas = await getMinhasPresencas();
+    renderizarPresencas(presencas, calcularAlertaFrequencia(presencas, presencas.length));
+  } catch (e) {
+    fb.style.display = 'block';
+    fb.style.color = 'rgba(255,120,120,.8)';
+    fb.textContent = e.message || 'Erro ao registrar presença.';
+    btn.disabled = false;
+    btn.textContent = 'Registrar →';
+  }
 }
 
-// Foto
+async function savePerfil() {
+  const btn = document.querySelector('.form-save');
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    const updates = {
+      nome: el('p-nome').value.trim(),
+      linkedin: el('p-linkedin').value.trim() || null,
+      github: el('p-github').value.trim() || null,
+      bio: el('p-bio').value.trim() || null,
+    };
+
+    const perfil = await atualizarPerfil(updates);
+    perfilAtual = { ...perfilAtual, ...perfil };
+    atualizarHeaderMembro(perfilAtual);
+
+    btn.textContent = 'Salvo ✓';
+    setTimeout(() => { btn.textContent = 'Salvar →'; btn.disabled = false; }, 2000);
+  } catch (e) {
+    btn.textContent = 'Salvar →';
+    btn.disabled = false;
+  }
+}
+
 function handleFoto(input) {
   const file = input.files[0];
   if (!file) return;
@@ -54,94 +489,55 @@ function handleFoto(input) {
   reader.onload = e => {
     const src = e.target.result;
     document.querySelector('.perfil-av').innerHTML = `<img src="${src}" alt="foto">`;
-    document.getElementById('sidebar-av').innerHTML = `<img src="${src}" alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:3px">`;
+    el('sidebar-av').innerHTML = `<img src="${src}" alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:3px">`;
   };
   reader.readAsDataURL(file);
 }
 
-// ── ONBOARDING ──
-const steps = [
-  {
-    kicker: 'Passo 1 de 3',
-    title: 'BEM-VINDO.',
-    sub: 'Esse é o portal das ligas. Aqui você acompanha suas aulas, entregas e presença. Vamos configurar seu perfil em 3 passos rápidos.',
-    content: '',
-    next: 'Começar →'
-  },
-  {
-    kicker: 'Passo 2 de 3',
-    title: 'SEU NOME.',
-    sub: 'Como você quer que apareça no portal?',
-    content: 'nome',
-    next: 'Continuar →'
-  },
-  {
-    kicker: 'Passo 3 de 3',
-    title: 'SEUS LINKS.',
-    sub: 'LinkedIn e GitHub são opcionais, mas aparecem pro time.',
-    content: 'links',
-    next: 'Entrar no portal →'
+// ── Inicialização ──
+async function inicializar() {
+  try {
+    const perfil = await getMeuPerfil();
+
+    if (!perfil || !perfil.onboarding_completo) {
+      mostrarOnboarding();
+      return;
+    }
+
+    perfilAtual = perfil;
+    fecharOnboarding();
+    atualizarHeaderMembro(perfil);
+
+    const [presencas, aulas, avisos] = await Promise.all([
+      getMinhasPresencas(),
+      getAulasComEntregas(),
+      getAvisos(),
+    ]);
+
+    aulasAtuais = aulas;
+    const alerta = calcularAlertaFrequencia(presencas, presencas.length);
+
+    renderizarDashboard(perfil, presencas, aulas);
+    renderizarPresencas(presencas, alerta);
+    renderizarAulas(aulas);
+    renderizarEntregas(aulas);
+    renderizarAvisos(avisos);
+  } catch (e) {
+    console.error('Erro ao carregar dashboard:', e);
   }
-];
-
-let currentStep = 0;
-
-function renderStep(i) {
-  const s = steps[i];
-  const stepEls = document.querySelectorAll('.ob-step');
-  stepEls.forEach((el, idx) => {
-    el.classList.remove('done', 'active');
-    if (idx < i) el.classList.add('done');
-    if (idx === i) el.classList.add('active');
-  });
-
-  let contentHtml = '';
-  if (s.content === 'nome') {
-    contentHtml = `<input class="ob-input" id="ob-nome" placeholder="Seu nome completo">`;
-  } else if (s.content === 'links') {
-    contentHtml = `
-      <input class="ob-input" id="ob-linkedin" placeholder="linkedin.com/in/usuario (opcional)" type="url">
-      <input class="ob-input" id="ob-github" placeholder="github.com/usuario (opcional)" type="url">`;
-  }
-
-  document.getElementById('ob-content').innerHTML = `
-    <div class="ob-slide">
-      <div class="ob-kicker">${s.kicker}</div>
-      <div class="ob-title">${s.title}</div>
-      <div class="ob-sub">${s.sub}</div>
-      ${contentHtml ? `<div class="ob-content">${contentHtml}</div>` : ''}
-      <div class="ob-actions">
-        <button class="ob-skip" onclick="finishOnboarding()">Pular</button>
-        <button class="ob-next" onclick="nextStep()">${s.next}</button>
-      </div>
-    </div>`;
 }
 
-function nextStep() {
-  if (currentStep === steps.length - 1) { finishOnboarding(); return; }
-  currentStep++;
-  renderStep(currentStep);
-}
+inicializar();
 
-function finishOnboarding() {
-  const nome = document.getElementById('ob-nome')?.value || 'Membro';
-  document.getElementById('sidebar-name').textContent = nome;
-  document.getElementById('perfil-name-display').textContent = nome;
-  document.getElementById('sidebar-av').textContent = nome[0];
-  document.getElementById('perfil-av-text').textContent = nome[0];
-  document.getElementById('p-nome').value = nome;
-  document.getElementById('onboarding').style.display = 'none';
-}
+// ── Logout ──
+el('btn-logout')?.addEventListener('click', fazerLogout);
 
-// Checa se é primeiro acesso — substituir por lógica Supabase
-const isFirstAccess = true;
-if (isFirstAccess) renderStep(0);
-else document.getElementById('onboarding').style.display = 'none';
-
-// Expõe pro onclick inline
+// ── Expose to inline onclick ──
 window.showTab = showTab;
-window.submitEntrega = submitEntrega;
+window.submitEntrega = handleSubmeterEntrega;
 window.savePerfil = savePerfil;
 window.handleFoto = handleFoto;
 window.nextStep = nextStep;
-window.finishOnboarding = finishOnboarding;
+window.finishOnboarding = salvarOnboarding;
+window.skipOnboarding = skipOnboarding;
+window.registrarPresencaCodigo = handleRegistrarPresenca;
