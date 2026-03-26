@@ -162,5 +162,23 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter') window.handleEntrar();
 });
 </script>
+
+<div class="cursor" id="cursor"></div>
+<script>
+(function(){
+  const c = document.getElementById('cursor');
+  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
+  document.addEventListener('mousemove', e => {
+    c.style.left = e.clientX + 'px';
+    c.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
+  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
+  document.querySelectorAll('a, button, input, label, [onclick]').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
+  });
+})();
+</script>
 </body>
 </html>
