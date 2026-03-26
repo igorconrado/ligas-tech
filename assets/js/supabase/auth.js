@@ -140,7 +140,8 @@ export async function getDashboardUrl() {
     .eq('id', user.id)
     .maybeSingle();
 
-  return data?.role === 'diretoria'
+  const ROLES_DIRETORIA = ['diretoria', 'presidente', 'vp', 'ops', 'rh', 'diretor', 'coordenador'];
+  return ROLES_DIRETORIA.includes(data?.role)
     ? '/membros/dashboard-diretoria'
     : '/membros/dashboard';
 }

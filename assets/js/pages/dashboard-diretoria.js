@@ -12,6 +12,20 @@ import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, e
 const session = await requireAuth();
 if (!session) throw new Error('Não autenticado');
 
+// ── Role guard — membro vai para dashboard de membro ──
+import { supabase } from '/assets/js/supabase/client.js';
+const { data: usuario } = await supabase
+  .from('usuarios')
+  .select('role')
+  .eq('id', session.user.id)
+  .maybeSingle();
+
+const ROLES_DIRETORIA = ['diretoria', 'presidente', 'vp', 'ops', 'rh', 'diretor', 'coordenador'];
+if (!usuario || !ROLES_DIRETORIA.includes(usuario.role)) {
+  window.location.href = '/membros/dashboard';
+  throw new Error('Redirecionando');
+}
+
 const perfil = await getMeuPerfil();
 const ligaId = perfil?.liga_id;
 
