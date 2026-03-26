@@ -1,112 +1,103 @@
 // ── Autenticação ──
-// Todas as funções de login, logout, sessão e onboarding.
+// Funções de login, logout, sessão e verificação de acesso.
 //
 // Tabelas envolvidas:
 //   - auth.users (Supabase Auth nativo)
-//   - perfis (tabela custom): id, user_id, nome, email, liga_id, role, linkedin,
-//     github, bio, foto_url, onboarding_completo, semestre_entrada, created_at
+//   - emails_autorizados: email, nome, matricula
+//   - usuarios: id, email, role, liga_id
 //
-// Roles possíveis: 'membro' | 'coordenador' | 'diretor' | 'presidente'
-// O role fica na tabela perfis (não no user_metadata) pra facilitar queries.
-//
-// RLS (Row Level Security):
-//   - Qualquer usuário autenticado lê seu próprio perfil
-//   - Diretoria (role in ['diretor','presidente']) lê todos os perfis
-//   - Apenas o próprio usuário ou diretoria pode atualizar um perfil
+// Fluxo simplificado:
+//   1. Verifica se email é @alunos.ibmec.edu.br
+//   2. Verifica se email está em emails_autorizados
+//   3. Tenta signIn → se falhar, faz signUp + signIn
 
 import { supabase } from '/assets/js/supabase/client.js'
 
 /**
- * Faz login com email e senha.
- * Valida domínio @ibmec.edu.br ANTES de chamar o Supabase.
- *
- * @param {string} email — email institucional
- * @param {string} password — senha
- * @returns {Promise<{user, session, error}>}
- *
- * Fluxo:
- *   1. Validar email.endsWith('@ibmec.edu.br')
- *   2. supabase.auth.signInWithPassword({ email, password })
- *   3. Se sucesso, verificar isFirstAccess() pra decidir redirect
- *   4. Redirecionar: primeiro acesso → dashboard com onboarding
- *                    acesso normal → dashboard direto
- *
- * Erros esperados:
- *   - 'Invalid login credentials' → email ou senha incorretos
- *   - 'Email not confirmed' → usuário ainda não confirmou email
+ * Valida formato do email institucional.
+ * @param {string} email
+ * @returns {boolean}
  */
-export async function login(email, password) {
-  // TODO: implementar
+export function emailValido(email) {
+  return email.trim().toLowerCase().endsWith('@alunos.ibmec.edu.br')
+}
+
+/**
+ * Verifica se o email está na tabela emails_autorizados.
+ * @param {string} email
+ * @returns {Promise<{autorizado: boolean, nome: string|null}>}
+ */
+export async function emailAutorizado(email) {
+  const { data, error } = await supabase
+    .from('emails_autorizados')
+    .select('nome')
+    .eq('email', email.trim().toLowerCase())
+    .maybeSingle()
+
+  if (error) throw error
+  return { autorizado: !!data, nome: data?.nome ?? null }
+}
+
+/**
+ * Tenta login primeiro; se falhar por conta inexistente, cria e loga.
+ * @param {string} email
+ * @param {string} senha
+ * @returns {Promise<{action: 'login'|'signup', data: object}>}
+ */
+export async function entrarOuCriar(email, senha) {
+  const e = email.trim().toLowerCase()
+
+  // Tenta login primeiro
+  const { data: loginData, error: loginError } =
+    await supabase.auth.signInWithPassword({ email: e, password: senha })
+
+  if (!loginError) return { action: 'login', data: loginData }
+
+  // Se o erro for de credenciais inválidas, pode ser conta nova
+  if (loginError.message.includes('Invalid login credentials')) {
+    const { data: signupData, error: signupError } =
+      await supabase.auth.signUp({ email: e, password: senha })
+
+    if (signupError) throw signupError
+
+    // Após criar, loga automaticamente
+    const { data: finalLogin, error: finalError } =
+      await supabase.auth.signInWithPassword({ email: e, password: senha })
+
+    if (finalError) throw finalError
+    return { action: 'signup', data: finalLogin }
+  }
+
+  throw loginError
 }
 
 /**
  * Faz logout e redireciona pro login.
- *
- * Fluxo:
- *   1. supabase.auth.signOut()
- *   2. window.location.href = '/membros/login'
  */
-export async function logout() {
-  // TODO: implementar
+export async function fazerLogout() {
+  await supabase.auth.signOut()
+  window.location.href = '/membros/login'
 }
 
 /**
- * Retorna sessão atual do usuário.
- *
- * @returns {Promise<{session, error}>}
- *
- * Uso: chamar no início de páginas protegidas.
- * Se session === null, redirecionar pro login.
+ * Retorna a sessão atual ou null.
+ * @returns {Promise<object|null>}
  */
 export async function getSession() {
-  // TODO: implementar
-  // supabase.auth.getSession()
+  const { data: { session } } = await supabase.auth.getSession()
+  return session
 }
 
 /**
- * Retorna o role do usuário logado.
- *
- * @returns {Promise<string>} — 'membro' | 'coordenador' | 'diretor' | 'presidente'
- *
- * Fluxo:
- *   1. getSession() pra pegar user.id
- *   2. SELECT role FROM perfis WHERE user_id = ?
- *
- * Usado pra:
- *   - Decidir se mostra dashboard membro ou diretoria
- *   - Controlar acesso a funcionalidades restritas
+ * Redireciona pro login se não houver sessão ativa.
+ * Usar no topo de páginas protegidas.
+ * @returns {Promise<object>} session
  */
-export async function getUserRole() {
-  // TODO: implementar
-}
-
-/**
- * Verifica se é primeiro acesso (onboarding não concluído).
- *
- * @returns {Promise<boolean>}
- *
- * Fluxo:
- *   1. getSession() pra pegar user.id
- *   2. SELECT onboarding_completo FROM perfis WHERE user_id = ?
- *   3. Retorna !onboarding_completo
- */
-export async function isFirstAccess() {
-  // TODO: implementar
-}
-
-/**
- * Completa o onboarding — salva nome e links opcionais.
- *
- * @param {string} nome — nome completo do membro
- * @param {string} linkedin — URL do LinkedIn (opcional)
- * @param {string} github — URL do GitHub (opcional)
- * @returns {Promise<{data, error}>}
- *
- * Fluxo:
- *   1. getSession() pra pegar user.id
- *   2. UPDATE perfis SET nome, linkedin, github, onboarding_completo = true
- *      WHERE user_id = ?
- */
-export async function completeOnboarding(nome, linkedin, github) {
-  // TODO: implementar
+export async function requireAuth() {
+  const session = await getSession()
+  if (!session) {
+    window.location.href = '/membros/login'
+    throw new Error('Não autenticado')
+  }
+  return session
 }

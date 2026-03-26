@@ -111,6 +111,38 @@ body::before {
 .login-footer a { color: var(--mid); text-decoration: none; transition: color .2s; }
 .login-footer a:hover { color: var(--text); }
 
+/* Botão de login (variante) */
+.login-btn {
+  width: 100%; font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 13px; border-radius: 3px; border: none; cursor: pointer;
+  background: var(--text); color: var(--bg); transition: opacity .2s; margin-top: .5rem;
+}
+.login-btn:hover { opacity: .88; }
+.login-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Hint abaixo do input */
+.login-hint {
+  display: block;
+  font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+  margin-top: .25rem;
+}
+
+/* Loading state */
+.login-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 1rem; padding: 3rem 0;
+  color: var(--mid); font-size: 13px; font-weight: 300;
+}
+.login-spinner {
+  width: 28px; height: 28px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* Animação staggered */
 .login-box > * { animation: fadeUp .4s ease both; }
 .login-box > *:nth-child(1) { animation-delay: .05s; }
