@@ -15,14 +15,13 @@ export async function emailAutorizado(email) {
 }
 
 export async function emailTemConta(email) {
-  const { data, error } = await supabase
-    .from('emails_autorizados')
-    .select('tem_conta')
+  const { data } = await supabase
+    .from('usuarios')
+    .select('id')
     .eq('email', email.trim().toLowerCase())
-    .single();
+    .maybeSingle();
 
-  if (error || !data) return false;
-  return data.tem_conta === true;
+  return !!data;
 }
 
 export async function criarConta(email, senha) {
