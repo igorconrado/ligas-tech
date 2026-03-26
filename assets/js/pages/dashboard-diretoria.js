@@ -1,27 +1,29 @@
 // ── Dashboard Diretoria page ──
 import { formatDate } from '/assets/js/global.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
+import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
+import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
+import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
+import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro } from '/assets/js/supabase/presenca.js';
+import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
+import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
+
+// ── Auth ──
+const session = await requireAuth();
+if (!session) throw new Error('Não autenticado');
+
+const perfil = await getMeuPerfil();
+const ligaId = perfil?.liga_id;
 
 // Data
 document.getElementById('topbar-date').textContent = formatDate();
 
-// Dados mockados
-const members = [
-  { name: 'Ana Lima', liga: 'IbTech', presenca: 82, entregas: '1/2', status: 'warn', adv: 0 },
-  { name: 'Bruno Dias', liga: 'IbTech', presenca: 88, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'Carla Melo', liga: 'IbBot', presenca: 100, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'Diego Santos', liga: 'IbTech', presenca: 65, entregas: '1/2', status: 'warn', adv: 1 },
-  { name: 'Fernanda Alves', liga: 'IbTech', presenca: 94, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'Gustavo Lima', liga: 'IbBot', presenca: 100, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'Helena Costa', liga: 'IbTech', presenca: 82, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'João Pires', liga: 'IbTech', presenca: 47, entregas: '0/2', status: 'adv', adv: 1 },
-  { name: 'Lucas Viana', liga: 'IbTech', presenca: 76, entregas: '1/2', status: 'warn', adv: 0 },
-  { name: 'Maria Costa', liga: 'IbBot', presenca: 100, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'Pedro Ramos', liga: 'IbTech', presenca: 53, entregas: '0/2', status: 'adv', adv: 1 },
-  { name: 'Rafael Souza', liga: 'IbTech', presenca: 88, entregas: '2/2', status: 'ok', adv: 0 },
-  { name: 'Sara Nunes', liga: 'IbBot', presenca: 100, entregas: '2/2', status: 'ok', adv: 0 },
-];
+// ── State ──
+let members = [];
+let presenceMembers = [];
+let presentSet = new Set();
 
+// Aulas (hardcoded — pendente integração)
 const aulas = [
   { num: '01', title: 'Lógica, condicionais e loops em C', status: 'ok', entregas: '15/17', prazo: '13 mar' },
   { num: '02', title: 'HTML, CSS e JavaScript — Frontend', status: 'warn', entregas: '12/17', prazo: '17 mar' },
@@ -31,10 +33,22 @@ const aulas = [
   { num: '06', title: 'Banco de dados — SQL', status: 'planned', entregas: '—', prazo: '17 abr' },
 ];
 
+// Entregas (hardcoded — pendente integração)
+const entregasData = [
+  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/ana/ibtech-aula01', status: 'ok', data: '13 mar' },
+  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
+  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/bruno/ibtech-aula01', status: 'ok', data: '12 mar' },
+  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 02', repo: 'github.com/bruno/ibtech-aula02', status: 'ok', data: '16 mar' },
+  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 01', repo: '—', status: 'late', data: '—' },
+  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
+  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/diego/ibtech-aula01', status: 'ok', data: '14 mar' },
+  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
+];
+
 const statusMap = { ok: 'ok', warn: 'warn', adv: 'adv' };
 const statusLabel = { ok: 'Regular', warn: 'Atenção', adv: 'Advertência' };
 
-// Tabs
+// ── Tabs ──
 function showTab(name, el) {
   document.querySelectorAll('.tab-page').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
@@ -44,7 +58,27 @@ function showTab(name, el) {
   document.getElementById('topbar-title').textContent = titles[name] || name;
 }
 
-// Render overview table
+// ── Carregar membros do Supabase ──
+async function carregarMembros() {
+  try {
+    const membros = await getMembrosLiga();
+    members = membros.map(m => ({
+      name: m.nome,
+      liga: m.ligas?.nome || '—',
+      presenca: 0,
+      entregas: '—',
+      status: 'ok',
+      adv: 0,
+    }));
+    renderOverview(members);
+    renderMembros(members);
+    renderPresenca();
+  } catch (e) {
+    console.error('Erro ao carregar membros:', e);
+  }
+}
+
+// ── Render overview table ──
 function renderOverview(data) {
   const tbl = document.getElementById('overview-tbl');
   tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead>
@@ -59,7 +93,7 @@ function renderOverview(data) {
   </tr>`).join('')}</tbody>`;
 }
 
-// Render membros
+// ── Render membros ──
 function renderMembros(data) {
   const tbl = document.getElementById('membros-tbl');
   tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead>
@@ -77,7 +111,7 @@ function renderMembros(data) {
   </tr>`).join('')}</tbody>`;
 }
 
-// Filtros membros
+// ── Filtros membros ──
 let filterText = '', filterLigaVal = '';
 function filterMembers(v) { filterText = v.toLowerCase(); applyFilters(); }
 function filterLiga(v) { filterLigaVal = v; applyFilters(); }
@@ -89,7 +123,7 @@ function applyFilters() {
   renderMembros(filtered);
 }
 
-// Render aulas
+// ── Render aulas ──
 function renderAulas() {
   const grid = document.getElementById('aulas-dir-grid');
   const statusPillMap = { ok: 'ok', warn: 'warn', next: 'next', planned: 'planned' };
@@ -108,18 +142,7 @@ function renderAulas() {
     </div>`).join('');
 }
 
-// Render entregas
-const entregasData = [
-  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/ana/ibtech-aula01', status: 'ok', data: '13 mar' },
-  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/bruno/ibtech-aula01', status: 'ok', data: '12 mar' },
-  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 02', repo: 'github.com/bruno/ibtech-aula02', status: 'ok', data: '16 mar' },
-  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 01', repo: '—', status: 'late', data: '—' },
-  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/diego/ibtech-aula01', status: 'ok', data: '14 mar' },
-  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-];
-
+// ── Render entregas ──
 let filterAulaVal = '';
 function filterEntregas(v) {
   filterAulaVal = v;
@@ -139,10 +162,9 @@ function renderEntregas(data) {
   </tr>`).join('')}</tbody>`;
 }
 
-// Presença
-const presenceMembers = members.filter(m => m.liga === 'IbTech').map(m => m.name);
-let presentSet = new Set([0, 1, 3, 4, 5, 6, 7, 9, 10, 11]);
+// ── Presença ──
 function renderPresenca() {
+  presenceMembers = members.filter(m => m.liga === 'IbTech').map(m => m.name);
   const grid = document.getElementById('presenca-grid');
   grid.innerHTML = presenceMembers.map((name, i) => {
     const on = presentSet.has(i);
@@ -166,9 +188,65 @@ function savePresenca() {
   document.getElementById('chamada-badge').textContent = 'Salva';
   document.getElementById('chamada-badge').className = 'chamada-badge closed';
 }
-function exportPresenca() { alert('CSV gerado — substituir por download real via Supabase'); }
 
-// QR Code
+// ── Chamada — Supabase ──
+async function handleAbrirChamada(encontroId) {
+  try {
+    const { codigo, expira } = await abrirChamada(encontroId);
+    exibirCodigoChamada(codigo, expira);
+
+    const channel = assinarPresencasEncontro(encontroId, (payload) => {
+      atualizarPresencaTempoReal(payload.new);
+    });
+
+    window._chamadaChannel = channel;
+  } catch (e) {
+    console.error('Erro ao abrir chamada:', e);
+  }
+}
+
+async function handleFecharChamada(encontroId) {
+  try {
+    await fecharChamada(encontroId);
+    if (window._chamadaChannel) {
+      window._chamadaChannel.unsubscribe();
+      window._chamadaChannel = null;
+    }
+    ocultarCodigoChamada();
+  } catch (e) {
+    console.error('Erro ao fechar chamada:', e);
+  }
+}
+
+function exibirCodigoChamada(codigo, expira) {
+  document.getElementById('qr-code-text').textContent = codigo;
+  const expiracaoMs = new Date(expira).getTime() - Date.now();
+  qrSeconds = Math.max(0, Math.floor(expiracaoMs / 1000));
+  openModal('qr-modal');
+  document.getElementById('chamada-badge').textContent = 'Aberta';
+  document.getElementById('chamada-badge').className = 'chamada-badge open';
+  clearInterval(qrTimer);
+  qrTimer = setInterval(() => {
+    qrSeconds--;
+    const m = String(Math.floor(qrSeconds / 60)).padStart(2, '0');
+    const s = String(qrSeconds % 60).padStart(2, '0');
+    document.getElementById('qr-timer-val').textContent = `${m}:${s}`;
+    if (qrSeconds <= 0) { clearInterval(qrTimer); closeModal('qr-modal'); }
+  }, 1000);
+}
+
+function ocultarCodigoChamada() {
+  clearInterval(qrTimer);
+  closeModal('qr-modal');
+  document.getElementById('chamada-badge').textContent = 'Fechada';
+  document.getElementById('chamada-badge').className = 'chamada-badge closed';
+}
+
+function atualizarPresencaTempoReal(novaPresenca) {
+  renderPresenca();
+}
+
+// ── QR Code (fallback local quando não há encontroId) ──
 let qrTimer, qrSeconds = 600;
 function openQR() {
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -187,7 +265,7 @@ function openQR() {
   }, 1000);
 }
 
-// Advertência
+// ── Advertência ──
 let advTarget = '';
 function openAdvModal(name) {
   advTarget = name;
@@ -199,22 +277,57 @@ function saveAdv() {
   closeModal('adv-modal');
 }
 
-// Aviso
-function publishAviso() {
-  const titulo = document.getElementById('aviso-titulo').value.trim();
-  const msg = document.getElementById('aviso-msg').value.trim();
-  if (!titulo || !msg) return;
+// ── Avisos — Supabase ──
+async function handlePublicarAviso(titulo, mensagem) {
+  try {
+    await publicarAviso(titulo, mensagem);
+    mostrarSucessoAviso();
+    const avisos = await getAvisos();
+    renderizarAvisos(avisos);
+  } catch (e) {
+    mostrarErroAviso('Erro ao publicar aviso.');
+  }
+}
+
+function renderizarAvisos(avisos) {
   const lista = document.getElementById('avisos-lista');
-  const now = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
-  lista.insertAdjacentHTML('afterbegin', `<div class="aviso-item">
-    <div class="aviso-head"><div class="aviso-title-text">${titulo}</div><div class="aviso-date">${now} · Igor</div></div>
-    <div class="aviso-body">${msg}</div>
-  </div>`);
+  lista.innerHTML = avisos.map(a => `
+    <div class="aviso-item">
+      <div class="aviso-head">
+        <div class="aviso-title-text">${a.titulo}</div>
+        <div class="aviso-date">${new Date(a.criado_em).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</div>
+      </div>
+      <div class="aviso-body">${a.mensagem}</div>
+    </div>
+  `).join('');
+}
+
+function mostrarSucessoAviso() {
   document.getElementById('aviso-titulo').value = '';
   document.getElementById('aviso-msg').value = '';
 }
 
-// CSV export
+function mostrarErroAviso(msg) {
+  alert(msg);
+}
+
+async function publishAviso() {
+  const titulo = document.getElementById('aviso-titulo').value.trim();
+  const msg = document.getElementById('aviso-msg').value.trim();
+  if (!titulo || !msg) return;
+  await handlePublicarAviso(titulo, msg);
+}
+
+async function carregarAvisos() {
+  try {
+    const avisos = await getAvisos();
+    renderizarAvisos(avisos);
+  } catch (e) {
+    console.error('Erro ao carregar avisos:', e);
+  }
+}
+
+// ── CSV export (legado local) ──
 function exportCSV() {
   const rows = [['Nome', 'Liga', 'Presença', 'Entregas', 'Status']];
   members.forEach(m => rows.push([m.name, m.liga, m.presenca + '%', m.entregas, statusLabel[m.status]]));
@@ -225,24 +338,34 @@ function exportCSV() {
   a.click();
 }
 
-// closeModal override — limpa timer do QR quando fecha
+function exportPresenca() { alert('CSV gerado — substituir por download real via Supabase'); }
+
+// ── closeModal override — limpa timer do QR quando fecha ──
 const _closeModal = closeModal;
 function closeModalWithQR(id) {
   _closeModal(id);
   if (id === 'qr-modal') { clearInterval(qrTimer); }
 }
 
-// Escape handler
+// ── Escape handler ──
 initModalEscape();
 
-// Init
-renderOverview(members);
-renderMembros(members);
+// ── Logout ──
+document.getElementById('btn-logout')?.addEventListener('click', fazerLogout);
+
+// ── Exportação — Supabase ──
+document.getElementById('btn-export-todos')?.addEventListener('click', () => exportarTodosRegistros(ligaId));
+document.getElementById('btn-export-membros')?.addEventListener('click', () => exportarResumoPorMembro(ligaId));
+document.getElementById('btn-export-encontros')?.addEventListener('click', () => exportarPorEncontro(ligaId));
+document.getElementById('btn-export-frequencia')?.addEventListener('click', () => exportarRelatorioFrequencia(ligaId));
+
+// ── Init ──
+await carregarMembros();
 renderAulas();
 renderEntregas(entregasData);
-renderPresenca();
+await carregarAvisos();
 
-// Expõe pro onclick inline
+// ── Expõe pro onclick inline ──
 window.showTab = showTab;
 window.openModal = openModal;
 window.closeModal = closeModalWithQR;
@@ -258,3 +381,5 @@ window.togglePresenca = togglePresenca;
 window.markAll = markAll;
 window.savePresenca = savePresenca;
 window.exportPresenca = exportPresenca;
+window.handleAbrirChamada = handleAbrirChamada;
+window.handleFecharChamada = handleFecharChamada;

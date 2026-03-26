@@ -118,7 +118,7 @@
         <div class="user-name">Igor</div>
         <div class="user-role">Presidente</div>
       </div>
-      <div class="logout-btn" onclick="window.location.href='/membros/login'" title="Sair">↩</div>
+      <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
     </div>
   </aside>
 
@@ -249,8 +249,11 @@
           <div class="member-grid" id="presenca-grid"></div>
           <div class="chamada-footer">
             <div class="chamada-count"><strong id="presenca-count">0</strong> / <span id="presenca-total">0</span> presentes</div>
-            <div style="display:flex;gap:.5rem">
-              <button class="btn-sm ghost" onclick="exportPresenca()">Exportar</button>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+              <button class="btn-sm ghost" id="btn-export-todos">Exportar tudo</button>
+              <button class="btn-sm ghost" id="btn-export-membros">Por membro</button>
+              <button class="btn-sm ghost" id="btn-export-encontros">Por encontro</button>
+              <button class="btn-sm ghost" id="btn-export-frequencia">Frequência</button>
               <button class="btn-sm b" onclick="savePresenca()">Salvar →</button>
             </div>
           </div>
