@@ -44,7 +44,7 @@ export async function login(email, password) {
  *
  * Fluxo:
  *   1. supabase.auth.signOut()
- *   2. window.location.href = 'login.html'
+ *   2. window.location.href = '/membros/login'
  */
 export async function logout() {
   // TODO: implementar
