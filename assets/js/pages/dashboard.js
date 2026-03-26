@@ -12,14 +12,14 @@ const session = await requireAuth();
 if (!session) throw new Error('Não autenticado');
 
 // ── Role guard — diretoria vai para dashboard-diretoria ──
-const { data: usuario } = await supabase
+const { data: usuario, error: userError } = await supabase
   .from('usuarios')
   .select('role')
   .eq('id', session.user.id)
-  .maybeSingle();
+  .single();
 
-const ROLES_DIRETORIA = ['diretoria', 'presidente', 'vp', 'ops', 'rh', 'diretor', 'coordenador'];
-if (usuario && ROLES_DIRETORIA.includes(usuario.role)) {
+const ROLES_DIRETORIA = ['presidente', 'vp', 'ops', 'rh', 'diretor', 'coordenador'];
+if (!userError && usuario && ROLES_DIRETORIA.includes(usuario.role)) {
   window.location.href = '/membros/dashboard-diretoria';
   throw new Error('Redirecionando');
 }
