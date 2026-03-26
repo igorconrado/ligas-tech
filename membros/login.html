@@ -228,11 +228,15 @@ window.handleCriar = async function() {
     sessionStorage.setItem('primeiro_acesso', '1');
     window.location.href = await getDashboardUrl();
   } catch (e) {
+    // Se a conta já existe, tenta logar direto com a senha informada
+    try {
+      await fazerLogin(emailAtual, senha);
+      window.location.href = await getDashboardUrl();
+      return;
+    } catch (_) { /* login falhou, mostra erro original */ }
+
     setBtn('btn-criar', false, 'Criar conta e entrar →');
-    const msg = e.message?.includes('already registered')
-      ? 'Este email já tem conta. Volte e faça login.'
-      : 'Erro ao criar conta. Tente novamente.';
-    showErr('err-criar', msg);
+    showErr('err-criar', 'Erro ao criar conta. Tente novamente.');
   }
 };
 
