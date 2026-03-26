@@ -15,29 +15,41 @@ export async function emailAutorizado(email) {
 }
 
 export async function emailTemConta(email) {
-  // Tenta login com senha impossível para detectar se conta existe
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
-    password: '___probe_impossivel_xyz___'
-  });
-  // "Invalid login credentials" = conta EXISTE mas senha errada
-  // Qualquer outro erro = conta NÃO existe
-  if (!error) return true;
-  return error.message.includes('Invalid login credentials');
+  const { data, error } = await supabase
+    .from('usuarios')
+    .select('id')
+    .eq('email', email.trim().toLowerCase())
+    .single();
+
+  if (error || !data) return false;
+  return true;
 }
 
 export async function criarConta(email, senha) {
+  // 1. Cria no Supabase Auth
   const { data, error } = await supabase.auth.signUp({
     email: email.trim().toLowerCase(),
     password: senha
   });
   if (error) throw error;
-  // Loga automaticamente após criar
+
+  // 2. Loga automaticamente
   const { data: login, error: loginError } = await supabase.auth.signInWithPassword({
     email: email.trim().toLowerCase(),
     password: senha
   });
   if (loginError) throw loginError;
+
+  // 3. Registra na tabela usuarios com role membro por padrão
+  const { error: dbError } = await supabase
+    .from('usuarios')
+    .insert({
+      id: login.user.id,
+      email: email.trim().toLowerCase(),
+      role: 'membro',
+      liga_id: null
+    });
+
   return login;
 }
 
