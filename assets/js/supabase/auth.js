@@ -25,44 +25,62 @@ export async function emailTemConta(email) {
 }
 
 export async function criarConta(email, senha) {
-  // 1. Cria no Supabase Auth
-  const { data, error } = await supabase.auth.signUp({
-    email: email.trim().toLowerCase(),
+  const emailNorm = email.trim().toLowerCase();
+
+  // 1. Cria no Supabase Auth (se já existir, ignora e faz login)
+  const { error } = await supabase.auth.signUp({
+    email: emailNorm,
     password: senha
   });
-  if (error) throw error;
+  if (error && !error.message?.includes('already registered')) throw error;
 
-  // 2. Loga automaticamente
+  // 2. Loga
   const { data: login, error: loginError } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
+    email: emailNorm,
     password: senha
   });
   if (loginError) throw loginError;
 
-  // 3. Registra na tabela usuarios com role membro por padrão
-  const { error: dbError } = await supabase
+  // 3. Garante linha na tabela usuarios
+  const { data: existingUser } = await supabase
     .from('usuarios')
-    .insert({
-      id: login.user.id,
-      email: email.trim().toLowerCase(),
-      role: 'membro',
-      liga_id: null
-    });
+    .select('id')
+    .eq('id', login.user.id)
+    .maybeSingle();
 
-  // 4. Cria linha na tabela membros para o onboarding
-  await supabase
+  if (!existingUser) {
+    await supabase
+      .from('usuarios')
+      .insert({
+        id: login.user.id,
+        email: emailNorm,
+        role: 'membro',
+        liga_id: null
+      });
+  }
+
+  // 4. Garante linha na tabela membros para o onboarding
+  const { data: existingMembro } = await supabase
     .from('membros')
-    .insert({
-      usuario_id: login.user.id,
-      onboarding_completo: false,
-      ativo: true
-    });
+    .select('id')
+    .eq('usuario_id', login.user.id)
+    .maybeSingle();
+
+  if (!existingMembro) {
+    await supabase
+      .from('membros')
+      .insert({
+        usuario_id: login.user.id,
+        onboarding_completo: false,
+        ativo: true
+      });
+  }
 
   // 5. Marca que essa pessoa já criou a conta
   await supabase
     .from('emails_autorizados')
     .update({ tem_conta: true })
-    .eq('email', email.trim().toLowerCase());
+    .eq('email', emailNorm);
 
   return login;
 }
