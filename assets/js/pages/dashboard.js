@@ -14,6 +14,7 @@ if (!session) throw new Error('Não autenticado');
 let perfilAtual = null;
 let aulasAtuais = [];
 let currentStep = 0;
+let onboardingNome = '';
 
 // ── Data atual ──
 document.getElementById('topbar-date').textContent = formatDate();
@@ -331,6 +332,11 @@ function renderStep(i) {
 }
 
 function nextStep() {
+  if (currentStep === 1) {
+    const nome = el('ob-nome')?.value?.trim();
+    if (!nome) return mostrarErroOnboarding('Digite seu nome completo.');
+    onboardingNome = nome;
+  }
   if (currentStep === onboardingSteps.length - 1) { salvarOnboarding(); return; }
   currentStep++;
   renderStep(currentStep);
@@ -352,12 +358,11 @@ function mostrarErroOnboarding(msg) {
 }
 
 async function salvarOnboarding() {
-  const nome = el('ob-nome')?.value?.trim();
-  if (!nome) return mostrarErroOnboarding('Digite seu nome completo.');
+  if (!onboardingNome) return mostrarErroOnboarding('Digite seu nome completo.');
 
   try {
     await completarOnboarding({
-      nome,
+      nome: onboardingNome,
       linkedin: el('ob-linkedin')?.value?.trim() || null,
       github: el('ob-github')?.value?.trim() || null,
     });
