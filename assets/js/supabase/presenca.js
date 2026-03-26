@@ -112,3 +112,43 @@ export function assinarPresencasEncontro(encontroId, onUpdate) {
     }, onUpdate)
     .subscribe();
 }
+
+// Diretoria: criar encontro
+export async function criarEncontro(ligaId, titulo, data) {
+  const { data: encontro, error } = await supabase
+    .from('encontros')
+    .insert({
+      liga_id: ligaId,
+      titulo,
+      data,
+      aberto: false
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return encontro;
+}
+
+// Diretoria: listar encontros da liga
+export async function getEncontros(ligaId) {
+  const { data, error } = await supabase
+    .from('encontros')
+    .select('*')
+    .eq('liga_id', ligaId)
+    .order('data', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+// Diretoria: ver presenças de um encontro
+export async function getPresencasEncontro(encontroId) {
+  const { data, error } = await supabase
+    .from('presencas')
+    .select('*, membros(nome)')
+    .eq('encontro_id', encontroId);
+
+  if (error) throw error;
+  return data || [];
+}
