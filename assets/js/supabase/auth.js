@@ -32,7 +32,8 @@ export async function criarConta(email, senha) {
     email: emailNorm,
     password: senha
   });
-  if (error && !error.message?.includes('already registered')) throw error;
+  const alreadyExists = error && (error.status === 422 || error.message?.includes('already registered'));
+  if (error && !alreadyExists) throw error;
 
   // 2. Loga
   const { data: login, error: loginError } = await supabase.auth.signInWithPassword({
