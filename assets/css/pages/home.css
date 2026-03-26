@@ -95,8 +95,8 @@
 }
 
 .t-ib   { color: var(--text); }
-.t-bot  { color: var(--red); text-shadow: 0 0 40px rgba(255,31,31,0.3); }
-.t-tech { color: var(--blue); text-shadow: 0 0 40px rgba(15,111,255,0.3); }
+.t-bot  { color: var(--red); text-shadow: 0 0 40px rgba(255,31,31,0.3); margin-left: 0.03em; }
+.t-tech { color: var(--blue); text-shadow: 0 0 40px rgba(15,111,255,0.3); margin-left: 0.03em; }
 .t-sep {
   color: rgba(255,255,255,.12);
   font-size: .5em;
