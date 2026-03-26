@@ -258,5 +258,23 @@
   reveals.forEach(el => io.observe(el));
 })();
 </script>
+
+<div id="scroll-progress" style="
+  position: fixed;
+  top: 0; left: 0;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--red), var(--blue));
+  z-index: 200;
+  pointer-events: none;
+  transition: width 0.1s linear;
+"></div>
+<script>
+window.addEventListener('scroll', () => {
+  const bar = document.getElementById('scroll-progress');
+  const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  if (bar) bar.style.width = pct + '%';
+});
+</script>
 </body>
 </html>

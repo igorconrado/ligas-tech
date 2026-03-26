@@ -12,7 +12,10 @@
   padding-top: 52px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-bottom: 4rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
   position: relative;
   overflow: hidden;
 }
@@ -41,16 +44,15 @@
 }
 
 .hero-kicker {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--muted);
   display: flex;
   align-items: center;
-  gap: .75rem;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--muted);
   margin-bottom: 1.5rem;
-  animation: fadeUp .4s ease both;
 }
 
 /* Kicker dots — processo-seletivo.html */
@@ -64,20 +66,20 @@
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(56px, 10vw, 100px);
-  line-height: .88;
-  letter-spacing: .01em;
+  font-size: clamp(72px, 12vw, 160px);
+  line-height: .84;
+  letter-spacing: -.01em;
   margin-bottom: 1.5rem;
-  animation: fadeUp .4s ease .1s both;
+  text-align: left;
 }
 
 .hero-sub {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 300;
   color: var(--mid);
-  line-height: 1.75;
-  max-width: 520px;
-  animation: fadeUp .4s ease .2s both;
+  max-width: 440px;
+  line-height: 1.8;
+  text-align: left;
 }
 
 /* Status Banner */
