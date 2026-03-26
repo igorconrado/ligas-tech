@@ -69,3 +69,68 @@ export async function submeterEntrega(aulaId, repoUrl) {
   if (error) throw error;
   return data;
 }
+
+// Diretoria: criar aula
+export async function criarAula(dados) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Não autenticado');
+
+  const { data, error } = await supabase
+    .from('aulas')
+    .insert({
+      liga_id: dados.liga_id,
+      numero: dados.numero,
+      titulo: dados.titulo,
+      prazo_entrega: dados.prazo_entrega || null,
+      material_url: dados.material_url || null,
+      slides_url: dados.slides_url || null,
+      publicada: dados.publicada ?? false
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// Diretoria: editar aula
+export async function editarAula(aulaId, updates) {
+  const { data, error } = await supabase
+    .from('aulas')
+    .update(updates)
+    .eq('id', aulaId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// Diretoria: publicar ou despublicar aula
+export async function togglePublicarAula(aulaId, publicada) {
+  return editarAula(aulaId, { publicada });
+}
+
+// Diretoria: listar todas as aulas da liga (incluindo não publicadas)
+export async function getTodasAulas(ligaId) {
+  const { data, error } = await supabase
+    .from('aulas')
+    .select('*')
+    .eq('liga_id', ligaId)
+    .order('numero');
+
+  if (error) throw error;
+  return data || [];
+}
+
+// Diretoria: ver entregas de uma aula específica
+export async function getEntregasAula(aulaId) {
+  const { data, error } = await supabase
+    .from('entregas')
+    .select('*, membros(nome, github)')
+    .eq('aula_id', aulaId)
+    .order('entregue_em', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
