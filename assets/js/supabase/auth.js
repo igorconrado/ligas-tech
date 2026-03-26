@@ -15,13 +15,63 @@ export async function emailAutorizado(email) {
 }
 
 export async function emailTemConta(email) {
-  const { data } = await supabase
+  const emailNorm = email.trim().toLowerCase();
+
+  const { data: usuario } = await supabase
     .from('usuarios')
     .select('id')
-    .eq('email', email.trim().toLowerCase())
+    .eq('email', emailNorm)
     .maybeSingle();
 
-  return !!data;
+  if (usuario) return true;
+
+  const { data: autorizado } = await supabase
+    .from('emails_autorizados')
+    .select('tem_conta')
+    .eq('email', emailNorm)
+    .maybeSingle();
+
+  return autorizado?.tem_conta === true;
+}
+
+async function garantirLinhasDB(userId, email) {
+  const { data: existingUser } = await supabase
+    .from('usuarios')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (!existingUser) {
+    await supabase
+      .from('usuarios')
+      .insert({
+        id: userId,
+        email,
+        role: 'membro',
+        liga_id: null
+      });
+  }
+
+  const { data: existingMembro } = await supabase
+    .from('membros')
+    .select('id')
+    .eq('usuario_id', userId)
+    .maybeSingle();
+
+  if (!existingMembro) {
+    await supabase
+      .from('membros')
+      .insert({
+        usuario_id: userId,
+        onboarding_completo: false,
+        ativo: true
+      });
+  }
+
+  await supabase
+    .from('emails_autorizados')
+    .update({ tem_conta: true })
+    .eq('email', email);
 }
 
 export async function criarConta(email, senha) {
@@ -42,56 +92,22 @@ export async function criarConta(email, senha) {
   });
   if (loginError) throw loginError;
 
-  // 3. Garante linha na tabela usuarios
-  const { data: existingUser } = await supabase
-    .from('usuarios')
-    .select('id')
-    .eq('id', login.user.id)
-    .maybeSingle();
-
-  if (!existingUser) {
-    await supabase
-      .from('usuarios')
-      .insert({
-        id: login.user.id,
-        email: emailNorm,
-        role: 'membro',
-        liga_id: null
-      });
-  }
-
-  // 4. Garante linha na tabela membros para o onboarding
-  const { data: existingMembro } = await supabase
-    .from('membros')
-    .select('id')
-    .eq('usuario_id', login.user.id)
-    .maybeSingle();
-
-  if (!existingMembro) {
-    await supabase
-      .from('membros')
-      .insert({
-        usuario_id: login.user.id,
-        onboarding_completo: false,
-        ativo: true
-      });
-  }
-
-  // 5. Marca que essa pessoa já criou a conta
-  await supabase
-    .from('emails_autorizados')
-    .update({ tem_conta: true })
-    .eq('email', emailNorm);
+  // 3. Garante linhas nas tabelas usuarios e membros
+  await garantirLinhasDB(login.user.id, emailNorm);
 
   return login;
 }
 
 export async function fazerLogin(email, senha) {
+  const emailNorm = email.trim().toLowerCase();
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
+    email: emailNorm,
     password: senha
   });
   if (error) throw error;
+
+  await garantirLinhasDB(data.user.id, emailNorm);
+
   return data;
 }
 
