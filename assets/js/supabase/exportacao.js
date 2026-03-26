@@ -1,4 +1,4 @@
-import { supabase } from './client.js';
+import { supabase } from '/assets/js/supabase/client.js';
 
 function downloadCSV(conteudo, nomeArquivo) {
   const blob = new Blob(['\uFEFF' + conteudo], { type: 'text/csv;charset=utf-8;' });

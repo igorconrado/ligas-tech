@@ -1,4 +1,4 @@
-import { supabase } from './client.js';
+import { supabase } from '/assets/js/supabase/client.js';
 
 export async function registrarPresenca(codigoDigitado) {
   const { data: { user } } = await supabase.auth.getUser();

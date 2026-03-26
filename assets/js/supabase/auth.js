@@ -14,7 +14,7 @@
 //   - Diretoria (role in ['diretor','presidente']) lê todos os perfis
 //   - Apenas o próprio usuário ou diretoria pode atualizar um perfil
 
-import { supabase } from './client.js'
+import { supabase } from '/assets/js/supabase/client.js'
 
 /**
  * Faz login com email e senha.
