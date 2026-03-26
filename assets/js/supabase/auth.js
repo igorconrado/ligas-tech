@@ -50,7 +50,16 @@ export async function criarConta(email, senha) {
       liga_id: null
     });
 
-  // 4. Marca que essa pessoa já criou a conta
+  // 4. Cria linha na tabela membros para o onboarding
+  await supabase
+    .from('membros')
+    .insert({
+      usuario_id: login.user.id,
+      onboarding_completo: false,
+      ativo: true
+    });
+
+  // 5. Marca que essa pessoa já criou a conta
   await supabase
     .from('emails_autorizados')
     .update({ tem_conta: true })
