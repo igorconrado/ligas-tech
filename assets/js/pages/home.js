@@ -10,13 +10,13 @@ animateCounters({ n1: 26, n2: 2, n3: 9, n4: 5, n5: 1 }, 1400, 400);
 const diretoria = [
   { nome: 'Igor', cargo: 'Presidente', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: 'Presidente das ligas IbBot e IbTech. Co-fundador da Vecto. Engenharia de Software — Ibmec BH.', linkedin: 'https://linkedin.com/in/', github: 'https://github.com/' },
   { nome: 'Joshua', cargo: 'Vice-Presidente', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
+  { nome: 'Marcelo', cargo: 'Parcerias', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
+  { nome: 'Tulio', cargo: 'Eventos', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
+  { nome: 'Júlia', cargo: 'Recursos Humanos', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
+  { nome: 'Isaac', cargo: 'Marketing', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
+  { nome: 'Pedro', cargo: 'Operações', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
   { nome: 'Beatriz', cargo: 'Diretora IbTech', liga: 'b', ligaNome: 'IbTech', foto: null, bio: '', linkedin: '', github: '' },
   { nome: 'A definir', cargo: 'Diretor IbBot', liga: 'r', ligaNome: 'IbBot', foto: null, bio: 'Cargo em aberto. Processo seletivo em andamento.', linkedin: '', github: '' },
-  { nome: 'Isaac', cargo: 'Marketing', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
-  { nome: 'Júlia', cargo: 'Recursos Humanos', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
-  { nome: 'Tulio', cargo: 'Eventos', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
-  { nome: 'Marcelo', cargo: 'Parcerias', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
-  { nome: 'Pedro', cargo: 'Operações', liga: 'w', ligaNome: 'IbBot & IbTech', foto: null, bio: '', linkedin: '', github: '' },
 ];
 
 // Renderiza cards
