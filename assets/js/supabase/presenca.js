@@ -1,144 +1,114 @@
-// ── Presença ──
-// Registro de presença, chamada com QR code e cálculo de frequência.
-//
-// Tabela: encontros
-//   id, titulo, data, liga_id, tipo ('aula'|'reuniao'|'evento'),
-//   aula_id (nullable, FK pra aulas), codigo_qr, codigo_expira_em,
-//   status ('aberto'|'fechado'), created_by, created_at
-//
-// Tabela: presenca
-//   id, membro_id, encontro_id, status ('presente'|'ausente'|'justificado'),
-//   registrado_via ('manual'|'qr'), registrado_por, created_at
-//
-// RLS:
-//   - Membro lê sua própria presença
-//   - Diretoria lê e escreve toda presença
-//   - Registro via QR: membro pode registrar a si mesmo se código válido
-//
-// Regras de frequência:
-//   - OK: < 15% ausências injustificadas
-//   - Atenção: >= 15% e < 25% ausências injustificadas
-//   - Risco: >= 25% ausências injustificadas
-//   - Justificadas não contam como ausência
+import { supabase } from './client.js';
 
-import { supabase } from './client.js'
+export async function registrarPresenca(codigoDigitado) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Não autenticado');
 
-/**
- * Cria novo encontro e gera código QR.
- *
- * @param {string} titulo — ex: 'Aula 03 — Arrays em C'
- * @param {string} data — ISO date string
- * @param {string} ligaId — ID da liga
- * @returns {Promise<{encontro, codigo, error}>}
- *
- * Fluxo:
- *   1. Gerar código aleatório (6 chars uppercase alfanumérico)
- *   2. INSERT INTO encontros (titulo, data, liga_id, codigo_qr, codigo_expira_em, status)
- *      VALUES (?, ?, ?, codigo, now() + interval '10 minutes', 'aberto')
- *   3. Retornar encontro criado + código pro QR display
- *
- * O código expira em 10 minutos. Quando expira, status muda pra 'fechado'.
- * Pode usar um database trigger ou verificar no client.
- */
-export async function criarEncontro(titulo, data, ligaId) {
-  // TODO: implementar
+  const { data: membro } = await supabase
+    .from('membros')
+    .select('id, liga_id')
+    .eq('usuario_id', user.id)
+    .single();
+
+  if (!membro) throw new Error('Perfil de membro não encontrado');
+
+  const { data: encontro } = await supabase
+    .from('encontros')
+    .select('id, codigo_expira_em, aberto')
+    .eq('codigo_presenca', codigoDigitado.trim())
+    .eq('liga_id', membro.liga_id)
+    .eq('aberto', true)
+    .single();
+
+  if (!encontro) throw new Error('Código inválido ou expirado');
+  if (new Date(encontro.codigo_expira_em) < new Date()) throw new Error('Código expirado. Peça um novo à diretoria');
+
+  const { data: jaExiste } = await supabase
+    .from('presencas')
+    .select('id')
+    .eq('membro_id', membro.id)
+    .eq('encontro_id', encontro.id)
+    .single();
+
+  if (jaExiste) throw new Error('Presença já registrada neste encontro');
+
+  const { error } = await supabase
+    .from('presencas')
+    .insert({ membro_id: membro.id, encontro_id: encontro.id, status: 'presente' });
+
+  if (error) throw error;
+  return { ok: true };
 }
 
-/**
- * Registra presença de um membro num encontro.
- * Usado pela diretoria no registro manual (checkbox grid).
- *
- * @param {string} membroId — ID do membro
- * @param {string} encontroId — ID do encontro
- * @param {string} status — 'presente' | 'ausente' | 'justificado'
- * @returns {Promise<{data, error}>}
- *
- * Usa UPSERT pra evitar duplicatas:
- *   INSERT INTO presenca (membro_id, encontro_id, status, registrado_via, registrado_por)
- *   VALUES (?, ?, ?, 'manual', currentUser.id)
- *   ON CONFLICT (membro_id, encontro_id) DO UPDATE SET status = ?, registrado_por = ?
- */
-export async function registrarPresenca(membroId, encontroId, status) {
-  // TODO: implementar
+export async function getMinhasPresencas() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: membro } = await supabase
+    .from('membros').select('id').eq('usuario_id', user.id).single();
+  if (!membro) return [];
+
+  const { data, error } = await supabase
+    .from('presencas')
+    .select('*, encontros(titulo, data)')
+    .eq('membro_id', membro.id)
+    .order('criado_em', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
 }
 
-/**
- * Busca presença de um membro em todos os encontros.
- * Usado na aba "Minha presença" do dashboard membro.
- *
- * @param {string} membroId — ID do membro
- * @returns {Promise<Array>} — [{ encontro_titulo, data, status, tipo }]
- *
- * Query:
- *   SELECT e.titulo, e.data, e.tipo, p.status
- *   FROM presenca p
- *   JOIN encontros e ON p.encontro_id = e.id
- *   WHERE p.membro_id = ?
- *   ORDER BY e.data DESC
- */
-export async function getPresencaByMembro(membroId) {
-  // TODO: implementar
+export function calcularAlertaFrequencia(presencas, totalEncontros) {
+  if (totalEncontros === 0) return { status: 'ok', percentual: 0 };
+  const ausencias = presencas.filter(p => p.status === 'ausente').length;
+  const percentual = (ausencias / totalEncontros) * 100;
+  if (percentual >= 25) return { status: 'risco', percentual };
+  if (percentual >= 15) return { status: 'atencao', percentual };
+  return { status: 'ok', percentual };
 }
 
-/**
- * Busca lista de presença de um encontro específico.
- * Usado na aba "Registro de presença" do dashboard diretoria.
- *
- * @param {string} encontroId — ID do encontro
- * @returns {Promise<Array>} — [{ membro_id, nome, status }]
- *
- * Query:
- *   SELECT p.membro_id, perf.nome, p.status
- *   FROM presenca p
- *   JOIN perfis perf ON p.membro_id = perf.id
- *   WHERE p.encontro_id = ?
- *   ORDER BY perf.nome
- *
- * Se um membro da liga não tem registro, considerar como 'ausente'.
- * Fazer LEFT JOIN com perfis da liga do encontro.
- */
-export async function getPresencaByEncontro(encontroId) {
-  // TODO: implementar
+export async function abrirChamada(encontroId) {
+  const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+  const expira = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+  const { data, error } = await supabase
+    .from('encontros')
+    .update({ codigo_presenca: codigo, codigo_expira_em: expira, aberto: true })
+    .eq('id', encontroId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return { codigo, expira, encontro: data };
 }
 
-/**
- * Calcula frequência de um membro.
- *
- * @param {string} membroId — ID do membro
- * @returns {Promise<{percentual, presentes, ausencias, justificadas, total, status}>}
- *   status: 'ok' | 'atencao' | 'risco'
- *
- * Cálculo:
- *   total = encontros da liga do membro no semestre atual
- *   presentes = presenca WHERE status = 'presente'
- *   justificadas = presenca WHERE status = 'justificado'
- *   ausencias = total - presentes - justificadas
- *   percentual = ((presentes + justificadas) / total) * 100
- *
- *   ausencia_pct = ausencias / total
- *   status = ausencia_pct >= 0.25 ? 'risco'
- *          : ausencia_pct >= 0.15 ? 'atencao'
- *          : 'ok'
- */
-export async function calcularFrequencia(membroId) {
-  // TODO: implementar
+export async function fecharChamada(encontroId) {
+  const { error } = await supabase
+    .from('encontros')
+    .update({ aberto: false, codigo_presenca: null, codigo_expira_em: null })
+    .eq('id', encontroId);
+
+  if (error) throw error;
 }
 
-/**
- * Valida código QR digitado pelo membro e registra presença.
- * Usado quando o membro escaneia ou digita o código da chamada.
- *
- * @param {string} codigo — código de 6 chars
- * @param {string} membroId — ID do membro
- * @returns {Promise<{success, error}>}
- *
- * Fluxo:
- *   1. SELECT * FROM encontros WHERE codigo_qr = ? AND status = 'aberto'
- *      AND codigo_expira_em > now()
- *   2. Se não encontrou: erro 'Código inválido ou expirado'
- *   3. Verificar se membro pertence à liga do encontro
- *   4. UPSERT presenca com status = 'presente', registrado_via = 'qr'
- */
-export async function validarCodigoPresenca(codigo, membroId) {
-  // TODO: implementar
+export async function corrigirPresenca(membroId, encontroId, novoStatus) {
+  const { error } = await supabase
+    .from('presencas')
+    .upsert(
+      { membro_id: membroId, encontro_id: encontroId, status: novoStatus },
+      { onConflict: 'membro_id,encontro_id' }
+    );
+  if (error) throw error;
+}
+
+export function assinarPresencasEncontro(encontroId, onUpdate) {
+  return supabase
+    .channel(`presencas-encontro-${encontroId}`)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'presencas',
+      filter: `encontro_id=eq.${encontroId}`
+    }, onUpdate)
+    .subscribe();
 }
