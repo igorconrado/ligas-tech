@@ -46,34 +46,75 @@
       <div class="login-title">ENTRAR</div>
       <div class="login-sub">Use seu email institucional pra acessar.</div>
 
-      <div id="step-main">
-        <div class="form-group" style="margin-bottom:.75rem">
+      <!-- STEP 1: Email -->
+      <div id="step-email">
+        <div class="form-group">
           <label class="form-label">Email institucional</label>
-          <input class="form-input" type="email" id="login-email"
+          <input class="form-input" type="email" id="input-email"
                  placeholder="matricula@alunos.ibmec.edu.br"
                  autocomplete="email">
           <span class="login-hint">Apenas emails @alunos.ibmec.edu.br</span>
         </div>
-        <div class="form-group" style="margin-bottom:.75rem">
-          <label class="form-label">Senha</label>
-          <input class="form-input" type="password" id="login-senha"
-                 placeholder="••••••••"
-                 autocomplete="current-password">
+        <div class="form-error" id="err-email" style="display:none"></div>
+        <button class="login-btn" id="btn-continuar" onclick="handleContinuar()">
+          Continuar →
+        </button>
+      </div>
+
+      <!-- STEP 2: Bloqueado -->
+      <div id="step-bloqueado" style="display:none">
+        <div class="login-blocked">
+          <div class="blocked-icon">—</div>
+          <p class="blocked-title">Área exclusiva para membros</p>
+          <p class="blocked-sub">Este email não está na lista de membros autorizados. Se você foi aprovado no processo seletivo e está tendo problemas, entre em contato com a diretoria.</p>
         </div>
-        <div class="form-group" style="margin-bottom:1.5rem">
-          <label class="form-label">Confirmar senha <span style="color:var(--muted);font-size:9px;letter-spacing:.04em">(só no primeiro acesso)</span></label>
-          <input class="form-input" type="password" id="login-senha2"
+        <button class="login-back" onclick="voltarEmail()">← Usar outro email</button>
+      </div>
+
+      <!-- STEP 3: Criar senha (primeiro acesso) -->
+      <div id="step-criar" style="display:none">
+        <div class="login-email-display" id="display-email-criar"></div>
+        <p class="login-sub">Primeiro acesso. Crie sua senha para entrar.</p>
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label class="form-label">Criar senha</label>
+          <input class="form-input" type="password" id="input-senha-criar"
+                 placeholder="Mínimo 8 caracteres"
+                 autocomplete="new-password">
+        </div>
+        <div class="form-group" style="margin-bottom:1.25rem">
+          <label class="form-label">Confirmar senha</label>
+          <input class="form-input" type="password" id="input-senha-criar2"
                  placeholder="Repita a senha"
                  autocomplete="new-password">
         </div>
-        <div class="form-error" id="error-main" style="display:none"></div>
-        <button class="login-btn" id="btn-entrar" onclick="handleEntrar()">Entrar →</button>
+        <div class="form-error" id="err-criar" style="display:none"></div>
+        <button class="login-btn" id="btn-criar" onclick="handleCriar()">
+          Criar conta e entrar →
+        </button>
+        <button class="login-back" onclick="voltarEmail()">← Usar outro email</button>
       </div>
 
+      <!-- STEP 4: Logar (já tem conta) -->
+      <div id="step-logar" style="display:none">
+        <div class="login-email-display" id="display-email-logar"></div>
+        <div class="form-group" style="margin-bottom:1.25rem">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="input-senha-logar"
+                 placeholder="••••••••"
+                 autocomplete="current-password">
+        </div>
+        <div class="form-error" id="err-logar" style="display:none"></div>
+        <button class="login-btn" id="btn-logar" onclick="handleLogar()">
+          Entrar →
+        </button>
+        <button class="login-back" onclick="voltarEmail()">← Usar outro email</button>
+      </div>
+
+      <!-- STEP loading -->
       <div id="step-loading" style="display:none">
         <div class="login-loading">
           <div class="login-spinner"></div>
-          <span id="loading-text">Entrando...</span>
+          <span id="loading-text">Verificando...</span>
         </div>
       </div>
 
@@ -87,79 +128,140 @@
 </div>
 
 <script type="module">
-import { emailValido, emailAutorizado, entrarOuCriar, getSession } from '/assets/js/supabase/auth.js';
+import { emailValido, emailAutorizado, emailTemConta, criarConta, fazerLogin, getSession } from '/assets/js/supabase/auth.js';
 
-// Redirecionar se já logado
-getSession().then(session => {
-  if (session) window.location.href = '/membros/dashboard';
-});
+// Redireciona se já logado
+getSession().then(s => { if (s) window.location.href = '/membros/dashboard'; });
 
-function showError(msg) {
-  const el = document.getElementById('error-main');
+let emailAtual = '';
+
+const steps = ['step-email','step-bloqueado','step-criar','step-logar','step-loading'];
+
+function showStep(id) {
+  steps.forEach(s => {
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
+  });
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
   el.textContent = msg;
   el.style.display = 'block';
 }
 
-function hideError() {
-  const el = document.getElementById('error-main');
+function hideErr(id) {
+  const el = document.getElementById(id);
   if (el) el.style.display = 'none';
 }
 
-function setLoading(state, msg = 'Entrando...') {
-  document.getElementById('step-main').style.display = state ? 'none' : 'block';
-  document.getElementById('step-loading').style.display = state ? 'block' : 'none';
-  document.getElementById('loading-text').textContent = msg;
+function setBtn(id, disabled, text) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = disabled;
+  btn.textContent = text;
 }
 
-window.handleEntrar = async function() {
-  const email = document.getElementById('login-email').value.trim();
-  const senha = document.getElementById('login-senha').value;
-  const senha2 = document.getElementById('login-senha2').value;
+window.voltarEmail = function() {
+  emailAtual = '';
+  showStep('step-email');
+  document.getElementById('input-email').value = '';
+  document.getElementById('input-email').focus();
+};
 
-  hideError();
+window.handleContinuar = async function() {
+  const email = document.getElementById('input-email').value.trim();
+  hideErr('err-email');
 
-  // Validações
-  if (!email) return showError('Digite seu email institucional.');
-  if (!emailValido(email)) return showError('Use seu email @alunos.ibmec.edu.br');
-  if (!senha) return showError('Digite sua senha.');
-  if (senha.length < 8) return showError('A senha precisa ter no mínimo 8 caracteres.');
-  if (senha2 && senha !== senha2) return showError('As senhas não coincidem.');
+  if (!email) return showErr('err-email', 'Digite seu email institucional.');
+  if (!emailValido(email)) return showErr('err-email', 'Use seu email @alunos.ibmec.edu.br');
 
-  setLoading(true, 'Verificando autorização...');
+  emailAtual = email.toLowerCase();
+  showStep('step-loading');
+  document.getElementById('loading-text').textContent = 'Verificando...';
 
   try {
-    // Verifica se email está autorizado
-    const { autorizado } = await emailAutorizado(email.toLowerCase());
+    // 1. Verifica se está autorizado
+    const { autorizado } = await emailAutorizado(emailAtual);
     if (!autorizado) {
-      setLoading(false);
-      return showError('Email não autorizado. Entre em contato com a diretoria.');
+      showStep('step-bloqueado');
+      return;
     }
 
-    setLoading(true, 'Entrando...');
+    // 2. Verifica se já tem conta
+    document.getElementById('loading-text').textContent = 'Carregando...';
+    const temConta = await emailTemConta(emailAtual);
 
-    const { action } = await entrarOuCriar(email.toLowerCase(), senha);
-
-    if (action === 'signup') {
-      sessionStorage.setItem('primeiro_acesso', '1');
-    }
-
-    window.location.href = '/membros/dashboard';
-
-  } catch (e) {
-    setLoading(false);
-    if (e.message?.includes('Invalid login credentials')) {
-      showError('Senha incorreta. Se é seu primeiro acesso, escolha uma senha nova.');
-    } else if (e.message?.includes('Password should be')) {
-      showError('A senha precisa ter no mínimo 8 caracteres.');
+    if (temConta) {
+      // Já tem conta → pede só a senha
+      document.getElementById('display-email-logar').textContent = emailAtual;
+      showStep('step-logar');
+      document.getElementById('input-senha-logar').focus();
     } else {
-      showError('Erro ao entrar. Tente novamente.');
+      // Primeiro acesso → cria senha
+      document.getElementById('display-email-criar').textContent = emailAtual;
+      showStep('step-criar');
+      document.getElementById('input-senha-criar').focus();
     }
+  } catch (e) {
+    showStep('step-email');
+    showErr('err-email', 'Erro ao verificar email. Tente novamente.');
   }
 };
 
-// Enter submete
+window.handleCriar = async function() {
+  const senha = document.getElementById('input-senha-criar').value;
+  const senha2 = document.getElementById('input-senha-criar2').value;
+  hideErr('err-criar');
+
+  if (senha.length < 8) return showErr('err-criar', 'A senha precisa ter no mínimo 8 caracteres.');
+  if (senha !== senha2) {
+    showErr('err-criar', 'As senhas não coincidem.');
+    document.getElementById('input-senha-criar2').value = '';
+    document.getElementById('input-senha-criar2').focus();
+    return;
+  }
+
+  setBtn('btn-criar', true, 'Criando conta...');
+
+  try {
+    await criarConta(emailAtual, senha);
+    sessionStorage.setItem('primeiro_acesso', '1');
+    window.location.href = '/membros/dashboard';
+  } catch (e) {
+    setBtn('btn-criar', false, 'Criar conta e entrar →');
+    const msg = e.message?.includes('already registered')
+      ? 'Este email já tem conta. Volte e faça login.'
+      : 'Erro ao criar conta. Tente novamente.';
+    showErr('err-criar', msg);
+  }
+};
+
+window.handleLogar = async function() {
+  const senha = document.getElementById('input-senha-logar').value;
+  hideErr('err-logar');
+
+  if (!senha) return showErr('err-logar', 'Digite sua senha.');
+
+  setBtn('btn-logar', true, 'Entrando...');
+
+  try {
+    await fazerLogin(emailAtual, senha);
+    window.location.href = '/membros/dashboard';
+  } catch (e) {
+    setBtn('btn-logar', false, 'Entrar →');
+    document.getElementById('input-senha-logar').value = '';
+    document.getElementById('input-senha-logar').focus();
+    showErr('err-logar', 'Senha incorreta. Tente novamente.');
+  }
+};
+
+// Enter avança o step atual
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') window.handleEntrar();
+  if (e.key !== 'Enter') return;
+  const visible = steps.find(s => document.getElementById(s)?.style.display !== 'none');
+  if (visible === 'step-email') window.handleContinuar();
+  if (visible === 'step-criar') window.handleCriar();
+  if (visible === 'step-logar') window.handleLogar();
 });
 </script>
 

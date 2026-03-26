@@ -149,3 +149,59 @@ body::before {
 .login-box > *:nth-child(2) { animation-delay: .1s; }
 .login-box > *:nth-child(3) { animation-delay: .15s; }
 .login-box > *:nth-child(4) { animation-delay: .2s; }
+
+/* Blocked state */
+.login-blocked {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+.blocked-icon {
+  font-family: var(--font-display);
+  font-size: 48px;
+  color: rgba(255,255,255,.1);
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+.blocked-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: .75rem;
+}
+.blocked-sub {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.7;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* Email display pill */
+.login-email-display {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--mid);
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  padding: 8px 12px;
+  margin-bottom: 1rem;
+  letter-spacing: .02em;
+}
+
+/* Back button */
+.login-back {
+  display: block;
+  width: 100%;
+  margin-top: .75rem;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color .2s;
+  text-align: center;
+}
+.login-back:hover { color: var(--text); }
