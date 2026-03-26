@@ -31,6 +31,8 @@ diretoria.forEach((d, i) => {
       <div>
         <div class="dir-name">${d.nome}</div>
         <div class="dir-role">${d.cargo}</div>
+        <div class="dir-liga-badge ${d.liga}">${d.ligaNome}</div>
+        ${d.nome === 'A definir' ? `<a class="dir-vaga-link" href="/processo-seletivo" onclick="event.stopPropagation()">Vaga em aberto →</a>` : ''}
       </div>
     </div>`;
 });
