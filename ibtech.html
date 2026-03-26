@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/ibtech.css">
 </head>
-<body>
+<body data-liga="ibtech">
 
 <!-- NAV -->
 <nav>
@@ -80,10 +80,10 @@
 
 <!-- STATS -->
 <div class="stats-bar">
-  <div class="stat-item"><div class="stat-prefix">const members =</div><div class="stat-num">17</div><div class="stat-label">Membros ativos</div></div>
-  <div class="stat-item"><div class="stat-prefix">const aulas =</div><div class="stat-num">2</div><div class="stat-label">Aulas concluídas</div></div>
-  <div class="stat-item"><div class="stat-prefix">const projetos =</div><div class="stat-num">3</div><div class="stat-label">Trilhas de capacitação</div></div>
-  <div class="stat-item"><div class="stat-prefix">const semestre =</div><div class="stat-num">1</div><div class="stat-label">Hackathon em andamento</div></div>
+  <div class="stat-item"><div class="stat-prefix">const members =</div><div class="stat-num" id="t1" data-count="17">17</div><div class="stat-label">Membros ativos</div></div>
+  <div class="stat-item"><div class="stat-prefix">const aulas =</div><div class="stat-num" id="t2" data-count="2">2</div><div class="stat-label">Aulas concluídas</div></div>
+  <div class="stat-item"><div class="stat-prefix">const projetos =</div><div class="stat-num" id="t3" data-count="3">3</div><div class="stat-label">Trilhas de capacitação</div></div>
+  <div class="stat-item"><div class="stat-prefix">const semestre =</div><div class="stat-num" id="t4" data-count="1">1</div><div class="stat-label">Hackathon em andamento</div></div>
 </div>
 
 <!-- SOBRE -->
@@ -267,6 +267,114 @@
       nav.style.borderBottomColor = '';
       nav.style.background = '';
     }
+  });
+})();
+</script>
+
+<script type="module">
+import { animateCounters } from '/assets/js/components/counter.js';
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      // Lê os valores reais dos elementos antes de animar
+      const targets = {};
+      e.target.querySelectorAll('[data-count]').forEach(el => {
+        targets[el.id] = parseInt(el.dataset.count);
+      });
+      if (Object.keys(targets).length > 0) {
+        animateCounters(targets, 1400, 0);
+      }
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+const statsBar = document.querySelector('.stats-bar');
+if (statsBar) io.observe(statsBar);
+</script>
+
+<script>
+(function(){
+  // Stagger cards ao entrar no viewport
+  const staggerSelectors = [
+    '.sobre-card',
+    '.dia-item',
+    '.showcase-card',
+    '.projeto-card'
+  ];
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const parent = entry.target;
+        const children = parent.children;
+        Array.from(children).forEach((child, i) => {
+          child.style.opacity = '0';
+          child.style.transform = 'translateY(20px)';
+          child.style.transition = `opacity 0.4s ease ${i * 0.08}s, transform 0.4s ease ${i * 0.08}s`;
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              child.style.opacity = '1';
+              child.style.transform = 'translateY(0)';
+            }, 50);
+          });
+        });
+        io.unobserve(parent);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  staggerSelectors.forEach(sel => {
+    const parent = document.querySelector(sel + 's, .sobre-grid, .dia-grid, .showcase-grid, .projetos-grid');
+    // Observa o container pai
+    document.querySelectorAll('.sobre-grid, .dia-grid, .showcase-grid, .projetos-grid').forEach(el => {
+      io.observe(el);
+    });
+  });
+
+  // Observa seção-title e section-body com reveal
+  document.querySelectorAll('.section-kicker, .section-title, .section-body').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = `opacity 0.45s ease ${i * 0.06}s, transform 0.45s ease ${i * 0.06}s`;
+
+    const sio = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+          sio.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    sio.observe(el);
+  });
+})();
+</script>
+
+<div id="scroll-progress" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  z-index: 200;
+  pointer-events: none;
+  transition: width 0.1s linear;
+"></div>
+
+<script>
+(function(){
+  const bar = document.getElementById('scroll-progress');
+  const ligaColor = document.body.dataset.liga === 'ibtech' ? '#0F6FFF' : '#FF1F1F';
+  if (bar) bar.style.background = ligaColor;
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    if (bar) bar.style.width = pct + '%';
   });
 })();
 </script>
