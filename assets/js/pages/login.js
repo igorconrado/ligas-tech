@@ -35,7 +35,7 @@ function handleLogin() {
   // Simula autenticação — substituir pela chamada Supabase
   setTimeout(() => {
     // Aqui o Supabase vai verificar se é primeiro acesso (onboarding) ou não
-    window.location.href = '/membros/dashboard.html';
+    window.location.href = '/membros/dashboard';
   }, 1000);
 }
 
