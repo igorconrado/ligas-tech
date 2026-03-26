@@ -46,32 +46,36 @@
       <div class="login-title">ENTRAR</div>
       <div class="login-sub">Use seu email institucional pra acessar.</div>
 
-      <div class="form-group">
-        <label class="form-label">Email institucional</label>
-        <input
-          class="form-input"
-          id="email"
-          type="email"
-          placeholder="nome@ibmec.edu.br"
-          autocomplete="email"
-        >
-        <span class="form-input-hint">Somente emails @ibmec.edu.br</span>
+      <div id="step-main">
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label class="form-label">Email institucional</label>
+          <input class="form-input" type="email" id="login-email"
+                 placeholder="matricula@alunos.ibmec.edu.br"
+                 autocomplete="email">
+          <span class="login-hint">Apenas emails @alunos.ibmec.edu.br</span>
+        </div>
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="login-senha"
+                 placeholder="••••••••"
+                 autocomplete="current-password">
+        </div>
+        <div class="form-group" style="margin-bottom:1.5rem">
+          <label class="form-label">Confirmar senha <span style="color:var(--muted);font-size:9px;letter-spacing:.04em">(só no primeiro acesso)</span></label>
+          <input class="form-input" type="password" id="login-senha2"
+                 placeholder="Repita a senha"
+                 autocomplete="new-password">
+        </div>
+        <div class="form-error" id="error-main" style="display:none"></div>
+        <button class="login-btn" id="btn-entrar" onclick="handleEntrar()">Entrar →</button>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input
-          class="form-input"
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          autocomplete="current-password"
-        >
+      <div id="step-loading" style="display:none">
+        <div class="login-loading">
+          <div class="login-spinner"></div>
+          <span id="loading-text">Entrando...</span>
+        </div>
       </div>
-
-      <button class="form-btn" id="login-btn" onclick="handleLogin()">Entrar →</button>
-
-      <div class="form-error" id="form-error"></div>
 
       <div class="login-footer">
         Problemas pra acessar? Fale com a diretoria.<br>
@@ -82,6 +86,81 @@
 
 </div>
 
-<script type="module" src="/assets/js/pages/login.js"></script>
+<script type="module">
+import { emailValido, emailAutorizado, entrarOuCriar, getSession } from '/assets/js/supabase/auth.js';
+
+// Redirecionar se já logado
+getSession().then(session => {
+  if (session) window.location.href = '/membros/dashboard';
+});
+
+function showError(msg) {
+  const el = document.getElementById('error-main');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideError() {
+  const el = document.getElementById('error-main');
+  if (el) el.style.display = 'none';
+}
+
+function setLoading(state, msg = 'Entrando...') {
+  document.getElementById('step-main').style.display = state ? 'none' : 'block';
+  document.getElementById('step-loading').style.display = state ? 'block' : 'none';
+  document.getElementById('loading-text').textContent = msg;
+}
+
+window.handleEntrar = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  const senha2 = document.getElementById('login-senha2').value;
+
+  hideError();
+
+  // Validações
+  if (!email) return showError('Digite seu email institucional.');
+  if (!emailValido(email)) return showError('Use seu email @alunos.ibmec.edu.br');
+  if (!senha) return showError('Digite sua senha.');
+  if (senha.length < 8) return showError('A senha precisa ter no mínimo 8 caracteres.');
+  if (senha2 && senha !== senha2) return showError('As senhas não coincidem.');
+
+  setLoading(true, 'Verificando autorização...');
+
+  try {
+    // Verifica se email está autorizado
+    const { autorizado } = await emailAutorizado(email.toLowerCase());
+    if (!autorizado) {
+      setLoading(false);
+      return showError('Email não autorizado. Entre em contato com a diretoria.');
+    }
+
+    setLoading(true, 'Entrando...');
+
+    const { action } = await entrarOuCriar(email.toLowerCase(), senha);
+
+    if (action === 'signup') {
+      sessionStorage.setItem('primeiro_acesso', '1');
+    }
+
+    window.location.href = '/membros/dashboard';
+
+  } catch (e) {
+    setLoading(false);
+    if (e.message?.includes('Invalid login credentials')) {
+      showError('Senha incorreta. Se é seu primeiro acesso, escolha uma senha nova.');
+    } else if (e.message?.includes('Password should be')) {
+      showError('A senha precisa ter no mínimo 8 caracteres.');
+    } else {
+      showError('Erro ao entrar. Tente novamente.');
+    }
+  }
+};
+
+// Enter submete
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.handleEntrar();
+});
+</script>
 </body>
 </html>
