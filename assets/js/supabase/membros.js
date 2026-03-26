@@ -47,18 +47,37 @@ export async function completarOnboarding(dados) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
-  const { data, error } = await supabase
+  const payload = {
+    nome: dados.nome,
+    linkedin: dados.linkedin || null,
+    github: dados.github || null,
+    bio: dados.bio || null,
+    onboarding_completo: true
+  };
+
+  // Check if membros row already exists
+  const { data: existing } = await supabase
     .from('membros')
-    .upsert({
-      usuario_id: user.id,
-      nome: dados.nome,
-      linkedin: dados.linkedin || null,
-      github: dados.github || null,
-      bio: dados.bio || null,
-      onboarding_completo: true
-    }, { onConflict: 'usuario_id' })
-    .select()
-    .single();
+    .select('id')
+    .eq('usuario_id', user.id)
+    .maybeSingle();
+
+  let data, error;
+
+  if (existing) {
+    ({ data, error } = await supabase
+      .from('membros')
+      .update(payload)
+      .eq('usuario_id', user.id)
+      .select()
+      .single());
+  } else {
+    ({ data, error } = await supabase
+      .from('membros')
+      .insert({ ...payload, usuario_id: user.id, ativo: true })
+      .select()
+      .single());
+  }
 
   if (error) throw error;
   return data;
