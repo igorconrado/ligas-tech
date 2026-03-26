@@ -1,5 +1,6 @@
 // ── Dashboard Membro page ──
 import { formatDate } from '/assets/js/global.js';
+import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMeuPerfil, completarOnboarding, atualizarPerfil } from '/assets/js/supabase/membros.js';
 import { getAulasComEntregas, submeterEntrega } from '/assets/js/supabase/aulas.js';
@@ -9,6 +10,19 @@ import { getAvisos } from '/assets/js/supabase/avisos.js';
 // ── Auth guard ──
 const session = await requireAuth();
 if (!session) throw new Error('Não autenticado');
+
+// ── Role guard — diretoria vai para dashboard-diretoria ──
+const { data: usuario } = await supabase
+  .from('usuarios')
+  .select('role')
+  .eq('id', session.user.id)
+  .maybeSingle();
+
+const ROLES_DIRETORIA = ['diretoria', 'presidente', 'vp', 'ops', 'rh', 'diretor', 'coordenador'];
+if (usuario && ROLES_DIRETORIA.includes(usuario.role)) {
+  window.location.href = '/membros/dashboard-diretoria';
+  throw new Error('Redirecionando');
+}
 
 // ── State ──
 let perfilAtual = null;
