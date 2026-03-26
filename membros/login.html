@@ -128,10 +128,10 @@
 </div>
 
 <script type="module">
-import { emailValido, emailAutorizado, emailTemConta, criarConta, fazerLogin, getSession } from '/assets/js/supabase/auth.js';
+import { emailValido, emailAutorizado, emailTemConta, criarConta, fazerLogin, getSession, getDashboardUrl } from '/assets/js/supabase/auth.js';
 
 // Redireciona se já logado
-getSession().then(s => { if (s) window.location.href = '/membros/dashboard'; });
+getSession().then(async s => { if (s) window.location.href = await getDashboardUrl(); });
 
 let emailAtual = '';
 
@@ -226,7 +226,7 @@ window.handleCriar = async function() {
   try {
     await criarConta(emailAtual, senha);
     sessionStorage.setItem('primeiro_acesso', '1');
-    window.location.href = '/membros/dashboard';
+    window.location.href = await getDashboardUrl();
   } catch (e) {
     setBtn('btn-criar', false, 'Criar conta e entrar →');
     const msg = e.message?.includes('already registered')
@@ -246,7 +246,7 @@ window.handleLogar = async function() {
 
   try {
     await fazerLogin(emailAtual, senha);
-    window.location.href = '/membros/dashboard';
+    window.location.href = await getDashboardUrl();
   } catch (e) {
     setBtn('btn-logar', false, 'Entrar →');
     document.getElementById('input-senha-logar').value = '';
