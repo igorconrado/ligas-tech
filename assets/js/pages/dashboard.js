@@ -206,6 +206,18 @@ function renderizarAulas(aulas) {
   }).join('');
 }
 
+// ── Helper de prazo ──
+function getPrazoClass(prazo, status) {
+  if (status === 'entregue') return 'prazo-ok';
+  if (status === 'atrasada') return 'prazo-atrasado';
+  if (!prazo) return '';
+  const diff = new Date(prazo) - new Date();
+  const dias = diff / (1000 * 60 * 60 * 24);
+  if (dias < 0) return 'prazo-atrasado';
+  if (dias < 2) return 'prazo-alerta';
+  return 'prazo-ok';
+}
+
 // ── Renderizar entregas (tab) ──
 function renderizarEntregas(aulas) {
   const tbody = el('tbody-entregas');
@@ -225,9 +237,11 @@ function renderizarEntregas(aulas) {
           ? `<a href="${a.entrega.repo_url}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:11px;text-decoration:none">${a.entrega.repo_url.replace('https://github.com/', '')} ↗</a>`
           : '<span style="color:var(--muted);font-size:11px">—</span>';
 
+        const prazoClass = getPrazoClass(a.prazo_entrega, a.statusEntrega);
+
         return `<tr>
           <td style="font-weight:500">Aula ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
-          <td style="color:${a.statusEntrega === 'atrasada' ? 'rgba(255,120,120,.7)' : 'var(--mid)'}">${fmtDate(a.prazo_entrega)}</td>
+          <td class="${prazoClass}">${fmtDate(a.prazo_entrega)}</td>
           <td>${repo}</td>
           <td><span class="pill ${pillClass}">${pillLabel}</span></td>
         </tr>`;
@@ -439,31 +453,26 @@ async function handleSubmeterEntrega() {
   }
 }
 
-async function handleRegistrarPresenca() {
-  const input = el('presenca-codigo');
+async function handleRegistrarPresenca(codigoParam) {
   const fb = el('presenca-feedback');
-  const codigo = input?.value?.trim();
+  const otpIds = ['otp-1','otp-2','otp-3','otp-4','otp-5','otp-6'];
+  const codigo = codigoParam || otpIds.map(id => el(id)?.value || '').join('').trim();
 
-  if (!codigo) {
+  if (!codigo || codigo.length < 6) {
     fb.style.display = 'block';
     fb.style.color = 'rgba(255,120,120,.8)';
     fb.textContent = 'Digite o código de presença.';
     return;
   }
 
-  const btn = el('btn-presenca');
   try {
-    btn.disabled = true;
-    btn.textContent = 'Registrando...';
+    otpIds.forEach(id => { const inp = el(id); if (inp) inp.disabled = true; });
 
     await registrarPresenca(codigo);
 
     fb.style.display = 'block';
     fb.style.color = '#4ade80';
     fb.textContent = '✓ Presença registrada!';
-    input.value = '';
-    input.disabled = true;
-    btn.style.opacity = '.4';
 
     const presencas = await getMinhasPresencas();
     renderizarPresencas(presencas, calcularAlertaFrequencia(presencas, presencas.length));
@@ -471,8 +480,8 @@ async function handleRegistrarPresenca() {
     fb.style.display = 'block';
     fb.style.color = 'rgba(255,120,120,.8)';
     fb.textContent = e.message || 'Erro ao registrar presença.';
-    btn.disabled = false;
-    btn.textContent = 'Registrar →';
+    otpIds.forEach(id => { const inp = el(id); if (inp) { inp.disabled = false; inp.value = ''; inp.classList.remove('filled'); } });
+    el('otp-1')?.focus();
   }
 }
 
