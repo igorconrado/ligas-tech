@@ -7,6 +7,14 @@
 :root { --sidebar: 220px; }
 body { font-size: 13px; min-height: 100vh; }
 
+/* Content max-width */
+.content { max-width: 1200px; }
+
+/* Títulos — hierarquia dashboard */
+.topbar-title { font-size: 18px; text-transform: uppercase; letter-spacing: .08em; }
+.panel-title { font-family: var(--font-body); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: none; }
+.tbl th { padding: .625rem .75rem; letter-spacing: .1em; }
+
 /* Sidebar overrides */
 .sidebar-brand { display: flex; align-items: center; gap: .5rem; }
 .nav-item.active.r { border-left: 2px solid var(--red); }

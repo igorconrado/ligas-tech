@@ -441,7 +441,14 @@ footer {
   text-decoration: none;
 }
 .nav-item:hover { background: var(--bg3); color: var(--text); }
-.nav-item.active { background: var(--bg4); color: var(--text); border: 1px solid var(--border2); }
+.nav-item.active {
+  background: var(--bg4); color: var(--text); font-weight: 600;
+  position: relative;
+}
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 25%; bottom: 25%;
+  width: 2px; border-radius: 2px; background: var(--blue);
+}
 .nav-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .nav-dot.r { background: var(--red); }
 .nav-dot.b { background: var(--blue); }
@@ -548,6 +555,35 @@ footer {
   .nav-tag { display: none; }
   .section { padding: 3.5rem 1.25rem; }
 }
+
+/* --------------------------------
+   Botões utilitários
+   Páginas: dashboard, dashboard-diretoria
+   -------------------------------- */
+.btn-primary {
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 9px 20px; border-radius: 3px; border: none; cursor: pointer;
+  background: var(--blue); color: #fff; transition: opacity .2s;
+}
+.btn-primary:hover { opacity: .88; }
+
+.btn-ghost {
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 9px 20px; border-radius: 3px; cursor: pointer;
+  background: transparent; color: var(--mid);
+  border: 1px solid var(--border2); transition: all .2s;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+
+.btn-danger {
+  font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 9px 20px; border-radius: 3px; border: none; cursor: pointer;
+  background: var(--red); color: #fff; transition: opacity .2s;
+}
+.btn-danger:hover { opacity: .88; }
 
 .reveal {
   opacity: 0;
