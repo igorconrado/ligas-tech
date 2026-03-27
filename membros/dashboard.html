@@ -237,37 +237,8 @@
           <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Cronograma</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">Semestre 2026.1 · IbBot & IbTech</div>
         </div>
-        <div class="cronograma">
-          <div class="cron-item">
-            <div class="cron-date"><strong>06 mar</strong>Qui</div>
-            <div class="cron-divider"></div>
-            <div class="cron-content"><div class="cron-title">Aula 01 — Lógica em C</div><div class="cron-desc">Condicionais, loops e estruturas básicas</div></div>
-            <div class="cron-liga"><span class="pill ok">Concluída</span></div>
-          </div>
-          <div class="cron-item">
-            <div class="cron-date"><strong>11 mar</strong>Ter</div>
-            <div class="cron-divider"></div>
-            <div class="cron-content"><div class="cron-title">IbBot — Reunião de fase</div><div class="cron-desc">Revisão mecânica e eletrônica</div></div>
-            <div class="cron-liga"><span class="pill ok">Concluída</span></div>
-          </div>
-          <div class="cron-item">
-            <div class="cron-date"><strong>13 mar</strong>Qui</div>
-            <div class="cron-divider"></div>
-            <div class="cron-content"><div class="cron-title">Aula 02 — Frontend</div><div class="cron-desc">HTML, CSS e JavaScript</div></div>
-            <div class="cron-liga"><span class="pill ok">Concluída</span></div>
-          </div>
-          <div class="cron-item today" style="border-color:rgba(15,111,255,.3)">
-            <div class="cron-date"><strong>20 mar</strong>Qui</div>
-            <div class="cron-divider"></div>
-            <div class="cron-content"><div class="cron-title">Aula 03 — Arrays em C</div><div class="cron-desc">Arrays, matrizes e funções</div></div>
-            <div class="cron-liga"><span class="pill next">Hoje</span></div>
-          </div>
-          <div class="cron-item">
-            <div class="cron-date"><strong>27 mar</strong>Qui</div>
-            <div class="cron-divider"></div>
-            <div class="cron-content"><div class="cron-title">Aula 04 — Git & GitHub</div><div class="cron-desc">Versionamento e boas práticas</div></div>
-            <div class="cron-liga"><span class="pill planned">Planejada</span></div>
-          </div>
+        <div class="timeline" id="timeline-container">
+          <!-- Itens gerados pelo JS -->
         </div>
       </div>
 
@@ -324,7 +295,9 @@
                 <textarea class="form-input form-textarea" id="p-bio" placeholder="Uma frase sobre você — aparece no perfil da diretoria"></textarea>
               </div>
             </div>
-            <button class="form-save" onclick="savePerfil()">Salvar →</button>
+            <button class="btn-sm b" id="btn-salvar-perfil" onclick="savePerfil()">
+              <span id="btn-salvar-texto">SALVAR →</span>
+            </button>
           </div>
         </div>
       </div>

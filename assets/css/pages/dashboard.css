@@ -12,6 +12,27 @@ body { font-size: 13px; min-height: 100vh; }
 .nav-item.active.r { border-left: 2px solid var(--red); }
 .nav-item.active.b { border-left: 2px solid var(--blue); }
 
+/* Avatar sidebar com gradiente */
+.user-av {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(15,111,255,.2), rgba(15,111,255,.05));
+  border: 1px solid rgba(15,111,255,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--blue);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.user-av:hover { border-color: rgba(15,111,255,.4); }
+.user-av img { width: 100%; height: 100%; object-fit: cover; }
+
 /* Topbar liga badge */
 .topbar-liga {
   font-family: var(--font-mono); font-size: 10px; padding: 2px 8px;
@@ -86,22 +107,69 @@ body { font-size: 13px; min-height: 100vh; }
 .form-save { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 9px 20px; border-radius: 3px; border: none; cursor: pointer; background: var(--text); color: var(--bg); margin-top: .75rem; transition: opacity .2s; }
 .form-save:hover { opacity: .88; }
 
-/* Cronograma */
-.cronograma { display: flex; flex-direction: column; gap: .375rem; }
-.cron-item {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
-  padding: .875rem 1.125rem; display: flex; align-items: center; gap: 1rem;
-  transition: background .15s;
+/* Timeline cronograma */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
 }
-.cron-item:hover { background: var(--bg3); }
-.cron-item.today { border-color: rgba(15,111,255,.3); }
-.cron-date { font-family: var(--font-mono); font-size: 11px; color: var(--muted); min-width: 80px; }
-.cron-date strong { display: block; font-size: 13px; color: var(--text); }
-.cron-divider { width: 1px; height: 32px; background: var(--border2); flex-shrink: 0; }
-.cron-content { flex: 1; }
-.cron-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-.cron-desc { font-size: 11px; color: var(--muted); }
-.cron-liga { margin-left: auto; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.timeline-item {
+  position: relative;
+  padding: 0 0 1.75rem 1.5rem;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot {
+  position: absolute;
+  left: -1.75rem;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  z-index: 1;
+}
+.timeline-dot.concluida { background: var(--green); border-color: var(--green); }
+.timeline-dot.hoje      { background: var(--blue);  border-color: var(--blue); box-shadow: 0 0 8px rgba(15,111,255,.4); }
+.timeline-dot.planejada { background: var(--bg3);   border-color: var(--border2); }
+.timeline-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  margin-bottom: .25rem;
+}
+.timeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: .25rem;
+}
+.timeline-sub {
+  font-size: 12px;
+  color: var(--mid);
+  font-weight: 300;
+}
+.timeline-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  margin-top: .375rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.timeline-badge.concluida { background: rgba(34,197,94,.1); color: #4ade80; }
+.timeline-badge.hoje      { background: rgba(15,111,255,.1); color: rgba(100,160,255,.9); }
+.timeline-badge.planejada { background: rgba(255,255,255,.05); color: var(--muted); }
 
 /* Presença do membro */
 .presenca-timeline { display: flex; flex-direction: column; gap: .375rem; }
