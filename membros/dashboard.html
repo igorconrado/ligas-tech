@@ -197,7 +197,14 @@
         <div class="panel-full">
           <table class="tbl">
             <thead><tr><th>Aula</th><th>Prazo</th><th>Repositório</th><th>Status</th></tr></thead>
-            <tbody id="tbody-entregas"></tbody>
+            <tbody id="tbody-entregas">
+              <tr id="estado-vazio-entregas">
+                <td colspan="4" style="text-align:center;padding:3rem 1rem;">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">Nenhuma entrega cadastrada</div>
+                  <div style="font-size:13px;color:var(--muted);font-weight:300">Quando suas entregas forem cadastradas pela diretoria, elas aparecerão aqui</div>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="entrega-box" id="entrega-box" style="display:none">
@@ -231,10 +238,15 @@
 
         <div class="presenca-box" style="margin-bottom:1.25rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:1rem 1.25rem">
           <div style="font-size:13px;font-weight:500;margin-bottom:.625rem">Registrar presença</div>
-          <div style="display:flex;gap:.5rem;align-items:center">
-            <input class="form-input" id="presenca-codigo" placeholder="Código de 6 dígitos" style="flex:1;max-width:220px;font-family:var(--font-mono);letter-spacing:.15em;text-align:center" maxlength="6">
-            <button class="login-btn" id="btn-presenca" onclick="registrarPresencaCodigo()" style="padding:.5rem 1.25rem;font-size:12px;white-space:nowrap">Registrar →</button>
+          <div class="otp-wrap">
+            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-1" onInput="otpNext(this, 'otp-2')">
+            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-2" onInput="otpNext(this, 'otp-3')" onKeydown="otpPrev(event, 'otp-1')">
+            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-3" onInput="otpNext(this, 'otp-4')" onKeydown="otpPrev(event, 'otp-2')">
+            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-4" onInput="otpNext(this, 'otp-5')" onKeydown="otpPrev(event, 'otp-3')">
+            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-5" onInput="otpNext(this, 'otp-6')" onKeydown="otpPrev(event, 'otp-4')">
+            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-6" onKeydown="otpPrev(event, 'otp-5')" onInput="otpFinal(this)">
           </div>
+          <p class="otp-hint">O código é exibido pela diretoria no início de cada encontro</p>
           <div id="presenca-feedback" style="display:none;margin-top:.5rem;font-family:var(--font-mono);font-size:11px"></div>
         </div>
 
@@ -361,6 +373,30 @@
     el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
   });
 })();
+</script>
+<script>
+function otpNext(el, nextId) {
+  el.classList.toggle('filled', el.value !== '');
+  if (el.value && nextId) {
+    document.getElementById(nextId)?.focus();
+  }
+}
+function otpPrev(event, prevId) {
+  if (event.key === 'Backspace' && !event.target.value) {
+    document.getElementById(prevId)?.focus();
+  }
+}
+function otpFinal(el) {
+  el.classList.toggle('filled', el.value !== '');
+  const codigo = ['otp-1','otp-2','otp-3','otp-4','otp-5','otp-6']
+    .map(id => document.getElementById(id)?.value || '')
+    .join('');
+  if (codigo.length === 6) {
+    if (typeof registrarPresencaCodigo === 'function') {
+      registrarPresencaCodigo(codigo);
+    }
+  }
+}
 </script>
 </body>
 </html>

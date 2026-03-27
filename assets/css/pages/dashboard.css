@@ -140,6 +140,9 @@ body { font-size: 13px; min-height: 100vh; }
 }
 .entrega-submit:hover { opacity: .88; }
 .entrega-hint { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: .5rem; }
+.prazo-ok    { color: var(--green); }
+.prazo-alerta { color: var(--amber); }
+.prazo-atrasado { color: var(--red); }
 
 /* Perfil */
 .perfil-grid { display: grid; grid-template-columns: 240px 1fr; gap: 1rem; }
@@ -184,6 +187,36 @@ body { font-size: 13px; min-height: 100vh; }
 .cron-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
 .cron-desc { font-size: 11px; color: var(--muted); }
 .cron-liga { margin-left: auto; }
+
+/* OTP input presença */
+.otp-wrap {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: .75rem;
+}
+.otp-input {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+  caret-color: transparent;
+}
+.otp-input:focus { border-color: var(--blue); }
+.otp-input.filled { border-color: rgba(15,111,255,.4); }
+.otp-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .04em;
+  margin-bottom: 1rem;
+}
 
 /* Presença do membro */
 .presenca-timeline { display: flex; flex-direction: column; gap: .375rem; }
