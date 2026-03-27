@@ -330,6 +330,39 @@ function renderizarAvisos(avisos) {
   // Placeholder — avisos podem ser exibidos futuramente no dashboard
 }
 
+// ── Timeline cronograma ──
+const cronogramaItens = [
+  { data: '2026-03-06', titulo: 'Aula 01 — Lógica em C', subtitulo: 'Condicionais, loops e estruturas básicas' },
+  { data: '2026-03-11', titulo: 'IbBot — Reunião de fase', subtitulo: 'Revisão mecânica e eletrônica' },
+  { data: '2026-03-13', titulo: 'Aula 02 — Frontend', subtitulo: 'HTML, CSS e JavaScript' },
+  { data: '2026-03-20', titulo: 'Aula 03 — Arrays em C', subtitulo: 'Arrays, matrizes e funções' },
+  { data: '2026-03-27', titulo: 'Aula 04 — Git & GitHub', subtitulo: 'Versionamento e boas práticas' },
+];
+
+function renderizarTimeline(itens) {
+  const container = document.getElementById('timeline-container');
+  if (!container) return;
+
+  const hoje = new Date().toDateString();
+
+  container.innerHTML = itens.map(item => {
+    const dataItem = new Date(item.data);
+    const isHoje = dataItem.toDateString() === hoje;
+    const isConcluida = dataItem < new Date() && !isHoje;
+    const status = isHoje ? 'hoje' : isConcluida ? 'concluida' : 'planejada';
+
+    return `
+      <div class="timeline-item">
+        <div class="timeline-dot ${status}"></div>
+        <div class="timeline-date">${dataItem.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+        <div class="timeline-title">${item.titulo}</div>
+        ${item.subtitulo ? `<div class="timeline-sub">${item.subtitulo}</div>` : ''}
+        <span class="timeline-badge ${status}">${status === 'hoje' ? 'Hoje' : status === 'concluida' ? 'Concluída' : 'Planejada'}</span>
+      </div>
+    `;
+  }).join('');
+}
+
 // ── Onboarding ──
 const onboardingSteps = [
   { kicker: 'Passo 1 de 3', title: 'BEM-VINDO.', sub: 'Esse é o portal das ligas. Aqui você acompanha suas aulas, entregas e presença. Vamos configurar seu perfil em 3 passos rápidos.', content: '', next: 'Começar →' },
@@ -495,11 +528,14 @@ async function handleRegistrarPresenca(codigoParam) {
 }
 
 async function savePerfil() {
-  const btn = document.querySelector('.form-save');
-  try {
-    btn.disabled = true;
-    btn.textContent = 'Salvando...';
+  const btn = el('btn-salvar-perfil');
+  const texto = el('btn-salvar-texto');
+  if (!btn || !texto) return;
 
+  btn.disabled = true;
+  texto.textContent = 'SALVANDO...';
+
+  try {
     const updates = {
       nome: el('p-nome').value.trim(),
       linkedin: el('p-linkedin').value.trim() || null,
@@ -511,11 +547,22 @@ async function savePerfil() {
     perfilAtual = { ...perfilAtual, ...perfil };
     atualizarHeaderMembro(perfilAtual);
 
-    btn.textContent = 'Salvo ✓';
-    setTimeout(() => { btn.textContent = 'Salvar →'; btn.disabled = false; }, 2000);
+    texto.textContent = '✓ SALVO';
+    btn.style.background = 'var(--green)';
+
+    setTimeout(() => {
+      texto.textContent = 'SALVAR →';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2000);
   } catch (e) {
-    btn.textContent = 'Salvar →';
-    btn.disabled = false;
+    texto.textContent = 'ERRO — TENTAR NOVAMENTE';
+    btn.style.background = 'var(--red)';
+    setTimeout(() => {
+      texto.textContent = 'SALVAR →';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2000);
   }
 }
 
@@ -559,6 +606,7 @@ async function inicializar() {
     renderizarAulas(aulas);
     renderizarEntregas(aulas);
     renderizarAvisos(avisos);
+    renderizarTimeline(cronogramaItens);
   } catch (e) {
     console.error('Erro ao carregar dashboard:', e);
   }
