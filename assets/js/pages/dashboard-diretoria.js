@@ -7,6 +7,7 @@ import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getTodasAulas, criarAula, togglePublicarAula, getEntregasAula } from '/assets/js/supabase/aulas.js';
 import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro } from '/assets/js/supabase/presenca.js';
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
+import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 
 // ── Auth ──
@@ -62,11 +63,54 @@ async function getMinhaLigaId() {
   return data?.liga_id;
 }
 
+// ── Feedback simples (usado por handlers de modal) ──
+function mostrarErroModal(msg) { alert(msg); }
+function mostrarSucesso(msg) { alert(msg); }
+
+// ── Novo membro — Supabase ──
+async function handleCadastrarMembro() {
+  const nome  = document.getElementById('novo-nome')?.value?.trim();
+  const email = document.getElementById('novo-email')?.value?.trim();
+  const liga  = document.getElementById('nova-liga')?.value;
+
+  if (!nome || !email || !liga) {
+    mostrarErroModal('Preencha todos os campos.');
+    return;
+  }
+
+  if (!email.endsWith('@alunos.ibmec.edu.br')) {
+    mostrarErroModal('Use o email @alunos.ibmec.edu.br');
+    return;
+  }
+
+  const matricula = email.replace('@alunos.ibmec.edu.br', '');
+
+  try {
+    const { error } = await supabase
+      .from('emails_autorizados')
+      .insert({ email, nome, matricula });
+
+    if (error) throw error;
+
+    closeModal('modal-novo-membro');
+    await carregarMembros();
+    mostrarSucesso('Membro cadastrado. Ele pode criar a conta pelo login.');
+
+  } catch (e) {
+    if (e.message?.includes('duplicate') || e.message?.includes('unique')) {
+      mostrarErroModal('Este email já está cadastrado.');
+    } else {
+      mostrarErroModal('Erro ao cadastrar. Tente novamente.');
+    }
+  }
+}
+
 // ── Carregar membros do Supabase ──
 async function carregarMembros() {
   try {
     const membros = await getMembrosLiga();
     members = membros.map(m => ({
+      id: m.id,
       name: m.nome,
       liga: m.ligas?.nome || '—',
       presenca: 0,
@@ -93,7 +137,7 @@ function renderOverview(data) {
     <td style="color:var(--mid)">${m.entregas}</td>
     <td><span class="pill ${statusMap[m.status] || 'ok'}">${statusLabel[m.status] || 'Regular'}</span></td>
     <td style="color:${m.adv > 0 ? 'rgba(255,120,120,.8)' : 'var(--muted)'}; font-family:var(--font-mono); font-size:11px">${m.adv > 0 ? m.adv + 'x' : '—'}</td>
-    <td><button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.name}')">Anotar</button></td>
+    <td><button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button></td>
   </tr>`).join('')}</tbody>`;
 }
 
@@ -109,7 +153,7 @@ function renderMembros(data) {
     <td style="color:${m.adv > 0 ? 'rgba(255,120,120,.8)' : 'var(--muted)'}; font-family:var(--font-mono); font-size:11px">${m.adv > 0 ? m.adv + 'x' : '—'}</td>
     <td style="color:var(--muted)">2026.1</td>
     <td style="display:flex;gap:.375rem">
-      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.name}')">Anotar</button>
+      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button>
       <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
     </td>
   </tr>`).join('')}</tbody>`;
@@ -324,16 +368,70 @@ function atualizarPresencaTempoReal(novaPresenca) {
   renderPresenca();
 }
 
-// ── Advertência ──
-let advTarget = '';
-function openAdvModal(name) {
-  advTarget = name;
-  document.getElementById('adv-modal-sub').textContent = `Membro: ${name}`;
-  document.getElementById('adv-desc').value = '';
-  openModal('adv-modal');
+// ── Advertência — Supabase ──
+function openAdvModal(membroId, name) {
+  const sub = document.getElementById('adv-modal-sub');
+  if (sub) sub.textContent = name ? `Membro: ${name}` : 'Registrar advertência ou anotação';
+  const idInput = document.getElementById('adv-membro-id');
+  if (idInput) idInput.value = membroId || '';
+  const desc = document.getElementById('adv-descricao');
+  if (desc) desc.value = '';
+  openModal('modal-advertencia');
 }
-function saveAdv() {
-  closeModal('adv-modal');
+
+async function handleSalvarAdvertencia() {
+  const membroId = document.getElementById('adv-membro-id')?.value;
+  const tipo     = document.getElementById('adv-tipo')?.value;
+  const descricao = document.getElementById('adv-descricao')?.value?.trim();
+
+  if (!membroId || !tipo || !descricao) return;
+
+  try {
+    await registrarAdvertencia(membroId, tipo, descricao);
+    closeModal('modal-advertencia');
+    await carregarAdvertencias();
+    mostrarSucesso('Advertência registrada.');
+  } catch (e) {
+    console.error('Erro ao registrar advertência:', e);
+  }
+}
+
+async function carregarAdvertencias() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const advertencias = await getTodasAdvertencias(ligaIdAtual);
+    renderizarAdvertencias(advertencias);
+  } catch (e) {
+    console.error('Erro ao carregar advertências:', e);
+  }
+}
+
+function renderizarAdvertencias(advertencias) {
+  const tbody = document.getElementById('tbody-advertencias') ||
+                document.querySelector('#tab-advertencias tbody');
+  if (!tbody) return;
+
+  if (!advertencias || advertencias.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-family:var(--font-mono);font-size:10px;letter-spacing:.08em">
+        Nenhuma advertência registrada
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = advertencias.map(adv => `
+    <tr>
+      <td>${adv.membros?.nome || '—'}</td>
+      <td><span class="pill ${adv.tipo === 'grave' ? 'adv' : 'warn'}">${adv.tipo}</span></td>
+      <td>${adv.descricao}</td>
+      <td>${new Date(adv.criado_em).toLocaleDateString('pt-BR')}</td>
+      <td><button class="btn-sm ghost" onclick="verAdvertencia('${adv.id}')">Ver</button></td>
+    </tr>
+  `).join('');
+}
+
+function verAdvertencia(id) {
+  console.log('ver advertência', id);
 }
 
 // ── Avisos — Supabase ──
@@ -427,13 +525,16 @@ await carregarAulas();
 await carregarEntregas();
 await atualizarMetricas();
 await carregarAvisos();
+await carregarAdvertencias();
 
 // ── Expõe pro onclick inline ──
 window.showTab = showTab;
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.openAdvModal = openAdvModal;
-window.saveAdv = saveAdv;
+window.handleSalvarAdvertencia = handleSalvarAdvertencia;
+window.handleCadastrarMembro = handleCadastrarMembro;
+window.verAdvertencia = verAdvertencia;
 window.publishAviso = handlePublicarAviso;
 window.exportCSV = exportCSV;
 window.filterMembers = filterMembers;
