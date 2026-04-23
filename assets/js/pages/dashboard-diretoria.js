@@ -12,6 +12,7 @@ import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, e
 import { toast } from '/assets/js/ui/toast.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows, skeletonCards, skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
+import { confirmDialog } from '/assets/js/ui/confirm.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -244,6 +245,7 @@ function renderizarAulas(aulas) {
     const prazoFmt = prazo
       ? prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
       : '—';
+    const togglePublicLabel = a.publicada ? 'Despublicar' : 'Publicar';
     return `
       <div class="aula-dir-card">
         <div class="aula-num">Aula ${numero}</div>
@@ -252,11 +254,34 @@ function renderizarAulas(aulas) {
           <span class="pill ${statusPillMap[status]}">${statusLabelMap[status]}</span>
           <div style="display:flex;align-items:center;gap:.5rem">
             <span class="aula-stats">Prazo: ${prazoFmt}</span>
+            <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="handleTogglePublicarAula('${a.id}', ${a.publicada})">${togglePublicLabel}</button>
             <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
           </div>
         </div>
       </div>`;
   }).join('');
+}
+
+async function handleTogglePublicarAula(aulaId, publicadaAtual) {
+  const novaFlag = !publicadaAtual;
+  const ok = await confirmDialog({
+    title: publicadaAtual ? 'Despublicar aula?' : 'Publicar aula?',
+    message: publicadaAtual
+      ? 'Membros não verão mais essa aula no dashboard enquanto estiver despublicada.'
+      : 'Os membros da liga vão ver essa aula no dashboard imediatamente.',
+    confirmLabel: publicadaAtual ? 'Despublicar' : 'Publicar',
+    danger: publicadaAtual,
+  });
+  if (!ok) return;
+
+  try {
+    await togglePublicarAula(aulaId, novaFlag);
+    await carregarAulas();
+    toast.success(novaFlag ? 'Aula publicada' : 'Aula despublicada');
+  } catch (e) {
+    console.error('Erro ao alterar publicação da aula:', e);
+    toast.error(e.message || 'Erro ao atualizar aula');
+  }
 }
 
 // ── Carregar + render entregas ──
@@ -644,6 +669,20 @@ async function handleAbrirChamada() {
 }
 
 async function handleFecharChamada(encontroId) {
+  const ok = await confirmDialog({
+    title: 'Encerrar chamada?',
+    message: 'Presenças não registradas vão ficar em branco. Você pode corrigi-las depois.',
+    confirmLabel: 'Encerrar',
+  });
+  if (!ok) return;
+
+  const btnAbrir = document.getElementById('btn-abrir-chamada');
+  const originalLabel = btnAbrir?.textContent;
+  if (btnAbrir) {
+    btnAbrir.disabled = true;
+    btnAbrir.textContent = 'Encerrando...';
+  }
+
   closeModal('qr-modal');
   try {
     await fecharChamada(encontroId);
@@ -656,14 +695,20 @@ async function handleFecharChamada(encontroId) {
     chamadaAberta = false;
     renderPresenca();
 
-    const btnAbrir = document.getElementById('btn-abrir-chamada');
     if (btnAbrir) {
+      btnAbrir.disabled = false;
       btnAbrir.textContent = 'Abrir Chamada';
       btnAbrir.onclick = handleAbrirChamada;
     }
 
+    toast.success('Chamada encerrada');
   } catch (e) {
     console.error('Erro ao fechar chamada:', e);
+    toast.error(e.message || 'Erro ao encerrar chamada');
+    if (btnAbrir) {
+      btnAbrir.disabled = false;
+      btnAbrir.textContent = originalLabel || 'Fechar Chamada';
+    }
   }
 }
 
@@ -711,15 +756,30 @@ async function handleSalvarAdvertencia() {
   }
   if (!tipo || !descricao) return;
 
+  const ok = await confirmDialog({
+    title: 'Registrar advertência?',
+    message: 'A advertência fica permanentemente no histórico do membro. Essa ação não pode ser desfeita.',
+    confirmLabel: 'Registrar',
+    danger: true,
+  });
+  if (!ok) return;
+
+  const btn = document.querySelector('button[onclick="handleSalvarAdvertencia()"]');
+  const originalLabel = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Registrando...'; }
+
   try {
     await registrarAdvertencia(membroId, tipo, descricao);
     closeModal('modal-advertencia');
     const selectReset = document.getElementById('advertencia-membro');
     if (selectReset) selectReset.value = '';
     await carregarAdvertencias();
-    toast.success('Advertência registrada.');
+    toast.success('Advertência registrada');
   } catch (e) {
     console.error('Erro ao registrar advertência:', e);
+    toast.error(e.message || 'Erro ao registrar advertência');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = originalLabel || 'Registrar →'; }
   }
 }
 
@@ -892,4 +952,5 @@ window.savePresenca = savePresenca;
 window.exportPresenca = exportPresenca;
 window.handleAbrirChamada = handleAbrirChamada;
 window.handleCriarEncontro = handleCriarEncontro;
+window.handleTogglePublicarAula = handleTogglePublicarAula;
 window.handleFecharChamada = handleFecharChamada;
