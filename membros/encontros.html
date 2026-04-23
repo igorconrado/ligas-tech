@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus Encontros — Área de Membros · IbBot & IbTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/global.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/dashboard.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 900px">
+
+  <div style="margin-bottom: var(--sp-5); display: flex; justify-content: space-between; align-items: center; gap: var(--sp-4)">
+    <div>
+      <h1 style="font-family: var(--font-display); font-size: var(--fs-h1); letter-spacing: .02em">Meus Encontros</h1>
+      <div id="presenca-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px"><span class="skeleton skeleton--text"></span></div>
+    </div>
+    <div id="presenca-percent-box" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:4px;padding:.75rem 1rem;text-align:center">
+      <div id="presenca-percent" style="font-family:var(--font-display);font-size:28px;color:var(--green)">—</div>
+      <div id="presenca-percent-label" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.06em">Regular</div>
+    </div>
+  </div>
+
+  <div class="presenca-box" style="margin-bottom:1.25rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:1rem 1.25rem">
+    <div style="font-size:13px;font-weight:500;margin-bottom:.625rem">Registrar presença</div>
+    <div class="otp-wrap">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-1" oninput="otpNext(this, 'otp-2')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-2" oninput="otpNext(this, 'otp-3')" onkeydown="otpPrev(event, 'otp-1')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-3" oninput="otpNext(this, 'otp-4')" onkeydown="otpPrev(event, 'otp-2')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-4" oninput="otpNext(this, 'otp-5')" onkeydown="otpPrev(event, 'otp-3')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-5" oninput="otpNext(this, 'otp-6')" onkeydown="otpPrev(event, 'otp-4')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-6" onkeydown="otpPrev(event, 'otp-5')" oninput="otpFinal(this)">
+    </div>
+    <p class="otp-hint">O código é exibido pela diretoria no início de cada encontro</p>
+    <div id="presenca-feedback" style="display:none;margin-top:.5rem;font-family:var(--font-mono);font-size:11px"></div>
+  </div>
+
+  <div class="presenca-timeline" id="presenca-timeline"></div>
+
+</main>
+<script>
+function otpNext(el, nextId) {
+  el.classList.toggle('filled', el.value !== '');
+  if (el.value && nextId) document.getElementById(nextId)?.focus();
+}
+function otpPrev(event, prevId) {
+  if (event.key === 'Backspace' && !event.target.value) document.getElementById(prevId)?.focus();
+}
+function otpFinal(el) {
+  el.classList.toggle('filled', el.value !== '');
+  const codigo = ['otp-1','otp-2','otp-3','otp-4','otp-5','otp-6']
+    .map(id => document.getElementById(id)?.value || '').join('');
+  if (codigo.length === 6 && typeof registrarPresencaCodigo === 'function') {
+    registrarPresencaCodigo(codigo);
+  }
+}
+</script>
+<script type="module" src="/assets/js/pages/encontros-membro.js"></script>
+</body>
+</html>

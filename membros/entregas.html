@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas Entregas — Área de Membros · IbBot & IbTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/global.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/dashboard.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1100px">
+  <div style="margin-bottom:var(--sp-5)">
+    <h1 style="font-family:var(--font-display);font-size:var(--fs-h1);letter-spacing:.02em">Minhas entregas</h1>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px">Envie o link do repositório GitHub pra cada aula</div>
+  </div>
+  <div class="panel-full">
+    <table class="tbl">
+      <thead><tr><th>Aula</th><th>Prazo</th><th>Repositório</th><th>Status</th></tr></thead>
+      <tbody id="tbody-entregas"></tbody>
+    </table>
+  </div>
+  <div class="entrega-box" id="entrega-box" style="display:none">
+    <div class="entrega-title" id="entrega-title">Enviar entrega</div>
+    <div class="entrega-input-row">
+      <input class="entrega-input" id="repo-input" placeholder="https://github.com/seu-usuario/ibtech-aula02-seunome" type="url">
+      <button class="entrega-submit" onclick="submitEntrega()">Enviar →</button>
+    </div>
+    <div class="entrega-hint">Use o formato: github.com/usuario/ibtech-aula02-seunome · O repositório precisa ser público</div>
+    <div id="entrega-feedback" style="display:none;margin-top:.625rem;font-family:var(--font-mono);font-size:11px"></div>
+  </div>
+</main>
+<script type="module" src="/assets/js/pages/entregas-membro.js"></script>
+</body>
+</html>
