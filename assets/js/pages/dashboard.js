@@ -99,9 +99,9 @@ function renderizarDashboard(perfil, presencas, aulas) {
   const pendentes = totalEntregas - entregues;
 
   const now = new Date();
-  const aulasPassadas = aulas.filter(a => new Date(a.data) < now);
+  const aulasPassadas = aulas.filter(a => new Date(a.prazo_entrega) < now);
   const pctAulas = aulas.length > 0 ? Math.round((aulasPassadas.length / aulas.length) * 100) : 0;
-  const proxima = aulas.find(a => new Date(a.data) >= now);
+  const proxima = aulas.find(a => new Date(a.prazo_entrega) >= now);
 
   // Métricas
   el('metric-presenca-val').textContent = `${pctPresenca}%`;
@@ -113,9 +113,9 @@ function renderizarDashboard(perfil, presencas, aulas) {
   el('metric-entregas-sub').textContent = pendentes > 0 ? `${pendentes} pendente${pendentes > 1 ? 's' : ''}` : 'Tudo em dia';
 
   if (proxima) {
-    const dia = new Date(proxima.data).toLocaleDateString('pt-BR', { weekday: 'long' });
+    const dia = new Date(proxima.prazo_entrega).toLocaleDateString('pt-BR', { weekday: 'long' });
     el('metric-proximo-val').textContent = dia.charAt(0).toUpperCase() + dia.slice(1);
-    el('metric-proximo-sub').textContent = `${fmtDate(proxima.data)} · Aula ${String(proxima.numero).padStart(2, '0')}`;
+    el('metric-proximo-sub').textContent = `${fmtDate(proxima.prazo_entrega)} · Aula ${String(proxima.numero).padStart(2, '0')}`;
   } else {
     el('metric-proximo-val').textContent = '—';
     el('metric-proximo-sub').textContent = 'Nenhuma agendada';
@@ -126,11 +126,11 @@ function renderizarDashboard(perfil, presencas, aulas) {
   el('metric-semestre-val').textContent = `${now.getFullYear()}.${month <= 6 ? 1 : 2}`;
 
   // Próximas aulas
-  const proximas = aulas.filter(a => new Date(a.data) >= now).slice(0, 3);
+  const proximas = aulas.filter(a => new Date(a.prazo_entrega) >= now).slice(0, 3);
   el('tbody-proximas-aulas').innerHTML = proximas.length
     ? proximas.map((a, i) => `<tr>
         <td>Aula ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
-        <td style="color:var(--mid)">${fmtDate(a.data)}</td>
+        <td style="color:var(--mid)">${fmtDate(a.prazo_entrega)}</td>
         <td><span class="pill ${i === 0 ? 'next' : 'planned'}">${i === 0 ? 'Próxima' : 'Planejada'}</span></td>
       </tr>`).join('')
     : '<tr><td colspan="3" style="color:var(--muted);text-align:center">Nenhuma aula próxima</td></tr>';
@@ -187,21 +187,21 @@ function renderizarAulas(aulas) {
   if (ht) ht.textContent = `Aulas — ${ligaNome}`;
   if (hs) hs.textContent = `Semestre ${now.getFullYear()}.${now.getMonth() < 6 ? 1 : 2} · ${aulas.length} aulas planejadas`;
 
-  const futuras = aulas.filter(a => new Date(a.data) >= now);
+  const futuras = aulas.filter(a => new Date(a.prazo_entrega) >= now);
 
   grid.innerHTML = aulas.map(a => {
-    const data = new Date(a.data);
+    const data = new Date(a.prazo_entrega);
     const passada = data < now;
     const isProxima = futuras[0]?.id === a.id;
 
     let pillClass, pillLabel;
     if (passada) { pillClass = 'ok'; pillLabel = 'Concluída'; }
-    else if (isProxima) { pillClass = 'next'; pillLabel = `Próxima · ${fmtDate(a.data)}`; }
+    else if (isProxima) { pillClass = 'next'; pillLabel = `Próxima · ${fmtDate(a.prazo_entrega)}`; }
     else { pillClass = 'planned'; pillLabel = 'Planejada'; }
 
-    const links = (a.link_slides || a.link_material) ? `<div class="aula-links">
-      ${a.link_slides ? `<a class="aula-link" href="${a.link_slides}" target="_blank">Slides</a>` : ''}
-      ${a.link_material ? `<a class="aula-link" href="${a.link_material}" target="_blank">Material</a>` : ''}
+    const links = (a.slides_url || a.material_url) ? `<div class="aula-links">
+      ${a.slides_url ? `<a class="aula-link" href="${a.slides_url}" target="_blank">Slides</a>` : ''}
+      ${a.material_url ? `<a class="aula-link" href="${a.material_url}" target="_blank">Material</a>` : ''}
     </div>` : '';
 
     return `<div class="aula-card${isProxima ? ' next-class' : ''}">
