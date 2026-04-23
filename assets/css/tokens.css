@@ -1,0 +1,27 @@
+/* ================================================================
+   DESIGN TOKENS — placeholder scaffolding
+   ----------------------------------------------------------------
+   Conteúdo completo será fornecido pelo dono do projeto e
+   preenchido em um segundo commit (task 8: fill tokens.css with
+   values). Por enquanto este arquivo existe apenas para:
+     - estabelecer a ordem de cascade nas páginas de membros;
+     - reservar o @media reduced-motion que zera durations.
+   NÃO inventar valores aqui.
+================================================================ */
+
+:root {
+  /* intencionalmente vazio — preencher com as paletas, neutros,
+     semânticos, tipografia, spacing, radii, shadows, easings,
+     durations, z-index e grid. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    /* Zerar todas as durations quando os tokens forem preenchidos:
+       --dur-fast: 0ms;
+       --dur-base: 0ms;
+       --dur-slow: 0ms;
+       --dur-hero: 0ms;
+    */
+  }
+}
