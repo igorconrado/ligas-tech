@@ -203,79 +203,68 @@ function savePresenca() {
 }
 
 // ── Chamada — Supabase ──
-async function handleAbrirChamada(encontroId) {
+async function handleAbrirChamada() {
+  const encontroId = document.getElementById('select-encontro')?.value;
+  if (!encontroId) {
+    alert('Selecione um encontro primeiro.');
+    return;
+  }
+
   try {
     const { codigo, expira } = await abrirChamada(encontroId);
-    exibirCodigoChamada(codigo, expira);
 
-    const channel = assinarPresencasEncontro(encontroId, (payload) => {
+    const qrCode = document.getElementById('qr-code');
+    const qrDisplay = document.getElementById('qr-display');
+    if (qrDisplay) qrDisplay.textContent = codigo;
+    if (qrCode) qrCode.style.display = 'block';
+
+    const expiraEl = document.getElementById('qr-expira');
+    if (expiraEl) {
+      const mins = Math.floor((new Date(expira) - new Date()) / 60000);
+      expiraEl.textContent = `Expira em ${mins} minutos`;
+    }
+
+    window._chamadaChannel = assinarPresencasEncontro(encontroId, (payload) => {
       atualizarPresencaTempoReal(payload.new);
     });
 
-    window._chamadaChannel = channel;
+    const btnAbrir = document.getElementById('btn-abrir-chamada');
+    if (btnAbrir) {
+      btnAbrir.textContent = 'Fechar Chamada';
+      btnAbrir.onclick = () => handleFecharChamada(encontroId);
+    }
+
   } catch (e) {
     console.error('Erro ao abrir chamada:', e);
+    alert('Erro ao abrir chamada. Tente novamente.');
   }
 }
 
 async function handleFecharChamada(encontroId) {
   try {
     await fecharChamada(encontroId);
+
     if (window._chamadaChannel) {
       window._chamadaChannel.unsubscribe();
       window._chamadaChannel = null;
     }
-    ocultarCodigoChamada();
+
+    const qrCode = document.getElementById('qr-code');
+    if (qrCode) qrCode.style.display = 'none';
+
+    const btnAbrir = document.getElementById('btn-abrir-chamada');
+    if (btnAbrir) {
+      btnAbrir.textContent = 'Abrir Chamada';
+      btnAbrir.onclick = handleAbrirChamada;
+    }
+
   } catch (e) {
     console.error('Erro ao fechar chamada:', e);
   }
 }
 
-function exibirCodigoChamada(codigo, expira) {
-  document.getElementById('qr-code-text').textContent = codigo;
-  const expiracaoMs = new Date(expira).getTime() - Date.now();
-  qrSeconds = Math.max(0, Math.floor(expiracaoMs / 1000));
-  openModal('qr-modal');
-  document.getElementById('chamada-badge').textContent = 'Aberta';
-  document.getElementById('chamada-badge').className = 'chamada-badge open';
-  clearInterval(qrTimer);
-  qrTimer = setInterval(() => {
-    qrSeconds--;
-    const m = String(Math.floor(qrSeconds / 60)).padStart(2, '0');
-    const s = String(qrSeconds % 60).padStart(2, '0');
-    document.getElementById('qr-timer-val').textContent = `${m}:${s}`;
-    if (qrSeconds <= 0) { clearInterval(qrTimer); closeModal('qr-modal'); }
-  }, 1000);
-}
-
-function ocultarCodigoChamada() {
-  clearInterval(qrTimer);
-  closeModal('qr-modal');
-  document.getElementById('chamada-badge').textContent = 'Fechada';
-  document.getElementById('chamada-badge').className = 'chamada-badge closed';
-}
-
 function atualizarPresencaTempoReal(novaPresenca) {
   renderPresenca();
-}
-
-// ── QR Code (fallback local quando não há encontroId) ──
-let qrTimer, qrSeconds = 600;
-function openQR() {
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  document.getElementById('qr-code-text').textContent = code;
-  qrSeconds = 600;
-  openModal('qr-modal');
-  document.getElementById('chamada-badge').textContent = 'Aberta';
-  document.getElementById('chamada-badge').className = 'chamada-badge open';
-  clearInterval(qrTimer);
-  qrTimer = setInterval(() => {
-    qrSeconds--;
-    const m = String(Math.floor(qrSeconds / 60)).padStart(2, '0');
-    const s = String(qrSeconds % 60).padStart(2, '0');
-    document.getElementById('qr-timer-val').textContent = `${m}:${s}`;
-    if (qrSeconds <= 0) { clearInterval(qrTimer); closeModal('qr-modal'); }
-  }, 1000);
 }
 
 // ── Advertência ──
@@ -353,13 +342,6 @@ function exportCSV() {
 
 function exportPresenca() { alert('CSV gerado — substituir por download real via Supabase'); }
 
-// ── closeModal override — limpa timer do QR quando fecha ──
-const _closeModal = closeModal;
-function closeModalWithQR(id) {
-  _closeModal(id);
-  if (id === 'qr-modal') { clearInterval(qrTimer); }
-}
-
 // ── Escape handler ──
 initModalEscape();
 
@@ -381,8 +363,7 @@ await carregarAvisos();
 // ── Expõe pro onclick inline ──
 window.showTab = showTab;
 window.openModal = openModal;
-window.closeModal = closeModalWithQR;
-window.openQR = openQR;
+window.closeModal = closeModal;
 window.openAdvModal = openAdvModal;
 window.saveAdv = saveAdv;
 window.publishAviso = publishAviso;

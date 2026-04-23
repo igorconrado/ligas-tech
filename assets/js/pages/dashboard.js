@@ -327,7 +327,27 @@ function renderizarPresencas(presencas, alerta) {
 
 // ── Renderizar avisos ──
 function renderizarAvisos(avisos) {
-  // Placeholder — avisos podem ser exibidos futuramente no dashboard
+  const container = document.getElementById('avisos-lista') ||
+                    document.querySelector('.avisos-container');
+  if (!container) return;
+
+  if (!avisos || avisos.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:2rem;font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">
+        Nenhum aviso no momento
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = avisos.map(aviso => `
+    <div class="aviso-item">
+      <div class="aviso-header">
+        <span class="aviso-titulo">${aviso.titulo}</span>
+        <span class="aviso-data">${new Date(aviso.criado_em).toLocaleDateString('pt-BR')}</span>
+      </div>
+      <p class="aviso-msg">${aviso.mensagem}</p>
+    </div>
+  `).join('');
 }
 
 // ── Timeline cronograma ──
