@@ -10,6 +10,7 @@ import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
 import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 import { toast } from '/assets/js/ui/toast.js';
+import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -39,6 +40,7 @@ let presenceMembers = [];
 let presentSet = new Set();
 let entregasCache = [];
 let filterAulaVal = '';
+let chamadaAberta = false;
 
 const statusMap = { ok: 'ok', warn: 'warn', adv: 'adv' };
 const statusLabel = { ok: 'Regular', warn: 'Atenção', adv: 'Advertência' };
@@ -126,6 +128,15 @@ async function carregarMembros() {
 // ── Render overview table ──
 function renderOverview(data) {
   const tbl = document.getElementById('overview-tbl');
+  if (!data.length) {
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead><tbody></tbody>`;
+    renderEmptyState(tbl.querySelector('tbody'), {
+      icon: icons.users,
+      title: 'Nenhum membro cadastrado',
+      description: 'Importe via processo seletivo ou adicione manualmente pelo botão "+ Novo membro".',
+    });
+    return;
+  }
   tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead>
   <tbody>${data.map(m => `<tr>
     <td style="font-weight:500">${m.name}</td>
@@ -141,6 +152,15 @@ function renderOverview(data) {
 // ── Render membros ──
 function renderMembros(data) {
   const tbl = document.getElementById('membros-tbl');
+  if (!data.length) {
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead><tbody></tbody>`;
+    renderEmptyState(tbl.querySelector('tbody'), {
+      icon: icons.users,
+      title: 'Nenhum membro cadastrado',
+      description: 'Importe via processo seletivo ou adicione manualmente pelo botão "+ Novo membro".',
+    });
+    return;
+  }
   tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead>
   <tbody>${data.map(m => `<tr>
     <td style="font-weight:500">${m.name}</td>
@@ -182,6 +202,14 @@ async function carregarAulas() {
 function renderizarAulas(aulas) {
   const grid = document.getElementById('aulas-dir-grid');
   if (!grid) return;
+  if (!aulas.length) {
+    renderEmptyState(grid, {
+      icon: icons.book,
+      title: 'Nenhuma aula cadastrada',
+      description: 'Use o botão "+ Nova aula" pra criar a primeira aula da liga.',
+    });
+    return;
+  }
   const statusPillMap = { ok: 'ok', next: 'next', planned: 'planned' };
   const statusLabelMap = { ok: 'Concluída', next: 'Próxima', planned: 'Planejada' };
   const now = new Date();
@@ -236,6 +264,15 @@ function filterEntregas(v) {
 function renderizarEntregas(data) {
   const tbl = document.getElementById('entregas-tbl');
   if (!tbl) return;
+  if (!data.length) {
+    tbl.innerHTML = `<thead><tr><th>Membro</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead><tbody></tbody>`;
+    renderEmptyState(tbl.querySelector('tbody'), {
+      icon: icons.inbox,
+      title: 'Ninguém entregou ainda',
+      description: 'As entregas aparecem aqui quando os membros enviarem.',
+    });
+    return;
+  }
   tbl.innerHTML = `<thead><tr><th>Membro</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead>
   <tbody>${data.map(e => {
     const nome = e.membros?.nome || '—';
@@ -275,8 +312,21 @@ async function atualizarMetricas() {
 
 // ── Presença ──
 function renderPresenca() {
-  presenceMembers = members.filter(m => m.liga === 'IbTech').map(m => m.name);
   const grid = document.getElementById('presenca-grid');
+  if (!grid) return;
+
+  if (!chamadaAberta) {
+    renderEmptyState(grid, {
+      icon: icons.clock,
+      title: 'Nenhuma chamada aberta agora',
+      description: 'Selecione um encontro e gere um QR Code pra abrir a chamada.',
+    });
+    document.getElementById('presenca-count').textContent = 0;
+    document.getElementById('presenca-total').textContent = 0;
+    return;
+  }
+
+  presenceMembers = members.filter(m => m.liga === 'IbTech').map(m => m.name);
   grid.innerHTML = presenceMembers.map((name, i) => {
     const on = presentSet.has(i);
     return `<div class="member-chip ${on ? 'present' : ''}" onclick="togglePresenca(${i})">
@@ -362,6 +412,9 @@ async function handleAbrirChamada() {
 
     openModal('qr-modal');
 
+    chamadaAberta = true;
+    renderPresenca();
+
     window._chamadaChannel = assinarPresencasEncontro(encontroId, (payload) => {
       atualizarPresencaTempoReal(payload.new);
     });
@@ -387,6 +440,9 @@ async function handleFecharChamada(encontroId) {
       window._chamadaChannel.unsubscribe();
       window._chamadaChannel = null;
     }
+
+    chamadaAberta = false;
+    renderPresenca();
 
     const btnAbrir = document.getElementById('btn-abrir-chamada');
     if (btnAbrir) {
@@ -471,10 +527,11 @@ function renderizarAdvertencias(advertencias) {
   if (!tbody) return;
 
   if (!advertencias || advertencias.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-family:var(--font-mono);font-size:10px;letter-spacing:.08em">
-        Nenhuma advertência registrada
-      </td></tr>`;
+    renderEmptyState(tbody, {
+      icon: icons.check,
+      title: 'Nenhuma advertência registrada',
+      description: 'A liga está limpa este semestre.',
+    });
     return;
   }
 
@@ -526,6 +583,14 @@ async function handlePublicarAviso() {
 function renderizarAvisos(avisos) {
   const lista = document.getElementById('avisos-lista');
   if (!lista) return;
+  if (!avisos || !avisos.length) {
+    renderEmptyState(lista, {
+      icon: icons.megaphone,
+      title: 'Nenhum aviso publicado',
+      description: 'Use o formulário ao lado pra publicar o primeiro aviso.',
+    });
+    return;
+  }
   lista.innerHTML = avisos.map(a => `
     <div class="aviso-item">
       <div class="aviso-head">

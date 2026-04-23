@@ -6,6 +6,7 @@ import { getMeuPerfil, completarOnboarding, atualizarPerfil } from '/assets/js/s
 import { getAulasComEntregas, submeterEntrega } from '/assets/js/supabase/aulas.js';
 import { getMinhasPresencas, registrarPresenca, calcularAlertaFrequencia, getEncontros } from '/assets/js/supabase/presenca.js';
 import { getAvisos } from '/assets/js/supabase/avisos.js';
+import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 
 // ── Auth guard ──
 const session = await requireAuth();
@@ -187,6 +188,15 @@ function renderizarAulas(aulas) {
   if (ht) ht.textContent = `Aulas — ${ligaNome}`;
   if (hs) hs.textContent = `Semestre ${now.getFullYear()}.${now.getMonth() < 6 ? 1 : 2} · ${aulas.length} aulas planejadas`;
 
+  if (!aulas.length) {
+    renderEmptyState(grid, {
+      icon: icons.book,
+      title: 'Nenhuma aula publicada ainda',
+      description: 'Quando a diretoria publicar, as aulas aparecem aqui.',
+    });
+    return;
+  }
+
   const futuras = aulas.filter(a => new Date(a.prazo_entrega) >= now);
 
   grid.innerHTML = aulas.map(a => {
@@ -332,10 +342,11 @@ function renderizarAvisos(avisos) {
   if (!container) return;
 
   if (!avisos || avisos.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center;padding:2rem;font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">
-        Nenhum aviso no momento
-      </div>`;
+    renderEmptyState(container, {
+      icon: icons.check,
+      title: 'Tudo em dia',
+      description: 'Nenhum aviso novo da diretoria.',
+    });
     return;
   }
 
@@ -376,10 +387,11 @@ function renderizarTimeline(itens) {
   if (!container) return;
 
   if (!itens.length) {
-    container.innerHTML = `
-      <div class="timeline-empty" style="text-align:center;padding:2rem 0;font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">
-        Nenhum encontro agendado
-      </div>`;
+    renderEmptyState(container, {
+      icon: icons.calendar,
+      title: 'Nenhum encontro agendado',
+      description: 'A diretoria ainda não cadastrou encontros pra sua liga.',
+    });
     return;
   }
 
