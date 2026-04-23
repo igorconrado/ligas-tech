@@ -9,6 +9,7 @@ import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
 import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
+import { toast } from '/assets/js/ui/toast.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -63,10 +64,6 @@ async function getMinhaLigaId() {
   return data?.liga_id;
 }
 
-// ── Feedback simples (usado por handlers de modal) ──
-function mostrarErroModal(msg) { alert(msg); }
-function mostrarSucesso(msg) { alert(msg); }
-
 // ── Novo membro — Supabase ──
 async function handleCadastrarMembro() {
   const nome  = document.getElementById('novo-nome')?.value?.trim();
@@ -74,12 +71,12 @@ async function handleCadastrarMembro() {
   const liga  = document.getElementById('nova-liga')?.value;
 
   if (!nome || !email || !liga) {
-    mostrarErroModal('Preencha todos os campos.');
+    toast.error('Preencha todos os campos.');
     return;
   }
 
   if (!email.endsWith('@alunos.ibmec.edu.br')) {
-    mostrarErroModal('Use o email @alunos.ibmec.edu.br');
+    toast.error('Use o email @alunos.ibmec.edu.br');
     return;
   }
 
@@ -94,13 +91,13 @@ async function handleCadastrarMembro() {
 
     closeModal('modal-novo-membro');
     await carregarMembros();
-    mostrarSucesso('Membro cadastrado. Ele pode criar a conta pelo login.');
+    toast.success('Membro cadastrado. Ele pode criar a conta pelo login.');
 
   } catch (e) {
     if (e.message?.includes('duplicate') || e.message?.includes('unique')) {
-      mostrarErroModal('Este email já está cadastrado.');
+      toast.error('Este email já está cadastrado.');
     } else {
-      mostrarErroModal('Erro ao cadastrar. Tente novamente.');
+      toast.error('Erro ao cadastrar. Tente novamente.');
     }
   }
 }
@@ -337,7 +334,7 @@ async function handleCriarEncontro() {
     await criarEncontro(ligaIdAtual, titulo, data);
     closeModal('modal-encontro');
     await carregarEncontros();
-    mostrarSucesso('Encontro criado.');
+    toast.success('Encontro criado.');
   } catch (e) {
     console.error('Erro ao criar encontro:', e);
   }
@@ -347,7 +344,7 @@ async function handleCriarEncontro() {
 async function handleAbrirChamada() {
   const encontroId = document.getElementById('select-encontro')?.value;
   if (!encontroId) {
-    alert('Selecione um encontro primeiro.');
+    toast.error('Selecione um encontro primeiro.');
     return;
   }
 
@@ -377,7 +374,7 @@ async function handleAbrirChamada() {
 
   } catch (e) {
     console.error('Erro ao abrir chamada:', e);
-    alert('Erro ao abrir chamada. Tente novamente.');
+    toast.error('Erro ao abrir chamada. Tente novamente.');
   }
 }
 
@@ -428,7 +425,7 @@ async function handleSalvarAdvertencia() {
     await registrarAdvertencia(membroId, tipo, descricao);
     closeModal('modal-advertencia');
     await carregarAdvertencias();
-    mostrarSucesso('Advertência registrada.');
+    toast.success('Advertência registrada.');
   } catch (e) {
     console.error('Erro ao registrar advertência:', e);
   }
@@ -543,7 +540,7 @@ function exportCSV() {
   a.click();
 }
 
-function exportPresenca() { alert('CSV gerado — substituir por download real via Supabase'); }
+function exportPresenca() { toast.info('CSV gerado — substituir por download real via Supabase'); }
 
 // ── Escape handler ──
 initModalEscape();
