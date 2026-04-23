@@ -13,6 +13,7 @@ import { toast } from '/assets/js/ui/toast.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows, skeletonCards, skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
+import { renderOverviewTable, renderMembrosTable } from '/assets/js/features/members-table.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -146,55 +147,13 @@ async function carregarMembros() {
   }
 }
 
-// ── Render overview table ──
+// ── Render overview / membros tables — extraídas pra features/members-table.js ──
 function renderOverview(data) {
-  const tbl = document.getElementById('overview-tbl');
-  if (!data.length) {
-    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead><tbody></tbody>`;
-    renderEmptyState(tbl.querySelector('tbody'), {
-      icon: icons.users,
-      title: 'Nenhum membro cadastrado',
-      description: 'Importe via processo seletivo ou adicione manualmente pelo botão "+ Novo membro".',
-    });
-    return;
-  }
-  tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead>
-  <tbody>${data.map(m => `<tr>
-    <td style="font-weight:500">${m.name}</td>
-    <td><span class="pill ${m.liga === 'IbBot' ? 'r' : 'b'}">${m.liga}</span></td>
-    <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${m.presenca >= 75 ? 'g' : 'r'}" style="width:${m.presenca}%"></div></div><span class="prog-val">${m.presenca}%</span></div></td>
-    <td style="color:var(--mid)">${m.entregas}</td>
-    <td><span class="pill ${statusMap[m.status] || 'ok'}">${statusLabel[m.status] || 'Regular'}</span></td>
-    <td style="color:${m.adv > 0 ? 'rgba(255,120,120,.8)' : 'var(--muted)'}; font-family:var(--font-mono); font-size:11px">${m.adv > 0 ? m.adv + 'x' : '—'}</td>
-    <td><button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button></td>
-  </tr>`).join('')}</tbody>`;
+  renderOverviewTable(document.getElementById('overview-tbl'), data);
 }
 
-// ── Render membros ──
 function renderMembros(data) {
-  const tbl = document.getElementById('membros-tbl');
-  if (!data.length) {
-    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead><tbody></tbody>`;
-    renderEmptyState(tbl.querySelector('tbody'), {
-      icon: icons.users,
-      title: 'Nenhum membro cadastrado',
-      description: 'Importe via processo seletivo ou adicione manualmente pelo botão "+ Novo membro".',
-    });
-    return;
-  }
-  tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead>
-  <tbody>${data.map(m => `<tr>
-    <td style="font-weight:500">${m.name}</td>
-    <td><span class="pill ${m.liga === 'IbBot' ? 'r' : 'b'}">${m.liga}</span></td>
-    <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${m.presenca >= 75 ? 'g' : 'r'}" style="width:${m.presenca}%"></div></div><span class="prog-val">${m.presenca}%</span></div></td>
-    <td style="color:var(--mid)">${m.entregas}</td>
-    <td style="color:${m.adv > 0 ? 'rgba(255,120,120,.8)' : 'var(--muted)'}; font-family:var(--font-mono); font-size:11px">${m.adv > 0 ? m.adv + 'x' : '—'}</td>
-    <td style="color:var(--muted)">2026.1</td>
-    <td style="display:flex;gap:.375rem">
-      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button>
-      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
-    </td>
-  </tr>`).join('')}</tbody>`;
+  renderMembrosTable(document.getElementById('membros-tbl'), data);
 }
 
 // ── Filtros membros ──
