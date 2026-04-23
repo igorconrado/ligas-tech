@@ -7,6 +7,7 @@ import { getAulasComEntregas, submeterEntrega } from '/assets/js/supabase/aulas.
 import { getMinhasPresencas, registrarPresenca, calcularAlertaFrequencia, getEncontros } from '/assets/js/supabase/presenca.js';
 import { getAvisos } from '/assets/js/supabase/avisos.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
+import { skeletonRows, skeletonCards, skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
 
 // ── Auth guard ──
 const session = await requireAuth();
@@ -363,6 +364,9 @@ function renderizarAvisos(avisos) {
 
 // ── Timeline cronograma ──
 async function carregarCronograma() {
+  const timelineContainer = document.getElementById('timeline-container');
+  if (timelineContainer) timelineContainer.innerHTML = skeletonRows(4);
+
   try {
     const { data: usuario } = await supabase
       .from('usuarios')
@@ -634,6 +638,28 @@ function handleFoto(input) {
   reader.readAsDataURL(file);
 }
 
+// ── Skeletons antes dos fetches ──
+function renderDashboardSkeletons() {
+  ['metric-presenca-val', 'metric-entregas-val', 'metric-proximo-val', 'metric-semestre-val'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = skeletonText('skeleton--title');
+  });
+  const tbodyProximas = document.getElementById('tbody-proximas-aulas');
+  if (tbodyProximas) tbodyProximas.innerHTML = skeletonTableRows(3, 3);
+  const tbodyDashEntregas = document.getElementById('tbody-dash-entregas');
+  if (tbodyDashEntregas) tbodyDashEntregas.innerHTML = skeletonTableRows(3, 3);
+  const aulasGrid = document.getElementById('aulas-grid');
+  if (aulasGrid) aulasGrid.innerHTML = skeletonCards(3);
+  const tbodyEntregas = document.getElementById('tbody-entregas');
+  if (tbodyEntregas) tbodyEntregas.innerHTML = skeletonTableRows(4, 4);
+  const avisosLista = document.getElementById('avisos-lista');
+  if (avisosLista) avisosLista.innerHTML = skeletonRows(3);
+  const presencaTimeline = document.getElementById('presenca-timeline');
+  if (presencaTimeline) presencaTimeline.innerHTML = skeletonRows(4);
+  const timelineContainer = document.getElementById('timeline-container');
+  if (timelineContainer) timelineContainer.innerHTML = skeletonRows(4);
+}
+
 // ── Inicialização ──
 async function inicializar() {
   try {
@@ -647,6 +673,8 @@ async function inicializar() {
     perfilAtual = perfil;
     fecharOnboarding();
     atualizarHeaderMembro(perfil);
+
+    renderDashboardSkeletons();
 
     const [presencas, aulas, avisos] = await Promise.all([
       getMinhasPresencas(),

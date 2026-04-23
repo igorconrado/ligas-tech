@@ -1,0 +1,28 @@
+/* ================================================================
+   SKELETON
+   Placeholders animados com shimmer pra áreas em loading.
+   Usado via assets/js/ui/skeleton.js.
+================================================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-1) 0%,
+    var(--bg-surface-2) 50%,
+    var(--bg-surface-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: var(--r-md);
+}
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+.skeleton--text  { height: 1em;   width: 100%; }
+.skeleton--title { height: 1.5em; width: 60%; }
+.skeleton--row   { height: 48px;  width: 100%; margin-bottom: 8px; }
+.skeleton--card  { height: 120px; width: 100%; }

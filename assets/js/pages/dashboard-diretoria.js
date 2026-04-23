@@ -11,6 +11,7 @@ import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 import { toast } from '/assets/js/ui/toast.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
+import { skeletonRows, skeletonCards, skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -106,6 +107,11 @@ async function handleCadastrarMembro() {
 
 // ── Carregar membros do Supabase ──
 async function carregarMembros() {
+  const overviewTbl = document.getElementById('overview-tbl');
+  if (overviewTbl) overviewTbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
+  const membrosTbl = document.getElementById('membros-tbl');
+  if (membrosTbl) membrosTbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
+
   try {
     const membros = await getMembrosLiga();
     members = membros.map(m => ({
@@ -190,6 +196,9 @@ function applyFilters() {
 
 // ── Carregar + render aulas ──
 async function carregarAulas() {
+  const grid = document.getElementById('aulas-dir-grid');
+  if (grid) grid.innerHTML = skeletonCards(3);
+
   try {
     const ligaIdAtual = await getMinhaLigaId();
     const aulas = await getTodasAulas(ligaIdAtual);
@@ -238,6 +247,9 @@ function renderizarAulas(aulas) {
 
 // ── Carregar + render entregas ──
 async function carregarEntregas() {
+  const tbl = document.getElementById('entregas-tbl');
+  if (tbl) tbl.innerHTML = `<tbody>${skeletonTableRows(4, 5)}</tbody>`;
+
   try {
     const ligaIdAtual = await getMinhaLigaId();
     const aulas = await getTodasAulas(ligaIdAtual);
@@ -297,12 +309,14 @@ function renderizarEntregas(data) {
 
 // ── Atualizar métricas do topo ──
 async function atualizarMetricas() {
+  const elMembros = document.querySelector('[data-metric="membros"]') ||
+                    document.getElementById('metric-membros');
+  if (elMembros) elMembros.innerHTML = skeletonText('skeleton--title');
+
   try {
     const membros = await getMembrosLiga();
     const totalMembros = membros.length;
 
-    const elMembros = document.querySelector('[data-metric="membros"]') ||
-                      document.getElementById('metric-membros');
     if (elMembros) elMembros.textContent = totalMembros;
 
   } catch (e) {
@@ -512,6 +526,10 @@ async function handleSalvarAdvertencia() {
 }
 
 async function carregarAdvertencias() {
+  const tbody = document.getElementById('tbody-advertencias') ||
+                document.querySelector('#tab-advertencias tbody');
+  if (tbody) tbody.innerHTML = skeletonTableRows(4, 7);
+
   try {
     const ligaIdAtual = await getMinhaLigaId();
     const advertencias = await getTodasAdvertencias(ligaIdAtual);
@@ -610,6 +628,9 @@ function mostrarSucessoAviso() {
 }
 
 async function carregarAvisos() {
+  const lista = document.getElementById('avisos-lista');
+  if (lista) lista.innerHTML = skeletonRows(3);
+
   try {
     const avisos = await getAvisos();
     renderizarAvisos(avisos);
