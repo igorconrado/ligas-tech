@@ -5,7 +5,7 @@ import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getTodasAulas, criarAula, togglePublicarAula, getEntregasAula } from '/assets/js/supabase/aulas.js';
-import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro } from '/assets/js/supabase/presenca.js';
+import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro, getEncontros, criarEncontro } from '/assets/js/supabase/presenca.js';
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
 import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
@@ -303,6 +303,46 @@ function savePresenca() {
   document.getElementById('chamada-badge').className = 'chamada-badge closed';
 }
 
+// ── Encontros — Supabase ──
+async function carregarEncontros() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const encontros = await getEncontros(ligaIdAtual);
+
+    const select = document.getElementById('select-encontro');
+    if (!select) return;
+
+    if (encontros.length === 0) {
+      select.innerHTML = '<option value="">Nenhum encontro cadastrado</option>';
+      return;
+    }
+
+    select.innerHTML = encontros.map(e => `
+      <option value="${e.id}">${e.titulo} — ${new Date(e.data).toLocaleDateString('pt-BR')}</option>
+    `).join('');
+
+  } catch (e) {
+    console.error('Erro ao carregar encontros:', e);
+  }
+}
+
+async function handleCriarEncontro() {
+  const titulo = document.getElementById('encontro-titulo')?.value?.trim();
+  const data   = document.getElementById('encontro-data')?.value;
+
+  if (!titulo || !data) return;
+
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    await criarEncontro(ligaIdAtual, titulo, data);
+    closeModal('modal-encontro');
+    await carregarEncontros();
+    mostrarSucesso('Encontro criado.');
+  } catch (e) {
+    console.error('Erro ao criar encontro:', e);
+  }
+}
+
 // ── Chamada — Supabase ──
 async function handleAbrirChamada() {
   const encontroId = document.getElementById('select-encontro')?.value;
@@ -526,6 +566,7 @@ await carregarEntregas();
 await atualizarMetricas();
 await carregarAvisos();
 await carregarAdvertencias();
+await carregarEncontros();
 
 // ── Expõe pro onclick inline ──
 window.showTab = showTab;
@@ -545,4 +586,5 @@ window.markAll = markAll;
 window.savePresenca = savePresenca;
 window.exportPresenca = exportPresenca;
 window.handleAbrirChamada = handleAbrirChamada;
+window.handleCriarEncontro = handleCriarEncontro;
 window.handleFecharChamada = handleFecharChamada;

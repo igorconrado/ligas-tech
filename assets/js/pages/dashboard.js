@@ -4,7 +4,7 @@ import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMeuPerfil, completarOnboarding, atualizarPerfil } from '/assets/js/supabase/membros.js';
 import { getAulasComEntregas, submeterEntrega } from '/assets/js/supabase/aulas.js';
-import { getMinhasPresencas, registrarPresenca, calcularAlertaFrequencia } from '/assets/js/supabase/presenca.js';
+import { getMinhasPresencas, registrarPresenca, calcularAlertaFrequencia, getEncontros } from '/assets/js/supabase/presenca.js';
 import { getAvisos } from '/assets/js/supabase/avisos.js';
 
 // ── Auth guard ──
@@ -351,13 +351,24 @@ function renderizarAvisos(avisos) {
 }
 
 // ── Timeline cronograma ──
-const cronogramaItens = [
-  { data: '2026-03-06', titulo: 'Aula 01 — Lógica em C', subtitulo: 'Condicionais, loops e estruturas básicas' },
-  { data: '2026-03-11', titulo: 'IbBot — Reunião de fase', subtitulo: 'Revisão mecânica e eletrônica' },
-  { data: '2026-03-13', titulo: 'Aula 02 — Frontend', subtitulo: 'HTML, CSS e JavaScript' },
-  { data: '2026-03-20', titulo: 'Aula 03 — Arrays em C', subtitulo: 'Arrays, matrizes e funções' },
-  { data: '2026-03-27', titulo: 'Aula 04 — Git & GitHub', subtitulo: 'Versionamento e boas práticas' },
-];
+async function carregarCronograma() {
+  try {
+    const { data: usuario } = await supabase
+      .from('usuarios')
+      .select('liga_id')
+      .eq('id', (await supabase.auth.getUser()).data.user.id)
+      .single();
+
+    const encontros = await getEncontros(usuario.liga_id);
+    renderizarTimeline(encontros.map(e => ({
+      data: e.data,
+      titulo: e.titulo,
+      subtitulo: e.aberto ? 'Chamada aberta agora' : ''
+    })));
+  } catch (e) {
+    console.error('Erro ao carregar cronograma:', e);
+  }
+}
 
 function renderizarTimeline(itens) {
   const container = document.getElementById('timeline-container');
@@ -626,7 +637,7 @@ async function inicializar() {
     renderizarAulas(aulas);
     renderizarEntregas(aulas);
     renderizarAvisos(avisos);
-    renderizarTimeline(cronogramaItens);
+    await carregarCronograma();
   } catch (e) {
     console.error('Erro ao carregar dashboard:', e);
   }
