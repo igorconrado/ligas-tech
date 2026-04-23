@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Área de Membros · IbBot & IbTech</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/global.css">
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/dashboard.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
 <!-- ONBOARDING OVERLAY -->
 <div class="onboarding-overlay" id="onboarding">
@@ -64,10 +70,10 @@
     <div class="sidebar-footer">
       <div class="user-av" id="sidebar-av">M</div>
       <div class="user-info">
-        <div class="user-name" id="sidebar-name">Carregando...</div>
+        <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
         <div class="user-role" id="sidebar-role">Membro</div>
       </div>
-      <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
+      <div class="logout-btn" id="btn-logout" title="Sair" role="button" aria-label="Sair" tabindex="0">↩</div>
     </div>
     <div class="sidebar-stats">
       <div class="sb-stat">
@@ -82,10 +88,10 @@
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <main class="main" id="main-content">
     <div class="topbar">
       <div class="topbar-left">
-        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
         <span class="topbar-liga b" id="topbar-liga"></span>
       </div>
       <div class="topbar-right">
@@ -101,17 +107,17 @@
           <div class="metric">
             <div class="metric-label">Presença</div>
             <div class="metric-val g" id="metric-presenca-val">—</div>
-            <div class="metric-sub" id="metric-presenca-sub">Carregando...</div>
+            <div class="metric-sub" id="metric-presenca-sub"><span class="skeleton skeleton--text"></span></div>
           </div>
           <div class="metric">
             <div class="metric-label">Entregas</div>
             <div class="metric-val b" id="metric-entregas-val">—</div>
-            <div class="metric-sub" id="metric-entregas-sub">Carregando...</div>
+            <div class="metric-sub" id="metric-entregas-sub"><span class="skeleton skeleton--text"></span></div>
           </div>
           <div class="metric destaque">
             <div class="metric-label">Próximo encontro</div>
             <div class="metric-val w" id="metric-proximo-val" style="font-size:18px;margin-top:4px">—</div>
-            <div class="metric-sub" id="metric-proximo-sub">Carregando...</div>
+            <div class="metric-sub" id="metric-proximo-sub"><span class="skeleton skeleton--text"></span></div>
           </div>
           <div class="metric">
             <div class="metric-label">Semestre</div>
@@ -182,7 +188,7 @@
         <div style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
           <div>
             <div id="aulas-header-title" style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Aulas</div>
-            <div id="aulas-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Carregando...</div>
+            <div id="aulas-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px"><span class="skeleton skeleton--text"></span></div>
           </div>
         </div>
         <div class="aulas-grid" id="aulas-grid"></div>
@@ -228,7 +234,7 @@
         <div style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
           <div>
             <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Minha presença</div>
-            <div id="presenca-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px">Carregando...</div>
+            <div id="presenca-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px"><span class="skeleton skeleton--text"></span></div>
           </div>
           <div id="presenca-percent-box" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:4px;padding:.75rem 1rem;text-align:center">
             <div id="presenca-percent" style="font-family:var(--font-display);font-size:28px;color:var(--green)">—</div>
@@ -275,7 +281,7 @@
             <div class="perfil-card" style="margin-bottom:.625rem">
               <div class="perfil-av"><span id="perfil-av-text">M</span></div>
               <div style="margin-top:1rem">
-                <div class="perfil-name" id="perfil-name-display">Carregando...</div>
+                <div class="perfil-name" id="perfil-name-display"><span class="skeleton skeleton--text"></span></div>
                 <div class="perfil-role">Membro ativo</div>
                 <span class="perfil-liga-badge b" id="perfil-liga-badge"></span>
               </div>

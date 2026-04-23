@@ -5,18 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diretoria — Área de Membros · IbBot & IbTech</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/global.css">
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/dashboard-diretoria.css">
 <link rel="stylesheet" href="/assets/css/pages/ux-improvements.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
 <!-- MODAL QR CODE -->
 <div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
   <div class="modal-box" id="qr-code" style="text-align:center">
-    <button class="modal-close" onclick="closeModal('qr-modal')">✕</button>
+    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Fechar">✕</button>
     <div class="modal-title">CHAMADA ABERTA</div>
     <div class="modal-sub">Membros digitam o código ou escaneiam o QR pra marcar presença</div>
     <div class="qr-code" id="qr-display">—</div>
@@ -28,7 +34,7 @@
 <!-- MODAL ADVERTÊNCIA -->
 <div class="modal-overlay" id="modal-advertencia" onclick="if(event.target===this)closeModal('modal-advertencia')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-advertencia')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-advertencia')" aria-label="Fechar">✕</button>
     <div class="modal-title">ADVERTÊNCIA</div>
     <div class="modal-sub" id="adv-modal-sub">Registrar advertência ou anotação</div>
     <div class="adv-form">
@@ -57,7 +63,7 @@
 <!-- MODAL CADASTRO MEMBRO -->
 <div class="modal-overlay" id="modal-novo-membro" onclick="if(event.target===this)closeModal('modal-novo-membro')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-novo-membro')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-novo-membro')" aria-label="Fechar">✕</button>
     <div class="modal-title">NOVO MEMBRO</div>
     <div class="modal-sub" style="margin-bottom:1.5rem">Cadastrar e atribuir liga e role</div>
     <div class="cadastro-form">
@@ -119,20 +125,20 @@
       <a class="nav-item" onclick="showTab('entregas',this)"><span class="nav-dot w"></span> Entregas <span class="nav-badge">5</span></a>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-av">I</div>
+      <div class="user-av" id="sidebar-av">—</div>
       <div class="user-info">
-        <div class="user-name">Igor</div>
-        <div class="user-role">Presidente</div>
+        <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
+        <div class="user-role" id="sidebar-role">—</div>
       </div>
-      <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
+      <div class="logout-btn" id="btn-logout" title="Sair" role="button" aria-label="Sair" tabindex="0">↩</div>
     </div>
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <main class="main" id="main-content">
     <div class="topbar">
       <div class="topbar-left">
-        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
       </div>
       <div class="topbar-right">
         <span class="topbar-date" id="topbar-date"></span>
@@ -146,10 +152,10 @@
       <!-- DASHBOARD -->
       <div class="tab-page active" id="tab-dashboard">
         <div class="metrics">
-          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">26</div><div class="metric-sub">7 IbBot · 17 IbTech</div></div>
-          <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g">79%</div><div class="metric-sub">Último encontro</div></div>
-          <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">5</div><div class="metric-sub">Aulas 01 e 02</div></div>
-          <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r">3</div><div class="metric-sub">Esse semestre</div></div>
+          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">—</div><div class="metric-sub" id="metric-membros-sub"></div></div>
+          <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g" id="metric-presenca-media">—</div><div class="metric-sub">Último encontro</div></div>
+          <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">—</div><div class="metric-sub" id="metric-entregas-pendentes-sub"></div></div>
+          <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r" id="metric-advertencias">—</div><div class="metric-sub">Esse semestre</div></div>
         </div>
 
         <div class="panels">
@@ -161,11 +167,7 @@
             <div class="panel-body">
               <table class="tbl">
                 <thead><tr><th>Encontro</th><th>Liga</th><th>Taxa</th></tr></thead>
-                <tbody>
-                  <tr><td>13 mar · Aula 02</td><td><span class="pill b">IbTech</span></td><td>14/17 (82%)</td></tr>
-                  <tr><td>11 mar · Reunião</td><td><span class="pill r">IbBot</span></td><td>6/7 (86%)</td></tr>
-                  <tr><td>06 mar · Aula 01</td><td><span class="pill b">IbTech</span></td><td>15/17 (88%)</td></tr>
-                </tbody>
+                <tbody id="tbody-ultimas-presencas"></tbody>
               </table>
             </div>
           </div>
@@ -177,11 +179,7 @@
             <div class="panel-body">
               <table class="tbl">
                 <thead><tr><th>Membro</th><th>Aula</th><th>Status</th></tr></thead>
-                <tbody>
-                  <tr><td>Ana Lima</td><td>Aula 02</td><td><span class="pill late">Atrasada</span></td></tr>
-                  <tr><td>Pedro Ramos</td><td>Aulas 01 e 02</td><td><span class="pill adv">2 atrasadas</span></td></tr>
-                  <tr><td>Diego Santos</td><td>Aula 02</td><td><span class="pill late">Atrasada</span></td></tr>
-                </tbody>
+                <tbody id="tbody-entregas-atrasadas"></tbody>
               </table>
             </div>
           </div>
@@ -292,16 +290,7 @@
         <div style="display:grid;grid-template-columns:1fr 360px;gap:1rem">
           <div>
             <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em;margin-bottom:1.25rem">Avisos publicados</div>
-            <div id="avisos-lista">
-              <div class="aviso-item">
-                <div class="aviso-head"><div class="aviso-title-text">Entrega da Aula 02 — prazo final</div><div class="aviso-date">18 mar · Igor</div></div>
-                <div class="aviso-body">O prazo final pra entrega da Aula 02 é sexta-feira. Quem não entregar receberá advertência automática.</div>
-              </div>
-              <div class="aviso-item">
-                <div class="aviso-head"><div class="aviso-title-text">Próximo encontro — Aula 03</div><div class="aviso-date">16 mar · Beatriz</div></div>
-                <div class="aviso-body">O próximo encontro da IbTech é quinta-feira às 13h. O conteúdo será arrays e matrizes em C.</div>
-              </div>
-            </div>
+            <div id="avisos-lista"></div>
           </div>
           <div class="panel" style="align-self:start">
             <div class="panel-head"><div class="panel-title">Novo aviso</div></div>
@@ -357,7 +346,7 @@
 <!-- MODAL NOVO ENCONTRO -->
 <div class="modal-overlay" id="modal-encontro" onclick="if(event.target===this)closeModal('modal-encontro')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-encontro')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-encontro')" aria-label="Fechar">✕</button>
     <div class="modal-title">Novo Encontro</div>
     <div class="modal-sub">Cadastra um encontro para abrir chamada de presença.</div>
     <div class="form-group" style="margin-bottom:.75rem">

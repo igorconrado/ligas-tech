@@ -1,0 +1,94 @@
+/* ================================================================
+   CONFIRM DIALOG
+   Modal de confirmação reutilizável. Usado via
+   assets/js/ui/confirm.js → confirmDialog({...}) → Promise<boolean>.
+================================================================ */
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out-quart);
+}
+.confirm-overlay.is-open { opacity: 1; }
+.confirm-overlay.is-leaving { opacity: 0; }
+
+.confirm-box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-surface-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  transform: scale(.95);
+  transition: transform var(--dur-fast) var(--ease-out-quart);
+  box-shadow: var(--shadow-3);
+}
+.confirm-overlay.is-open .confirm-box { transform: scale(1); }
+
+.confirm-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  letter-spacing: var(--tr-tight);
+  color: var(--text-primary);
+  margin: 0 0 var(--sp-3);
+}
+
+.confirm-message {
+  font-family: var(--font-body);
+  font-size: var(--fs-body-s);
+  color: var(--text-secondary);
+  line-height: var(--lh-body);
+  margin: 0 0 var(--sp-5);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.confirm-btn {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--dur-fast), border-color var(--dur-fast), opacity var(--dur-fast);
+}
+
+.confirm-btn--cancel:hover {
+  background: var(--bg-surface-2);
+}
+
+.confirm-btn--confirm {
+  background: var(--text-primary);
+  color: var(--bg-base);
+  border-color: var(--text-primary);
+}
+.confirm-btn--confirm:hover { opacity: .88; }
+
+.confirm-btn--confirm.is-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-overlay,
+  .confirm-box { transition: none; }
+  .confirm-box { transform: none; }
+}

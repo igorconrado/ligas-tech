@@ -5,11 +5,14 @@ import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getTodasAulas, criarAula, togglePublicarAula, getEntregasAula } from '/assets/js/supabase/aulas.js';
-import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro, getEncontros, criarEncontro } from '/assets/js/supabase/presenca.js';
+import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro, getEncontros, criarEncontro, getPresencasEncontro } from '/assets/js/supabase/presenca.js';
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
 import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 import { toast } from '/assets/js/ui/toast.js';
+import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
+import { skeletonRows, skeletonCards, skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
+import { confirmDialog } from '/assets/js/ui/confirm.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -33,12 +36,27 @@ const ligaId = perfil?.liga_id;
 // Data
 document.getElementById('topbar-date').textContent = formatDate();
 
+// ── Sidebar com dados reais do perfil ──
+(function atualizarHeaderDiretoria() {
+  const nome = perfil?.nome || session.user.email?.split('@')[0] || 'Diretoria';
+  const inicial = nome.trim()[0]?.toUpperCase() || 'D';
+  const role = (usuario?.role || 'Diretoria').replace(/^./, c => c.toUpperCase());
+
+  const elAv = document.getElementById('sidebar-av');
+  const elName = document.getElementById('sidebar-name');
+  const elRole = document.getElementById('sidebar-role');
+  if (elAv) elAv.textContent = inicial;
+  if (elName) elName.textContent = nome;
+  if (elRole) elRole.textContent = role;
+})();
+
 // ── State ──
 let members = [];
 let presenceMembers = [];
 let presentSet = new Set();
 let entregasCache = [];
 let filterAulaVal = '';
+let chamadaAberta = false;
 
 const statusMap = { ok: 'ok', warn: 'warn', adv: 'adv' };
 const statusLabel = { ok: 'Regular', warn: 'Atenção', adv: 'Advertência' };
@@ -104,6 +122,11 @@ async function handleCadastrarMembro() {
 
 // ── Carregar membros do Supabase ──
 async function carregarMembros() {
+  const overviewTbl = document.getElementById('overview-tbl');
+  if (overviewTbl) overviewTbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
+  const membrosTbl = document.getElementById('membros-tbl');
+  if (membrosTbl) membrosTbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
+
   try {
     const membros = await getMembrosLiga();
     members = membros.map(m => ({
@@ -126,6 +149,15 @@ async function carregarMembros() {
 // ── Render overview table ──
 function renderOverview(data) {
   const tbl = document.getElementById('overview-tbl');
+  if (!data.length) {
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead><tbody></tbody>`;
+    renderEmptyState(tbl.querySelector('tbody'), {
+      icon: icons.users,
+      title: 'Nenhum membro cadastrado',
+      description: 'Importe via processo seletivo ou adicione manualmente pelo botão "+ Novo membro".',
+    });
+    return;
+  }
   tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Status</th><th>Adv.</th><th></th></tr></thead>
   <tbody>${data.map(m => `<tr>
     <td style="font-weight:500">${m.name}</td>
@@ -141,6 +173,15 @@ function renderOverview(data) {
 // ── Render membros ──
 function renderMembros(data) {
   const tbl = document.getElementById('membros-tbl');
+  if (!data.length) {
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead><tbody></tbody>`;
+    renderEmptyState(tbl.querySelector('tbody'), {
+      icon: icons.users,
+      title: 'Nenhum membro cadastrado',
+      description: 'Importe via processo seletivo ou adicione manualmente pelo botão "+ Novo membro".',
+    });
+    return;
+  }
   tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead>
   <tbody>${data.map(m => `<tr>
     <td style="font-weight:500">${m.name}</td>
@@ -170,6 +211,9 @@ function applyFilters() {
 
 // ── Carregar + render aulas ──
 async function carregarAulas() {
+  const grid = document.getElementById('aulas-dir-grid');
+  if (grid) grid.innerHTML = skeletonCards(3);
+
   try {
     const ligaIdAtual = await getMinhaLigaId();
     const aulas = await getTodasAulas(ligaIdAtual);
@@ -182,6 +226,14 @@ async function carregarAulas() {
 function renderizarAulas(aulas) {
   const grid = document.getElementById('aulas-dir-grid');
   if (!grid) return;
+  if (!aulas.length) {
+    renderEmptyState(grid, {
+      icon: icons.book,
+      title: 'Nenhuma aula cadastrada',
+      description: 'Use o botão "+ Nova aula" pra criar a primeira aula da liga.',
+    });
+    return;
+  }
   const statusPillMap = { ok: 'ok', next: 'next', planned: 'planned' };
   const statusLabelMap = { ok: 'Concluída', next: 'Próxima', planned: 'Planejada' };
   const now = new Date();
@@ -193,6 +245,7 @@ function renderizarAulas(aulas) {
     const prazoFmt = prazo
       ? prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
       : '—';
+    const togglePublicLabel = a.publicada ? 'Despublicar' : 'Publicar';
     return `
       <div class="aula-dir-card">
         <div class="aula-num">Aula ${numero}</div>
@@ -201,6 +254,7 @@ function renderizarAulas(aulas) {
           <span class="pill ${statusPillMap[status]}">${statusLabelMap[status]}</span>
           <div style="display:flex;align-items:center;gap:.5rem">
             <span class="aula-stats">Prazo: ${prazoFmt}</span>
+            <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="handleTogglePublicarAula('${a.id}', ${a.publicada})">${togglePublicLabel}</button>
             <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
           </div>
         </div>
@@ -208,8 +262,33 @@ function renderizarAulas(aulas) {
   }).join('');
 }
 
+async function handleTogglePublicarAula(aulaId, publicadaAtual) {
+  const novaFlag = !publicadaAtual;
+  const ok = await confirmDialog({
+    title: publicadaAtual ? 'Despublicar aula?' : 'Publicar aula?',
+    message: publicadaAtual
+      ? 'Membros não verão mais essa aula no dashboard enquanto estiver despublicada.'
+      : 'Os membros da liga vão ver essa aula no dashboard imediatamente.',
+    confirmLabel: publicadaAtual ? 'Despublicar' : 'Publicar',
+    danger: publicadaAtual,
+  });
+  if (!ok) return;
+
+  try {
+    await togglePublicarAula(aulaId, novaFlag);
+    await carregarAulas();
+    toast.success(novaFlag ? 'Aula publicada' : 'Aula despublicada');
+  } catch (e) {
+    console.error('Erro ao alterar publicação da aula:', e);
+    toast.error(e.message || 'Erro ao atualizar aula');
+  }
+}
+
 // ── Carregar + render entregas ──
 async function carregarEntregas() {
+  const tbl = document.getElementById('entregas-tbl');
+  if (tbl) tbl.innerHTML = `<tbody>${skeletonTableRows(4, 5)}</tbody>`;
+
   try {
     const ligaIdAtual = await getMinhaLigaId();
     const aulas = await getTodasAulas(ligaIdAtual);
@@ -236,6 +315,15 @@ function filterEntregas(v) {
 function renderizarEntregas(data) {
   const tbl = document.getElementById('entregas-tbl');
   if (!tbl) return;
+  if (!data.length) {
+    tbl.innerHTML = `<thead><tr><th>Membro</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead><tbody></tbody>`;
+    renderEmptyState(tbl.querySelector('tbody'), {
+      icon: icons.inbox,
+      title: 'Ninguém entregou ainda',
+      description: 'As entregas aparecem aqui quando os membros enviarem.',
+    });
+    return;
+  }
   tbl.innerHTML = `<thead><tr><th>Membro</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead>
   <tbody>${data.map(e => {
     const nome = e.membros?.nome || '—';
@@ -258,25 +346,224 @@ function renderizarEntregas(data) {
   }).join('')}</tbody>`;
 }
 
-// ── Atualizar métricas do topo ──
+// ── Atualizar métricas do topo (4 KPIs) ──
 async function atualizarMetricas() {
-  try {
-    const membros = await getMembrosLiga();
-    const totalMembros = membros.length;
+  ['metric-membros', 'metric-presenca-media', 'pending-count', 'metric-advertencias'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = skeletonText('skeleton--title');
+  });
 
-    const elMembros = document.querySelector('[data-metric="membros"]') ||
-                      document.getElementById('metric-membros');
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+
+    const [membros, encontros, aulas, advertencias] = await Promise.all([
+      getMembrosLiga(ligaIdAtual),
+      getEncontros(ligaIdAtual),
+      getTodasAulas(ligaIdAtual),
+      getTodasAdvertencias(ligaIdAtual),
+    ]);
+
+    // 1. Membros ativos (val + sub por liga)
+    const totalMembros = membros.length;
+    const elMembros = document.getElementById('metric-membros');
     if (elMembros) elMembros.textContent = totalMembros;
+
+    const porLiga = membros.reduce((acc, m) => {
+      const nome = m.ligas?.nome || 'Sem liga';
+      acc[nome] = (acc[nome] || 0) + 1;
+      return acc;
+    }, {});
+    const subMembros = document.getElementById('metric-membros-sub');
+    if (subMembros) {
+      subMembros.textContent = Object.entries(porLiga)
+        .map(([nome, n]) => `${n} ${nome}`)
+        .join(' · ') || '—';
+    }
+
+    // 2. Presença média — N+1 paralelizado
+    const presencasPorEnc = encontros.length
+      ? await Promise.all(encontros.map(e => getPresencasEncontro(e.id)))
+      : [];
+    const porMembro = {};
+    presencasPorEnc.flat().forEach(p => {
+      porMembro[p.membro_id] = porMembro[p.membro_id] || { presentes: 0, total: 0 };
+      porMembro[p.membro_id].total++;
+      if (p.status === 'presente') porMembro[p.membro_id].presentes++;
+    });
+    const taxas = Object.values(porMembro)
+      .filter(v => v.total > 0)
+      .map(v => v.presentes / v.total);
+    const presencaMedia = taxas.length
+      ? Math.round((taxas.reduce((a, b) => a + b, 0) / taxas.length) * 100)
+      : 0;
+    const elPresenca = document.getElementById('metric-presenca-media');
+    if (elPresenca) elPresenca.textContent = `${presencaMedia}%`;
+
+    // 3. Entregas pendentes — aulas publicadas com prazo × membros ativos - entregues
+    const aulasElegiveis = aulas.filter(a => a.publicada && a.prazo_entrega);
+    const entregasPorAula = aulasElegiveis.length
+      ? await Promise.all(aulasElegiveis.map(a => getEntregasAula(a.id)))
+      : [];
+    const totalEntregues = entregasPorAula.flat().filter(e => e.status === 'entregue').length;
+    const totalEsperado = aulasElegiveis.length * totalMembros;
+    const pendentes = Math.max(0, totalEsperado - totalEntregues);
+    const elPending = document.getElementById('pending-count');
+    if (elPending) elPending.textContent = pendentes;
+
+    const subEntregas = document.getElementById('metric-entregas-pendentes-sub');
+    if (subEntregas) {
+      subEntregas.textContent = aulasElegiveis.length
+        ? `em ${aulasElegiveis.length} aula${aulasElegiveis.length > 1 ? 's' : ''} com prazo`
+        : 'Nenhuma aula com prazo';
+    }
+
+    // 4. Advertências ativas
+    const elAdv = document.getElementById('metric-advertencias');
+    if (elAdv) elAdv.textContent = advertencias.length;
 
   } catch (e) {
     console.error('Erro ao atualizar métricas:', e);
   }
 }
 
+// ── Últimas presenças (panel dashboard diretoria) ──
+async function renderizarUltimasPresencas() {
+  const tbody = document.getElementById('tbody-ultimas-presencas');
+  if (!tbody) return;
+  tbody.innerHTML = skeletonTableRows(3, 3);
+
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const [encontros, membros] = await Promise.all([
+      getEncontros(ligaIdAtual),
+      getMembrosLiga(ligaIdAtual),
+    ]);
+    const ligaNome = perfil?.ligas?.nome || '—';
+    const totalMembros = membros.length;
+
+    const ultimos = encontros.slice(0, 3);
+    if (!ultimos.length) {
+      renderEmptyState(tbody, {
+        icon: icons.clock,
+        title: 'Nenhum encontro registrado',
+        description: 'Crie encontros e abra chamadas pra ver taxas de presença.',
+      });
+      return;
+    }
+
+    const presencasPorEnc = await Promise.all(
+      ultimos.map(e => getPresencasEncontro(e.id))
+    );
+
+    tbody.innerHTML = ultimos.map((e, i) => {
+      const data = new Date(e.data).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }).replace('.', '');
+      const presentes = presencasPorEnc[i].filter(p => p.status === 'presente').length;
+      const taxa = totalMembros > 0 ? Math.round((presentes / totalMembros) * 100) : 0;
+      const pill = ligaNome === 'IbBot' ? 'r' : 'b';
+      return `<tr>
+        <td>${data} · ${e.titulo}</td>
+        <td><span class="pill ${pill}">${ligaNome}</span></td>
+        <td>${presentes}/${totalMembros} (${taxa}%)</td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    console.error('Erro em últimas presenças:', e);
+  }
+}
+
+// ── Entregas atrasadas (panel dashboard diretoria) ──
+async function renderizarEntregasAtrasadas() {
+  const tbody = document.getElementById('tbody-entregas-atrasadas');
+  if (!tbody) return;
+  tbody.innerHTML = skeletonTableRows(3, 3);
+
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const [aulas, membros] = await Promise.all([
+      getTodasAulas(ligaIdAtual),
+      getMembrosLiga(ligaIdAtual),
+    ]);
+
+    const now = new Date();
+    const aulasAtrasadas = aulas
+      .filter(a => a.publicada && a.prazo_entrega && new Date(a.prazo_entrega) < now)
+      .sort((a, b) => new Date(b.prazo_entrega) - new Date(a.prazo_entrega));
+
+    if (!aulasAtrasadas.length) {
+      renderEmptyState(tbody, {
+        icon: icons.check,
+        title: 'Sem entregas atrasadas',
+        description: 'Tudo em dia ou nenhum prazo passou ainda.',
+      });
+      return;
+    }
+
+    const entregasPorAula = await Promise.all(
+      aulasAtrasadas.map(a => getEntregasAula(a.id))
+    );
+
+    const porMembro = {};
+    aulasAtrasadas.forEach((a, i) => {
+      const entreguesIds = new Set(
+        entregasPorAula[i].filter(e => e.status === 'entregue').map(e => e.membro_id)
+      );
+      membros.forEach(m => {
+        if (!entreguesIds.has(m.id)) {
+          porMembro[m.id] = porMembro[m.id] || { nome: m.nome, aulas: [] };
+          porMembro[m.id].aulas.push(a.numero);
+        }
+      });
+    });
+
+    const top = Object.values(porMembro)
+      .sort((a, b) => b.aulas.length - a.aulas.length)
+      .slice(0, 3);
+
+    if (!top.length) {
+      renderEmptyState(tbody, {
+        icon: icons.check,
+        title: 'Sem entregas atrasadas',
+        description: 'Todos entregaram no prazo.',
+      });
+      return;
+    }
+
+    tbody.innerHTML = top.map(m => {
+      const n = m.aulas.length;
+      const aulasLabel = n === 1
+        ? `Aula ${String(m.aulas[0]).padStart(2, '0')}`
+        : `${n} atrasadas`;
+      const statusPill = n === 1
+        ? '<span class="pill late">Atrasada</span>'
+        : `<span class="pill adv">${n} atrasadas</span>`;
+      return `<tr>
+        <td>${m.nome}</td>
+        <td>${aulasLabel}</td>
+        <td>${statusPill}</td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    console.error('Erro em entregas atrasadas:', e);
+  }
+}
+
 // ── Presença ──
 function renderPresenca() {
-  presenceMembers = members.filter(m => m.liga === 'IbTech').map(m => m.name);
   const grid = document.getElementById('presenca-grid');
+  if (!grid) return;
+
+  if (!chamadaAberta) {
+    renderEmptyState(grid, {
+      icon: icons.clock,
+      title: 'Nenhuma chamada aberta agora',
+      description: 'Selecione um encontro e gere um QR Code pra abrir a chamada.',
+    });
+    document.getElementById('presenca-count').textContent = 0;
+    document.getElementById('presenca-total').textContent = 0;
+    return;
+  }
+
+  presenceMembers = members.filter(m => m.liga === 'IbTech').map(m => m.name);
   grid.innerHTML = presenceMembers.map((name, i) => {
     const on = presentSet.has(i);
     return `<div class="member-chip ${on ? 'present' : ''}" onclick="togglePresenca(${i})">
@@ -362,6 +649,9 @@ async function handleAbrirChamada() {
 
     openModal('qr-modal');
 
+    chamadaAberta = true;
+    renderPresenca();
+
     window._chamadaChannel = assinarPresencasEncontro(encontroId, (payload) => {
       atualizarPresencaTempoReal(payload.new);
     });
@@ -379,6 +669,20 @@ async function handleAbrirChamada() {
 }
 
 async function handleFecharChamada(encontroId) {
+  const ok = await confirmDialog({
+    title: 'Encerrar chamada?',
+    message: 'Presenças não registradas vão ficar em branco. Você pode corrigi-las depois.',
+    confirmLabel: 'Encerrar',
+  });
+  if (!ok) return;
+
+  const btnAbrir = document.getElementById('btn-abrir-chamada');
+  const originalLabel = btnAbrir?.textContent;
+  if (btnAbrir) {
+    btnAbrir.disabled = true;
+    btnAbrir.textContent = 'Encerrando...';
+  }
+
   closeModal('qr-modal');
   try {
     await fecharChamada(encontroId);
@@ -388,14 +692,23 @@ async function handleFecharChamada(encontroId) {
       window._chamadaChannel = null;
     }
 
-    const btnAbrir = document.getElementById('btn-abrir-chamada');
+    chamadaAberta = false;
+    renderPresenca();
+
     if (btnAbrir) {
+      btnAbrir.disabled = false;
       btnAbrir.textContent = 'Abrir Chamada';
       btnAbrir.onclick = handleAbrirChamada;
     }
 
+    toast.success('Chamada encerrada');
   } catch (e) {
     console.error('Erro ao fechar chamada:', e);
+    toast.error(e.message || 'Erro ao encerrar chamada');
+    if (btnAbrir) {
+      btnAbrir.disabled = false;
+      btnAbrir.textContent = originalLabel || 'Fechar Chamada';
+    }
   }
 }
 
@@ -443,19 +756,38 @@ async function handleSalvarAdvertencia() {
   }
   if (!tipo || !descricao) return;
 
+  const ok = await confirmDialog({
+    title: 'Registrar advertência?',
+    message: 'A advertência fica permanentemente no histórico do membro. Essa ação não pode ser desfeita.',
+    confirmLabel: 'Registrar',
+    danger: true,
+  });
+  if (!ok) return;
+
+  const btn = document.querySelector('button[onclick="handleSalvarAdvertencia()"]');
+  const originalLabel = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Registrando...'; }
+
   try {
     await registrarAdvertencia(membroId, tipo, descricao);
     closeModal('modal-advertencia');
     const selectReset = document.getElementById('advertencia-membro');
     if (selectReset) selectReset.value = '';
     await carregarAdvertencias();
-    toast.success('Advertência registrada.');
+    toast.success('Advertência registrada');
   } catch (e) {
     console.error('Erro ao registrar advertência:', e);
+    toast.error(e.message || 'Erro ao registrar advertência');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = originalLabel || 'Registrar →'; }
   }
 }
 
 async function carregarAdvertencias() {
+  const tbody = document.getElementById('tbody-advertencias') ||
+                document.querySelector('#tab-advertencias tbody');
+  if (tbody) tbody.innerHTML = skeletonTableRows(4, 7);
+
   try {
     const ligaIdAtual = await getMinhaLigaId();
     const advertencias = await getTodasAdvertencias(ligaIdAtual);
@@ -471,10 +803,11 @@ function renderizarAdvertencias(advertencias) {
   if (!tbody) return;
 
   if (!advertencias || advertencias.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-family:var(--font-mono);font-size:10px;letter-spacing:.08em">
-        Nenhuma advertência registrada
-      </td></tr>`;
+    renderEmptyState(tbody, {
+      icon: icons.check,
+      title: 'Nenhuma advertência registrada',
+      description: 'A liga está limpa este semestre.',
+    });
     return;
   }
 
@@ -526,6 +859,14 @@ async function handlePublicarAviso() {
 function renderizarAvisos(avisos) {
   const lista = document.getElementById('avisos-lista');
   if (!lista) return;
+  if (!avisos || !avisos.length) {
+    renderEmptyState(lista, {
+      icon: icons.megaphone,
+      title: 'Nenhum aviso publicado',
+      description: 'Use o formulário ao lado pra publicar o primeiro aviso.',
+    });
+    return;
+  }
   lista.innerHTML = avisos.map(a => `
     <div class="aviso-item">
       <div class="aviso-head">
@@ -545,6 +886,9 @@ function mostrarSucessoAviso() {
 }
 
 async function carregarAvisos() {
+  const lista = document.getElementById('avisos-lista');
+  if (lista) lista.innerHTML = skeletonRows(3);
+
   try {
     const avisos = await getAvisos();
     renderizarAvisos(avisos);
@@ -583,6 +927,8 @@ await carregarMembros();
 await carregarAulas();
 await carregarEntregas();
 await atualizarMetricas();
+await renderizarUltimasPresencas();
+await renderizarEntregasAtrasadas();
 await carregarAvisos();
 await carregarAdvertencias();
 await carregarEncontros();
@@ -606,4 +952,5 @@ window.savePresenca = savePresenca;
 window.exportPresenca = exportPresenca;
 window.handleAbrirChamada = handleAbrirChamada;
 window.handleCriarEncontro = handleCriarEncontro;
+window.handleTogglePublicarAula = handleTogglePublicarAula;
 window.handleFecharChamada = handleFecharChamada;
