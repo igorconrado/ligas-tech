@@ -15,12 +15,12 @@
 
 <!-- MODAL QR CODE -->
 <div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
-  <div class="modal-box" style="text-align:center">
+  <div class="modal-box" id="qr-code" style="text-align:center">
     <button class="modal-close" onclick="closeModal('qr-modal')">✕</button>
     <div class="modal-title">CHAMADA ABERTA</div>
     <div class="modal-sub">Membros digitam o código ou escaneiam o QR pra marcar presença</div>
-    <div class="qr-code" id="qr-code-text">—</div>
-    <div class="qr-timer">Expira em <span id="qr-timer-val" style="color:var(--amber)">10:00</span></div>
+    <div class="qr-code" id="qr-display">—</div>
+    <div class="qr-timer">Expira em <span id="qr-expira" style="color:var(--amber)">10:00</span></div>
     <button class="btn-sm ghost" style="width:100%" onclick="closeModal('qr-modal')">Fechar chamada</button>
   </div>
 </div>
@@ -141,7 +141,7 @@
       <!-- DASHBOARD -->
       <div class="tab-page active" id="tab-dashboard">
         <div class="metrics">
-          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w">26</div><div class="metric-sub">7 IbBot · 17 IbTech</div></div>
+          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">26</div><div class="metric-sub">7 IbBot · 17 IbTech</div></div>
           <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g">79%</div><div class="metric-sub">Último encontro</div></div>
           <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">5</div><div class="metric-sub">Aulas 01 e 02</div></div>
           <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r">3</div><div class="metric-sub">Esse semestre</div></div>
@@ -237,13 +237,13 @@
               <span class="chamada-badge closed" id="chamada-badge">Fechada</span>
             </div>
             <div style="display:flex;gap:.5rem">
-              <select style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)">
+              <select id="select-encontro" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)">
                 <option>IbTech · 20 mar · Aula 03</option>
                 <option>IbBot · 18 mar · Reunião</option>
                 <option>IbTech · 13 mar · Aula 02</option>
               </select>
               <button class="btn-sm ghost" onclick="markAll()">Marcar todos</button>
-              <button class="btn-sm g" onclick="handleAbrirChamada()">Gerar QR Code</button>
+              <button class="btn-sm g" id="btn-abrir-chamada" onclick="handleAbrirChamada()">Gerar QR Code</button>
               <button class="btn-sm b" onclick="savePresenca()">Salvar chamada</button>
             </div>
           </div>
@@ -311,14 +311,14 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Mensagem</label>
-                  <textarea class="aviso-input aviso-textarea" id="aviso-msg" placeholder="Escreva o aviso..."></textarea>
+                  <textarea class="aviso-input aviso-textarea" id="aviso-mensagem" placeholder="Escreva o aviso..."></textarea>
                 </div>
                 <div class="form-group">
                   <label class="form-label">Destinatários</label>
-                  <select class="form-select">
-                    <option>Todos os membros</option>
-                    <option>IbTech</option>
-                    <option>IbBot</option>
+                  <select class="form-select" id="aviso-destinatario">
+                    <option value="todos">Todos os membros</option>
+                    <option value="IbTech">IbTech</option>
+                    <option value="IbBot">IbBot</option>
                   </select>
                 </div>
                 <button class="btn-sm b" style="align-self:flex-end" onclick="publishAviso()">Publicar →</button>
