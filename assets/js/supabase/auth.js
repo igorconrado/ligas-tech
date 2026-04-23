@@ -15,14 +15,13 @@ export async function emailAutorizado(email) {
 }
 
 export async function emailTemConta(email) {
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
-    password: '__verificacao_placeholder_xyz_123__'
-  });
-  if (!error) return true;
-  if (error.message.includes('Invalid login credentials')) return true;
-  if (error.message.includes('Email not confirmed')) return true;
-  return false;
+  const { data, error } = await supabase
+    .from('emails_autorizados')
+    .select('tem_conta')
+    .eq('email', email.toLowerCase().trim())
+    .maybeSingle();
+  if (error || !data) return false;
+  return data.tem_conta === true;
 }
 
 async function garantirLinhasDB(userId, email) {
