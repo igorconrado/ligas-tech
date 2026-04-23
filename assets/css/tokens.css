@@ -1,27 +1,231 @@
-/* ================================================================
-   DESIGN TOKENS — placeholder scaffolding
-   ----------------------------------------------------------------
-   Conteúdo completo será fornecido pelo dono do projeto e
-   preenchido em um segundo commit (task 8: fill tokens.css with
-   values). Por enquanto este arquivo existe apenas para:
-     - estabelecer a ordem de cascade nas páginas de membros;
-     - reservar o @media reduced-motion que zera durations.
-   NÃO inventar valores aqui.
-================================================================ */
+/* ============================================================
+   tokens.css — Design tokens da área de membros
+   ============================================================
+   Dark-first. Cores de marca intocadas (#FF1F1F, #0F6FFF).
+   Escalas tonais derivadas via HSL pra dar profundidade ao sistema.
+   Importado antes de qualquer outro stylesheet em /membros/*.html.
+
+   Fontes da verdade da marca (não alterar sem aprovação da Diretoria):
+   - IbBot: #FF1F1F
+   - IbTech: #0F6FFF
+   - Fundo: #080808
+   - Texto: #EDEDED
+   - Display: Bebas Neue · Body: Space Grotesk · Mono: JetBrains Mono
+
+   Convenções:
+   - Paletas: escala 50→900 (mais escuro = número maior)
+   - Em CSS de aplicação: usar SEMPRE tokens semânticos (--bg-*,
+     --text-*, --accent-*). Cores cruas (--bot-500) só em casos
+     excepcionais e justificados.
+   ============================================================ */
 
 :root {
-  /* intencionalmente vazio — preencher com as paletas, neutros,
-     semânticos, tipografia, spacing, radii, shadows, easings,
-     durations, z-index e grid. */
+  /* ---------- PALETA — RED (IbBot) ----------
+     Derivada de #FF1F1F (HSL 0°, 100%, 56%).
+     Steps: lightness varia, saturação preservada nos médios. */
+  --bot-50:  #FFE8E5;
+  --bot-100: #FFC4BD;
+  --bot-200: #FF9A8E;
+  --bot-300: #FF6E5C;
+  --bot-400: #FF4530;
+  --bot-500: #FF1F1F;   /* COR-MARCA — não alterar */
+  --bot-600: #D81515;
+  --bot-700: #A50E0E;
+  --bot-800: #6E0808;
+  --bot-900: #380404;
+
+  /* ---------- PALETA — BLUE (IbTech) ----------
+     Derivada de #0F6FFF (HSL 215°, 100%, 53%). */
+  --tech-50:  #E5EFFF;
+  --tech-100: #BDD4FF;
+  --tech-200: #8FB5FF;
+  --tech-300: #5C95FF;
+  --tech-400: #3082FF;
+  --tech-500: #0F6FFF;  /* COR-MARCA — não alterar */
+  --tech-600: #0856D8;
+  --tech-700: #053FA5;
+  --tech-800: #03296E;
+  --tech-900: #011538;
+
+  /* ---------- NEUTROS QUENTES (superfícies) ----------
+     Ancorado em --bg-base #080808 (intocado).
+     Steps acima crescem em luminosidade preservando o tom levemente
+     quente do preto profundo. */
+  --warm-50:  #F5F2EE;
+  --warm-100: #E3DFD8;
+  --warm-200: #BDB7AD;
+  --warm-300: #908A80;
+  --warm-400: #66615A;
+  --warm-500: #423E39;
+  --warm-600: #2A2724;
+  --warm-700: #1A1816;
+  --warm-800: #11100E;
+  --warm-900: #080808;   /* fundo principal — intocado */
+
+  /* ---------- NEUTROS FRIOS (texto técnico, mono) ---------- */
+  --cool-50:  #F4F6F8;
+  --cool-100: #E3E7EC;
+  --cool-200: #C1C7D0;
+  --cool-300: #8B93A1;
+  --cool-400: #5B6372;
+  --cool-500: #3A4150;
+  --cool-600: #252B36;
+  --cool-700: #171B23;
+  --cool-800: #0C0E13;
+
+  /* ---------- SEMÂNTICOS — SUPERFÍCIES ----------
+     Stack dark com 3 níveis de elevação. Cards = surface-1.
+     Hover de card ou modal de baixo nível = surface-2.
+     Modais e popovers (peak elevation) = surface-3. */
+  --bg-base:       #080808;            /* fundo da página — INTOCADO */
+  --bg-surface-1:  #111110;            /* cards, inputs */
+  --bg-surface-2:  #1A1817;            /* cards elevados, hover */
+  --bg-surface-3:  #232120;            /* modais, popovers */
+  --bg-inverse:    var(--warm-50);
+
+  /* ---------- SEMÂNTICOS — TEXTO ----------
+     --text-primary é #EDEDED (cor-marca de texto, intocada).
+     Secundários derivados pra hierarquia clara (4.5:1 mínimo no
+     bg-base; tertiary é só pra labels não-essenciais). */
+  --text-primary:   #EDEDED;            /* cor-marca de texto — INTOCADO */
+  --text-secondary: #A8A39B;
+  --text-tertiary:  #6E6A64;
+  --text-disabled:  #3D3A36;
+  --text-inverse:   #080808;
+
+  /* ---------- SEMÂNTICOS — BORDAS ---------- */
+  --border-subtle:  rgba(237, 237, 237, 0.06);
+  --border-default: rgba(237, 237, 237, 0.12);
+  --border-strong:  rgba(237, 237, 237, 0.24);
+
+  /* ---------- SEMÂNTICOS — ACENTOS ---------- */
+  --accent-bot:        var(--bot-500);
+  --accent-tech:       var(--tech-500);
+  --accent-bot-hover:  var(--bot-400);
+  --accent-tech-hover: var(--tech-400);
+
+  /* ---------- SEMÂNTICOS — STATUS ---------- */
+  --success: #2EBE7A;
+  --warning: #F5B544;
+  --danger:  #E84545;
+  --info:    var(--tech-400);
+
+  /* tints translúcidos pra badges/backgrounds de status */
+  --success-bg: rgba(46, 190, 122, 0.12);
+  --warning-bg: rgba(245, 181, 68, 0.12);
+  --danger-bg:  rgba(232, 69, 69, 0.12);
+  --info-bg:    rgba(48, 130, 255, 0.12);
+
+  --success-border: rgba(46, 190, 122, 0.24);
+  --warning-border: rgba(245, 181, 68, 0.24);
+  --danger-border:  rgba(232, 69, 69, 0.24);
+  --info-border:    rgba(48, 130, 255, 0.24);
+
+  /* ---------- TIPOGRAFIA — FAMILIES ----------
+     Bebas Neue: condensada caps-only, brilha em display grande.
+     Space Grotesk: corpo, variável, geometric grotesk.
+     JetBrains Mono: labels, código, badges. */
+  --font-display: "Bebas Neue", "Druk Wide", "Neue Haas Grotesk Display", sans-serif;
+  --font-body:    "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Berkeley Mono", ui-monospace, monospace;
+
+  /* ---------- TIPOGRAFIA — ESCALA (clamp) ---------- */
+  --fs-display-xl: clamp(4.5rem, 12vw, 12rem);   /* hero, raro */
+  --fs-display-l:  clamp(3rem,  8vw,  7rem);     /* títulos de seção */
+  --fs-display-m:  clamp(2rem,  5vw,  4rem);
+  --fs-h1:         clamp(2rem,  3.5vw, 3rem);
+  --fs-h2:         clamp(1.5rem, 2.5vw, 2.25rem);
+  --fs-h3:         1.375rem;
+  --fs-body-l:     1.125rem;
+  --fs-body:       1rem;
+  --fs-body-s:     0.875rem;
+  --fs-label:      0.75rem;
+  --fs-micro:      0.6875rem;
+
+  /* ---------- TIPOGRAFIA — LINE HEIGHT ---------- */
+  --lh-display: 0.88;
+  --lh-tight:   1.1;
+  --lh-body:    1.5;
+  --lh-loose:   1.7;
+
+  /* ---------- TIPOGRAFIA — TRACKING ---------- */
+  --tr-display: -0.03em;   /* Bebas é condensada, kerning negativo aperta bem */
+  --tr-tight:   -0.01em;
+  --tr-normal:  0;
+  --tr-caps:    0.1em;     /* labels mono uppercase — abrir o tracking */
+
+  /* ---------- ESPAÇAMENTO (escala 4px) ---------- */
+  --sp-0:  0;
+  --sp-1:  0.25rem;   /* 4  */
+  --sp-2:  0.5rem;    /* 8  */
+  --sp-3:  0.75rem;   /* 12 */
+  --sp-4:  1rem;      /* 16 */
+  --sp-5:  1.5rem;    /* 24 */
+  --sp-6:  2rem;      /* 32 */
+  --sp-7:  3rem;      /* 48 */
+  --sp-8:  4rem;      /* 64 */
+  --sp-9:  6rem;      /* 96 */
+  --sp-10: 8rem;      /* 128 */
+  --sp-11: 12rem;     /* 192 */
+
+  /* ---------- RAIOS ---------- */
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   12px;
+  --r-xl:   20px;
+  --r-pill: 9999px;
+
+  /* ---------- SOMBRAS ---------- */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+  --shadow-glow-bot:  0 0 60px rgba(255, 31, 31, 0.35);
+  --shadow-glow-tech: 0 0 60px rgba(15, 111, 255, 0.35);
+
+  /* ---------- MOVIMENTO — EASINGS ---------- */
+  --ease-out-quart:  cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:     cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-anticipate: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+
+  /* ---------- MOVIMENTO — DURAÇÕES ---------- */
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+  --dur-hero: 1200ms;
+
+  /* ---------- Z-INDEX ---------- */
+  --z-cursor:  9999;
+  --z-modal:   1000;
+  --z-header:  100;
+  --z-overlay: 50;
+
+  /* ---------- GRID / LAYOUT ---------- */
+  --col:       12;
+  --gutter:    clamp(1rem, 2vw, 2rem);
+  --page-pad:  clamp(1.25rem, 4vw, 3rem);
+  --max-w:     1600px;
 }
 
+/* ============================================================
+   Reduced motion — zera durações e impede animações longas.
+   Animações não desaparecem totalmente (0.01ms preserva código
+   que aguarda transitionend ou animationend).
+   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    /* Zerar todas as durations quando os tokens forem preenchidos:
-       --dur-fast: 0ms;
-       --dur-base: 0ms;
-       --dur-slow: 0ms;
-       --dur-hero: 0ms;
-    */
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+    --dur-hero: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
