@@ -4,7 +4,7 @@ import { openModal, closeModal, initModalEscape } from '/assets/js/components/mo
 import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
-import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
+import { getTodasAulas, criarAula, togglePublicarAula, getEntregasAula } from '/assets/js/supabase/aulas.js';
 import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro } from '/assets/js/supabase/presenca.js';
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
@@ -35,28 +35,8 @@ document.getElementById('topbar-date').textContent = formatDate();
 let members = [];
 let presenceMembers = [];
 let presentSet = new Set();
-
-// Aulas (hardcoded — pendente integração)
-const aulas = [
-  { num: '01', title: 'Lógica, condicionais e loops em C', status: 'ok', entregas: '15/17', prazo: '13 mar' },
-  { num: '02', title: 'HTML, CSS e JavaScript — Frontend', status: 'warn', entregas: '12/17', prazo: '17 mar' },
-  { num: '03', title: 'Arrays, matrizes e funções em C', status: 'next', entregas: '—', prazo: '27 mar' },
-  { num: '04', title: 'Git e GitHub — versionamento', status: 'planned', entregas: '—', prazo: '03 abr' },
-  { num: '05', title: 'Backend com Node.js', status: 'planned', entregas: '—', prazo: '10 abr' },
-  { num: '06', title: 'Banco de dados — SQL', status: 'planned', entregas: '—', prazo: '17 abr' },
-];
-
-// Entregas (hardcoded — pendente integração)
-const entregasData = [
-  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/ana/ibtech-aula01', status: 'ok', data: '13 mar' },
-  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/bruno/ibtech-aula01', status: 'ok', data: '12 mar' },
-  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 02', repo: 'github.com/bruno/ibtech-aula02', status: 'ok', data: '16 mar' },
-  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 01', repo: '—', status: 'late', data: '—' },
-  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/diego/ibtech-aula01', status: 'ok', data: '14 mar' },
-  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-];
+let entregasCache = [];
+let filterAulaVal = '';
 
 const statusMap = { ok: 'ok', warn: 'warn', adv: 'adv' };
 const statusLabel = { ok: 'Regular', warn: 'Atenção', adv: 'Advertência' };
@@ -69,6 +49,17 @@ function showTab(name, el) {
   if (el) el.classList.add('active');
   const titles = { dashboard: 'Dashboard', membros: 'Membros', advertencias: 'Advertências', presenca: 'Presença', aulas: 'Aulas', entregas: 'Entregas', avisos: 'Avisos' };
   document.getElementById('topbar-title').textContent = titles[name] || name;
+}
+
+// ── Helper: liga do usuário logado ──
+async function getMinhaLigaId() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase
+    .from('usuarios')
+    .select('liga_id')
+    .eq('id', user.id)
+    .single();
+  return data?.liga_id;
 }
 
 // ── Carregar membros do Supabase ──
@@ -136,43 +127,109 @@ function applyFilters() {
   renderMembros(filtered);
 }
 
-// ── Render aulas ──
-function renderAulas() {
-  const grid = document.getElementById('aulas-dir-grid');
-  const statusPillMap = { ok: 'ok', warn: 'warn', next: 'next', planned: 'planned' };
-  const statusLabelMap = { ok: 'Concluída', warn: 'Entregas pendentes', next: 'Próxima', planned: 'Planejada' };
-  grid.innerHTML = aulas.map(a => `
-    <div class="aula-dir-card">
-      <div class="aula-num">Aula ${a.num}</div>
-      <div class="aula-title-sm">${a.title}</div>
-      <div class="aula-meta">
-        <span class="pill ${statusPillMap[a.status]}">${statusLabelMap[a.status]}</span>
-        <div style="display:flex;align-items:center;gap:.5rem">
-          <span class="aula-stats">${a.entregas !== '—' ? a.entregas + ' entregas' : 'Prazo: ' + a.prazo}</span>
-          <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
-        </div>
-      </div>
-    </div>`).join('');
+// ── Carregar + render aulas ──
+async function carregarAulas() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const aulas = await getTodasAulas(ligaIdAtual);
+    renderizarAulas(aulas);
+  } catch (e) {
+    console.error('Erro ao carregar aulas:', e);
+  }
 }
 
-// ── Render entregas ──
-let filterAulaVal = '';
+function renderizarAulas(aulas) {
+  const grid = document.getElementById('aulas-dir-grid');
+  if (!grid) return;
+  const statusPillMap = { ok: 'ok', next: 'next', planned: 'planned' };
+  const statusLabelMap = { ok: 'Concluída', next: 'Próxima', planned: 'Planejada' };
+  const now = new Date();
+  grid.innerHTML = aulas.map(a => {
+    const numero = String(a.numero).padStart(2, '0');
+    const prazo = a.prazo_entrega ? new Date(a.prazo_entrega) : null;
+    let status = 'planned';
+    if (a.publicada) status = prazo && prazo < now ? 'ok' : 'next';
+    const prazoFmt = prazo
+      ? prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
+      : '—';
+    return `
+      <div class="aula-dir-card">
+        <div class="aula-num">Aula ${numero}</div>
+        <div class="aula-title-sm">${a.titulo}</div>
+        <div class="aula-meta">
+          <span class="pill ${statusPillMap[status]}">${statusLabelMap[status]}</span>
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <span class="aula-stats">Prazo: ${prazoFmt}</span>
+            <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Carregar + render entregas ──
+async function carregarEntregas() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const aulas = await getTodasAulas(ligaIdAtual);
+
+    const todasEntregas = [];
+    for (const aula of aulas) {
+      const entregas = await getEntregasAula(aula.id);
+      entregas.forEach(e => todasEntregas.push({ ...e, aula_titulo: aula.titulo }));
+    }
+
+    entregasCache = todasEntregas;
+    renderizarEntregas(todasEntregas);
+  } catch (e) {
+    console.error('Erro ao carregar entregas:', e);
+  }
+}
+
 function filterEntregas(v) {
   filterAulaVal = v;
-  const filtered = entregasData.filter(e => filterAulaVal === '' || e.aula === filterAulaVal);
-  renderEntregas(filtered);
+  const filtered = entregasCache.filter(e => filterAulaVal === '' || e.aula_titulo === filterAulaVal);
+  renderizarEntregas(filtered);
 }
-function renderEntregas(data) {
+
+function renderizarEntregas(data) {
   const tbl = document.getElementById('entregas-tbl');
-  tbl.innerHTML = `<thead><tr><th>Membro</th><th>Liga</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead>
-  <tbody>${data.map(e => `<tr>
-    <td style="font-weight:500">${e.membro}</td>
-    <td><span class="pill ${e.liga === 'IbBot' ? 'r' : 'b'}">${e.liga}</span></td>
-    <td style="color:var(--mid)">${e.aula}</td>
-    <td>${e.repo !== '—' ? `<a href="https://${e.repo}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:10px;text-decoration:none">${e.repo} ↗</a>` : '<span style="color:var(--muted)">—</span>'}</td>
-    <td style="color:var(--muted);font-family:var(--font-mono);font-size:10px">${e.data}</td>
-    <td><span class="pill ${e.status === 'ok' ? 'ok' : 'late'}">${e.status === 'ok' ? 'Entregue' : 'Atrasada'}</span></td>
-  </tr>`).join('')}</tbody>`;
+  if (!tbl) return;
+  tbl.innerHTML = `<thead><tr><th>Membro</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead>
+  <tbody>${data.map(e => {
+    const nome = e.membros?.nome || '—';
+    const aula = e.aula_titulo || '—';
+    const repo = e.repo_url;
+    const repoHtml = repo
+      ? `<a href="${repo}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:10px;text-decoration:none">${repo.replace(/^https?:\/\//, '')} ↗</a>`
+      : '<span style="color:var(--muted)">—</span>';
+    const entregueEm = e.entregue_em
+      ? new Date(e.entregue_em).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
+      : '—';
+    const statusOk = e.status === 'entregue';
+    return `<tr>
+      <td style="font-weight:500">${nome}</td>
+      <td style="color:var(--mid)">${aula}</td>
+      <td>${repoHtml}</td>
+      <td style="color:var(--muted);font-family:var(--font-mono);font-size:10px">${entregueEm}</td>
+      <td><span class="pill ${statusOk ? 'ok' : 'late'}">${statusOk ? 'Entregue' : 'Atrasada'}</span></td>
+    </tr>`;
+  }).join('')}</tbody>`;
+}
+
+// ── Atualizar métricas do topo ──
+async function atualizarMetricas() {
+  try {
+    const membros = await getMembrosLiga();
+    const totalMembros = membros.length;
+
+    const elMembros = document.querySelector('[data-metric="membros"]') ||
+                      document.getElementById('metric-membros');
+    if (elMembros) elMembros.textContent = totalMembros;
+
+  } catch (e) {
+    console.error('Erro ao atualizar métricas:', e);
+  }
 }
 
 // ── Presença ──
@@ -280,19 +337,38 @@ function saveAdv() {
 }
 
 // ── Avisos — Supabase ──
-async function handlePublicarAviso(titulo, mensagem) {
+async function handlePublicarAviso() {
+  const titulo = document.getElementById('aviso-titulo')?.value?.trim();
+  const mensagem = document.getElementById('aviso-mensagem')?.value?.trim();
+  const destinatario = document.getElementById('aviso-destinatario')?.value;
+
+  if (!titulo || !mensagem) return;
+
+  let ligaIdAviso = null;
+  if (destinatario && destinatario !== 'todos') {
+    const { data } = await supabase
+      .from('ligas')
+      .select('id')
+      .eq('nome', destinatario)
+      .single();
+    ligaIdAviso = data?.id || null;
+  }
+
   try {
-    await publicarAviso(titulo, mensagem);
+    await publicarAviso(titulo, mensagem, ligaIdAviso);
     mostrarSucessoAviso();
+    document.getElementById('aviso-titulo').value = '';
+    document.getElementById('aviso-mensagem').value = '';
     const avisos = await getAvisos();
     renderizarAvisos(avisos);
   } catch (e) {
-    mostrarErroAviso('Erro ao publicar aviso.');
+    console.error('Erro ao publicar aviso:', e);
   }
 }
 
 function renderizarAvisos(avisos) {
   const lista = document.getElementById('avisos-lista');
+  if (!lista) return;
   lista.innerHTML = avisos.map(a => `
     <div class="aviso-item">
       <div class="aviso-head">
@@ -305,19 +381,10 @@ function renderizarAvisos(avisos) {
 }
 
 function mostrarSucessoAviso() {
-  document.getElementById('aviso-titulo').value = '';
-  document.getElementById('aviso-msg').value = '';
-}
-
-function mostrarErroAviso(msg) {
-  alert(msg);
-}
-
-async function publishAviso() {
-  const titulo = document.getElementById('aviso-titulo').value.trim();
-  const msg = document.getElementById('aviso-msg').value.trim();
-  if (!titulo || !msg) return;
-  await handlePublicarAviso(titulo, msg);
+  const t = document.getElementById('aviso-titulo');
+  const m = document.getElementById('aviso-msg');
+  if (t) t.value = '';
+  if (m) m.value = '';
 }
 
 async function carregarAvisos() {
@@ -356,8 +423,9 @@ document.getElementById('btn-export-frequencia')?.addEventListener('click', () =
 
 // ── Init ──
 await carregarMembros();
-renderAulas();
-renderEntregas(entregasData);
+await carregarAulas();
+await carregarEntregas();
+await atualizarMetricas();
 await carregarAvisos();
 
 // ── Expõe pro onclick inline ──
@@ -366,7 +434,7 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 window.openAdvModal = openAdvModal;
 window.saveAdv = saveAdv;
-window.publishAviso = publishAviso;
+window.publishAviso = handlePublicarAviso;
 window.exportCSV = exportCSV;
 window.filterMembers = filterMembers;
 window.filterLiga = filterLiga;
