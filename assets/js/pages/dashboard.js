@@ -360,7 +360,8 @@ async function carregarCronograma() {
       .single();
 
     const encontros = await getEncontros(usuario.liga_id);
-    renderizarTimeline(encontros.map(e => ({
+    const ordenados = [...encontros].sort((a, b) => new Date(a.data) - new Date(b.data));
+    renderizarTimeline(ordenados.map(e => ({
       data: e.data,
       titulo: e.titulo,
       subtitulo: e.aberto ? 'Chamada aberta agora' : ''
@@ -374,6 +375,14 @@ function renderizarTimeline(itens) {
   const container = document.getElementById('timeline-container');
   if (!container) return;
 
+  if (!itens.length) {
+    container.innerHTML = `
+      <div class="timeline-empty" style="text-align:center;padding:2rem 0;font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">
+        Nenhum encontro agendado
+      </div>`;
+    return;
+  }
+
   const hoje = new Date().toDateString();
 
   container.innerHTML = itens.map(item => {
@@ -382,10 +391,14 @@ function renderizarTimeline(itens) {
     const isConcluida = dataItem < new Date() && !isHoje;
     const status = isHoje ? 'hoje' : isConcluida ? 'concluida' : 'planejada';
 
+    const weekday = dataItem.toLocaleDateString('pt-BR', { weekday: 'long' });
+    const weekdayCap = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+    const dataFmt = dataItem.toLocaleDateString('pt-BR');
+
     return `
-      <div class="timeline-item">
+      <div class="timeline-item ${status}">
         <div class="timeline-dot ${status}"></div>
-        <div class="timeline-date">${dataItem.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+        <div class="timeline-date">${weekdayCap} · ${dataFmt}</div>
         <div class="timeline-title">${item.titulo}</div>
         ${item.subtitulo ? `<div class="timeline-sub">${item.subtitulo}</div>` : ''}
         <span class="timeline-badge ${status}">${status === 'hoje' ? 'Hoje' : status === 'concluida' ? 'Concluída' : 'Planejada'}</span>

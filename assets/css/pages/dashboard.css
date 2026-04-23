@@ -219,6 +219,7 @@ body { font-size: 13px; min-height: 100vh; }
   padding: 0 0 1.75rem 1.5rem;
 }
 .timeline-item:last-child { padding-bottom: 0; }
+.timeline-item.concluida { opacity: .5; }
 .timeline-dot {
   position: absolute;
   left: -1.75rem;
