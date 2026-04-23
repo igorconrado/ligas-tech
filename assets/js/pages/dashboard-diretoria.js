@@ -354,16 +354,16 @@ async function handleAbrirChamada() {
   try {
     const { codigo, expira } = await abrirChamada(encontroId);
 
-    const qrCode = document.getElementById('qr-code');
     const qrDisplay = document.getElementById('qr-display');
     if (qrDisplay) qrDisplay.textContent = codigo;
-    if (qrCode) qrCode.style.display = 'block';
 
     const expiraEl = document.getElementById('qr-expira');
     if (expiraEl) {
       const mins = Math.floor((new Date(expira) - new Date()) / 60000);
       expiraEl.textContent = `Expira em ${mins} minutos`;
     }
+
+    openModal('qr-modal');
 
     window._chamadaChannel = assinarPresencasEncontro(encontroId, (payload) => {
       atualizarPresencaTempoReal(payload.new);
@@ -382,6 +382,7 @@ async function handleAbrirChamada() {
 }
 
 async function handleFecharChamada(encontroId) {
+  closeModal('qr-modal');
   try {
     await fecharChamada(encontroId);
 
@@ -389,9 +390,6 @@ async function handleFecharChamada(encontroId) {
       window._chamadaChannel.unsubscribe();
       window._chamadaChannel = null;
     }
-
-    const qrCode = document.getElementById('qr-code');
-    if (qrCode) qrCode.style.display = 'none';
 
     const btnAbrir = document.getElementById('btn-abrir-chamada');
     if (btnAbrir) {
