@@ -13,8 +13,10 @@
 <link rel="stylesheet" href="/assets/css/ui/empty-state.css">
 <link rel="stylesheet" href="/assets/css/ui/skeleton.css">
 <link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
 <!-- ONBOARDING OVERLAY -->
 <div class="onboarding-overlay" id="onboarding">
@@ -71,7 +73,7 @@
         <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
         <div class="user-role" id="sidebar-role">Membro</div>
       </div>
-      <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
+      <div class="logout-btn" id="btn-logout" title="Sair" role="button" aria-label="Sair" tabindex="0">↩</div>
     </div>
     <div class="sidebar-stats">
       <div class="sb-stat">
@@ -86,10 +88,10 @@
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <main class="main" id="main-content">
     <div class="topbar">
       <div class="topbar-left">
-        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
         <span class="topbar-liga b" id="topbar-liga"></span>
       </div>
       <div class="topbar-right">

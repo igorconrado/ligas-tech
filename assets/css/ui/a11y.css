@@ -1,0 +1,36 @@
+/* ================================================================
+   A11Y
+   Baseline: skip-link + focus-visible global.
+   Importado nos HTMLs da área de membros.
+================================================================ */
+
+/* Skip to content: visível só no foco (primeiro tab da página). */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: var(--sp-4);
+  top: var(--sp-4);
+  z-index: var(--z-overlay);
+  background: var(--bg-surface-3);
+  color: var(--text-primary);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  text-decoration: none;
+}
+
+/* Focus visible global — aplica só em navegação por teclado. */
+:focus-visible {
+  outline: 2px solid var(--accent-tech);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Remove outline default quando foco vem de click/touch (não-keyboard). */
+:focus:not(:focus-visible) {
+  outline: none;
+}

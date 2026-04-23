@@ -14,13 +14,15 @@
 <link rel="stylesheet" href="/assets/css/ui/empty-state.css">
 <link rel="stylesheet" href="/assets/css/ui/skeleton.css">
 <link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
 <!-- MODAL QR CODE -->
 <div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
   <div class="modal-box" id="qr-code" style="text-align:center">
-    <button class="modal-close" onclick="closeModal('qr-modal')">✕</button>
+    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Fechar">✕</button>
     <div class="modal-title">CHAMADA ABERTA</div>
     <div class="modal-sub">Membros digitam o código ou escaneiam o QR pra marcar presença</div>
     <div class="qr-code" id="qr-display">—</div>
@@ -32,7 +34,7 @@
 <!-- MODAL ADVERTÊNCIA -->
 <div class="modal-overlay" id="modal-advertencia" onclick="if(event.target===this)closeModal('modal-advertencia')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-advertencia')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-advertencia')" aria-label="Fechar">✕</button>
     <div class="modal-title">ADVERTÊNCIA</div>
     <div class="modal-sub" id="adv-modal-sub">Registrar advertência ou anotação</div>
     <div class="adv-form">
@@ -61,7 +63,7 @@
 <!-- MODAL CADASTRO MEMBRO -->
 <div class="modal-overlay" id="modal-novo-membro" onclick="if(event.target===this)closeModal('modal-novo-membro')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-novo-membro')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-novo-membro')" aria-label="Fechar">✕</button>
     <div class="modal-title">NOVO MEMBRO</div>
     <div class="modal-sub" style="margin-bottom:1.5rem">Cadastrar e atribuir liga e role</div>
     <div class="cadastro-form">
@@ -128,15 +130,15 @@
         <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
         <div class="user-role" id="sidebar-role">—</div>
       </div>
-      <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
+      <div class="logout-btn" id="btn-logout" title="Sair" role="button" aria-label="Sair" tabindex="0">↩</div>
     </div>
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <main class="main" id="main-content">
     <div class="topbar">
       <div class="topbar-left">
-        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
       </div>
       <div class="topbar-right">
         <span class="topbar-date" id="topbar-date"></span>
@@ -344,7 +346,7 @@
 <!-- MODAL NOVO ENCONTRO -->
 <div class="modal-overlay" id="modal-encontro" onclick="if(event.target===this)closeModal('modal-encontro')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-encontro')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-encontro')" aria-label="Fechar">✕</button>
     <div class="modal-title">Novo Encontro</div>
     <div class="modal-sub">Cadastra um encontro para abrir chamada de presença.</div>
     <div class="form-group" style="margin-bottom:.75rem">
