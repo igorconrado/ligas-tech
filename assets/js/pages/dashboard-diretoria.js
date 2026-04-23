@@ -5,7 +5,7 @@ import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getTodasAulas, criarAula, togglePublicarAula, getEntregasAula } from '/assets/js/supabase/aulas.js';
-import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro, getEncontros, criarEncontro } from '/assets/js/supabase/presenca.js';
+import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro, getEncontros, criarEncontro, getPresencasEncontro } from '/assets/js/supabase/presenca.js';
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
 import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
@@ -34,6 +34,20 @@ const ligaId = perfil?.liga_id;
 
 // Data
 document.getElementById('topbar-date').textContent = formatDate();
+
+// ── Sidebar com dados reais do perfil ──
+(function atualizarHeaderDiretoria() {
+  const nome = perfil?.nome || session.user.email?.split('@')[0] || 'Diretoria';
+  const inicial = nome.trim()[0]?.toUpperCase() || 'D';
+  const role = (usuario?.role || 'Diretoria').replace(/^./, c => c.toUpperCase());
+
+  const elAv = document.getElementById('sidebar-av');
+  const elName = document.getElementById('sidebar-name');
+  const elRole = document.getElementById('sidebar-role');
+  if (elAv) elAv.textContent = inicial;
+  if (elName) elName.textContent = nome;
+  if (elRole) elRole.textContent = role;
+})();
 
 // ── State ──
 let members = [];
@@ -307,20 +321,204 @@ function renderizarEntregas(data) {
   }).join('')}</tbody>`;
 }
 
-// ── Atualizar métricas do topo ──
+// ── Atualizar métricas do topo (4 KPIs) ──
 async function atualizarMetricas() {
-  const elMembros = document.querySelector('[data-metric="membros"]') ||
-                    document.getElementById('metric-membros');
-  if (elMembros) elMembros.innerHTML = skeletonText('skeleton--title');
+  ['metric-membros', 'metric-presenca-media', 'pending-count', 'metric-advertencias'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = skeletonText('skeleton--title');
+  });
 
   try {
-    const membros = await getMembrosLiga();
-    const totalMembros = membros.length;
+    const ligaIdAtual = await getMinhaLigaId();
 
+    const [membros, encontros, aulas, advertencias] = await Promise.all([
+      getMembrosLiga(ligaIdAtual),
+      getEncontros(ligaIdAtual),
+      getTodasAulas(ligaIdAtual),
+      getTodasAdvertencias(ligaIdAtual),
+    ]);
+
+    // 1. Membros ativos (val + sub por liga)
+    const totalMembros = membros.length;
+    const elMembros = document.getElementById('metric-membros');
     if (elMembros) elMembros.textContent = totalMembros;
+
+    const porLiga = membros.reduce((acc, m) => {
+      const nome = m.ligas?.nome || 'Sem liga';
+      acc[nome] = (acc[nome] || 0) + 1;
+      return acc;
+    }, {});
+    const subMembros = document.getElementById('metric-membros-sub');
+    if (subMembros) {
+      subMembros.textContent = Object.entries(porLiga)
+        .map(([nome, n]) => `${n} ${nome}`)
+        .join(' · ') || '—';
+    }
+
+    // 2. Presença média — N+1 paralelizado
+    const presencasPorEnc = encontros.length
+      ? await Promise.all(encontros.map(e => getPresencasEncontro(e.id)))
+      : [];
+    const porMembro = {};
+    presencasPorEnc.flat().forEach(p => {
+      porMembro[p.membro_id] = porMembro[p.membro_id] || { presentes: 0, total: 0 };
+      porMembro[p.membro_id].total++;
+      if (p.status === 'presente') porMembro[p.membro_id].presentes++;
+    });
+    const taxas = Object.values(porMembro)
+      .filter(v => v.total > 0)
+      .map(v => v.presentes / v.total);
+    const presencaMedia = taxas.length
+      ? Math.round((taxas.reduce((a, b) => a + b, 0) / taxas.length) * 100)
+      : 0;
+    const elPresenca = document.getElementById('metric-presenca-media');
+    if (elPresenca) elPresenca.textContent = `${presencaMedia}%`;
+
+    // 3. Entregas pendentes — aulas publicadas com prazo × membros ativos - entregues
+    const aulasElegiveis = aulas.filter(a => a.publicada && a.prazo_entrega);
+    const entregasPorAula = aulasElegiveis.length
+      ? await Promise.all(aulasElegiveis.map(a => getEntregasAula(a.id)))
+      : [];
+    const totalEntregues = entregasPorAula.flat().filter(e => e.status === 'entregue').length;
+    const totalEsperado = aulasElegiveis.length * totalMembros;
+    const pendentes = Math.max(0, totalEsperado - totalEntregues);
+    const elPending = document.getElementById('pending-count');
+    if (elPending) elPending.textContent = pendentes;
+
+    const subEntregas = document.getElementById('metric-entregas-pendentes-sub');
+    if (subEntregas) {
+      subEntregas.textContent = aulasElegiveis.length
+        ? `em ${aulasElegiveis.length} aula${aulasElegiveis.length > 1 ? 's' : ''} com prazo`
+        : 'Nenhuma aula com prazo';
+    }
+
+    // 4. Advertências ativas
+    const elAdv = document.getElementById('metric-advertencias');
+    if (elAdv) elAdv.textContent = advertencias.length;
 
   } catch (e) {
     console.error('Erro ao atualizar métricas:', e);
+  }
+}
+
+// ── Últimas presenças (panel dashboard diretoria) ──
+async function renderizarUltimasPresencas() {
+  const tbody = document.getElementById('tbody-ultimas-presencas');
+  if (!tbody) return;
+  tbody.innerHTML = skeletonTableRows(3, 3);
+
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const [encontros, membros] = await Promise.all([
+      getEncontros(ligaIdAtual),
+      getMembrosLiga(ligaIdAtual),
+    ]);
+    const ligaNome = perfil?.ligas?.nome || '—';
+    const totalMembros = membros.length;
+
+    const ultimos = encontros.slice(0, 3);
+    if (!ultimos.length) {
+      renderEmptyState(tbody, {
+        icon: icons.clock,
+        title: 'Nenhum encontro registrado',
+        description: 'Crie encontros e abra chamadas pra ver taxas de presença.',
+      });
+      return;
+    }
+
+    const presencasPorEnc = await Promise.all(
+      ultimos.map(e => getPresencasEncontro(e.id))
+    );
+
+    tbody.innerHTML = ultimos.map((e, i) => {
+      const data = new Date(e.data).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }).replace('.', '');
+      const presentes = presencasPorEnc[i].filter(p => p.status === 'presente').length;
+      const taxa = totalMembros > 0 ? Math.round((presentes / totalMembros) * 100) : 0;
+      const pill = ligaNome === 'IbBot' ? 'r' : 'b';
+      return `<tr>
+        <td>${data} · ${e.titulo}</td>
+        <td><span class="pill ${pill}">${ligaNome}</span></td>
+        <td>${presentes}/${totalMembros} (${taxa}%)</td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    console.error('Erro em últimas presenças:', e);
+  }
+}
+
+// ── Entregas atrasadas (panel dashboard diretoria) ──
+async function renderizarEntregasAtrasadas() {
+  const tbody = document.getElementById('tbody-entregas-atrasadas');
+  if (!tbody) return;
+  tbody.innerHTML = skeletonTableRows(3, 3);
+
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const [aulas, membros] = await Promise.all([
+      getTodasAulas(ligaIdAtual),
+      getMembrosLiga(ligaIdAtual),
+    ]);
+
+    const now = new Date();
+    const aulasAtrasadas = aulas
+      .filter(a => a.publicada && a.prazo_entrega && new Date(a.prazo_entrega) < now)
+      .sort((a, b) => new Date(b.prazo_entrega) - new Date(a.prazo_entrega));
+
+    if (!aulasAtrasadas.length) {
+      renderEmptyState(tbody, {
+        icon: icons.check,
+        title: 'Sem entregas atrasadas',
+        description: 'Tudo em dia ou nenhum prazo passou ainda.',
+      });
+      return;
+    }
+
+    const entregasPorAula = await Promise.all(
+      aulasAtrasadas.map(a => getEntregasAula(a.id))
+    );
+
+    const porMembro = {};
+    aulasAtrasadas.forEach((a, i) => {
+      const entreguesIds = new Set(
+        entregasPorAula[i].filter(e => e.status === 'entregue').map(e => e.membro_id)
+      );
+      membros.forEach(m => {
+        if (!entreguesIds.has(m.id)) {
+          porMembro[m.id] = porMembro[m.id] || { nome: m.nome, aulas: [] };
+          porMembro[m.id].aulas.push(a.numero);
+        }
+      });
+    });
+
+    const top = Object.values(porMembro)
+      .sort((a, b) => b.aulas.length - a.aulas.length)
+      .slice(0, 3);
+
+    if (!top.length) {
+      renderEmptyState(tbody, {
+        icon: icons.check,
+        title: 'Sem entregas atrasadas',
+        description: 'Todos entregaram no prazo.',
+      });
+      return;
+    }
+
+    tbody.innerHTML = top.map(m => {
+      const n = m.aulas.length;
+      const aulasLabel = n === 1
+        ? `Aula ${String(m.aulas[0]).padStart(2, '0')}`
+        : `${n} atrasadas`;
+      const statusPill = n === 1
+        ? '<span class="pill late">Atrasada</span>'
+        : `<span class="pill adv">${n} atrasadas</span>`;
+      return `<tr>
+        <td>${m.nome}</td>
+        <td>${aulasLabel}</td>
+        <td>${statusPill}</td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    console.error('Erro em entregas atrasadas:', e);
   }
 }
 
@@ -669,6 +867,8 @@ await carregarMembros();
 await carregarAulas();
 await carregarEntregas();
 await atualizarMetricas();
+await renderizarUltimasPresencas();
+await renderizarEntregasAtrasadas();
 await carregarAvisos();
 await carregarAdvertencias();
 await carregarEncontros();

@@ -122,10 +122,10 @@
       <a class="nav-item" onclick="showTab('entregas',this)"><span class="nav-dot w"></span> Entregas <span class="nav-badge">5</span></a>
     </nav>
     <div class="sidebar-footer">
-      <div class="user-av">I</div>
+      <div class="user-av" id="sidebar-av">—</div>
       <div class="user-info">
-        <div class="user-name">Igor</div>
-        <div class="user-role">Presidente</div>
+        <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
+        <div class="user-role" id="sidebar-role">—</div>
       </div>
       <div class="logout-btn" id="btn-logout" title="Sair">↩</div>
     </div>
@@ -149,10 +149,10 @@
       <!-- DASHBOARD -->
       <div class="tab-page active" id="tab-dashboard">
         <div class="metrics">
-          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">26</div><div class="metric-sub">7 IbBot · 17 IbTech</div></div>
-          <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g">79%</div><div class="metric-sub">Último encontro</div></div>
-          <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">5</div><div class="metric-sub">Aulas 01 e 02</div></div>
-          <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r">3</div><div class="metric-sub">Esse semestre</div></div>
+          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">—</div><div class="metric-sub" id="metric-membros-sub"></div></div>
+          <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g" id="metric-presenca-media">—</div><div class="metric-sub">Último encontro</div></div>
+          <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">—</div><div class="metric-sub" id="metric-entregas-pendentes-sub"></div></div>
+          <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r" id="metric-advertencias">—</div><div class="metric-sub">Esse semestre</div></div>
         </div>
 
         <div class="panels">
@@ -164,11 +164,7 @@
             <div class="panel-body">
               <table class="tbl">
                 <thead><tr><th>Encontro</th><th>Liga</th><th>Taxa</th></tr></thead>
-                <tbody>
-                  <tr><td>13 mar · Aula 02</td><td><span class="pill b">IbTech</span></td><td>14/17 (82%)</td></tr>
-                  <tr><td>11 mar · Reunião</td><td><span class="pill r">IbBot</span></td><td>6/7 (86%)</td></tr>
-                  <tr><td>06 mar · Aula 01</td><td><span class="pill b">IbTech</span></td><td>15/17 (88%)</td></tr>
-                </tbody>
+                <tbody id="tbody-ultimas-presencas"></tbody>
               </table>
             </div>
           </div>
@@ -180,11 +176,7 @@
             <div class="panel-body">
               <table class="tbl">
                 <thead><tr><th>Membro</th><th>Aula</th><th>Status</th></tr></thead>
-                <tbody>
-                  <tr><td>Ana Lima</td><td>Aula 02</td><td><span class="pill late">Atrasada</span></td></tr>
-                  <tr><td>Pedro Ramos</td><td>Aulas 01 e 02</td><td><span class="pill adv">2 atrasadas</span></td></tr>
-                  <tr><td>Diego Santos</td><td>Aula 02</td><td><span class="pill late">Atrasada</span></td></tr>
-                </tbody>
+                <tbody id="tbody-entregas-atrasadas"></tbody>
               </table>
             </div>
           </div>
@@ -295,16 +287,7 @@
         <div style="display:grid;grid-template-columns:1fr 360px;gap:1rem">
           <div>
             <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em;margin-bottom:1.25rem">Avisos publicados</div>
-            <div id="avisos-lista">
-              <div class="aviso-item">
-                <div class="aviso-head"><div class="aviso-title-text">Entrega da Aula 02 — prazo final</div><div class="aviso-date">18 mar · Igor</div></div>
-                <div class="aviso-body">O prazo final pra entrega da Aula 02 é sexta-feira. Quem não entregar receberá advertência automática.</div>
-              </div>
-              <div class="aviso-item">
-                <div class="aviso-head"><div class="aviso-title-text">Próximo encontro — Aula 03</div><div class="aviso-date">16 mar · Beatriz</div></div>
-                <div class="aviso-body">O próximo encontro da IbTech é quinta-feira às 13h. O conteúdo será arrays e matrizes em C.</div>
-              </div>
-            </div>
+            <div id="avisos-lista"></div>
           </div>
           <div class="panel" style="align-self:start">
             <div class="panel-head"><div class="panel-title">Novo aviso</div></div>
