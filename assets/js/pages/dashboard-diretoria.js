@@ -4,10 +4,12 @@ import { openModal, closeModal, initModalEscape } from '/assets/js/components/mo
 import { supabase } from '/assets/js/supabase/client.js';
 import { requireAuth, fazerLogout } from '/assets/js/supabase/auth.js';
 import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
-import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
-import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro } from '/assets/js/supabase/presenca.js';
+import { getTodasAulas, criarAula, togglePublicarAula, getEntregasAula } from '/assets/js/supabase/aulas.js';
+import { abrirChamada, fecharChamada, corrigirPresenca, assinarPresencasEncontro, getEncontros, criarEncontro } from '/assets/js/supabase/presenca.js';
 import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
+import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
+import { toast } from '/assets/js/ui/toast.js';
 
 // ── Auth ──
 const session = await requireAuth();
@@ -35,28 +37,8 @@ document.getElementById('topbar-date').textContent = formatDate();
 let members = [];
 let presenceMembers = [];
 let presentSet = new Set();
-
-// Aulas (hardcoded — pendente integração)
-const aulas = [
-  { num: '01', title: 'Lógica, condicionais e loops em C', status: 'ok', entregas: '15/17', prazo: '13 mar' },
-  { num: '02', title: 'HTML, CSS e JavaScript — Frontend', status: 'warn', entregas: '12/17', prazo: '17 mar' },
-  { num: '03', title: 'Arrays, matrizes e funções em C', status: 'next', entregas: '—', prazo: '27 mar' },
-  { num: '04', title: 'Git e GitHub — versionamento', status: 'planned', entregas: '—', prazo: '03 abr' },
-  { num: '05', title: 'Backend com Node.js', status: 'planned', entregas: '—', prazo: '10 abr' },
-  { num: '06', title: 'Banco de dados — SQL', status: 'planned', entregas: '—', prazo: '17 abr' },
-];
-
-// Entregas (hardcoded — pendente integração)
-const entregasData = [
-  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/ana/ibtech-aula01', status: 'ok', data: '13 mar' },
-  { membro: 'Ana Lima', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/bruno/ibtech-aula01', status: 'ok', data: '12 mar' },
-  { membro: 'Bruno Dias', liga: 'IbTech', aula: 'Aula 02', repo: 'github.com/bruno/ibtech-aula02', status: 'ok', data: '16 mar' },
-  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 01', repo: '—', status: 'late', data: '—' },
-  { membro: 'Pedro Ramos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 01', repo: 'github.com/diego/ibtech-aula01', status: 'ok', data: '14 mar' },
-  { membro: 'Diego Santos', liga: 'IbTech', aula: 'Aula 02', repo: '—', status: 'late', data: '—' },
-];
+let entregasCache = [];
+let filterAulaVal = '';
 
 const statusMap = { ok: 'ok', warn: 'warn', adv: 'adv' };
 const statusLabel = { ok: 'Regular', warn: 'Atenção', adv: 'Advertência' };
@@ -71,11 +53,61 @@ function showTab(name, el) {
   document.getElementById('topbar-title').textContent = titles[name] || name;
 }
 
+// ── Helper: liga do usuário logado ──
+async function getMinhaLigaId() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase
+    .from('usuarios')
+    .select('liga_id')
+    .eq('id', user.id)
+    .single();
+  return data?.liga_id;
+}
+
+// ── Novo membro — Supabase ──
+async function handleCadastrarMembro() {
+  const nome  = document.getElementById('novo-nome')?.value?.trim();
+  const email = document.getElementById('novo-email')?.value?.trim();
+  const liga  = document.getElementById('nova-liga')?.value;
+
+  if (!nome || !email || !liga) {
+    toast.error('Preencha todos os campos.');
+    return;
+  }
+
+  if (!email.endsWith('@alunos.ibmec.edu.br')) {
+    toast.error('Use o email @alunos.ibmec.edu.br');
+    return;
+  }
+
+  const matricula = email.replace('@alunos.ibmec.edu.br', '');
+
+  try {
+    const { error } = await supabase
+      .from('emails_autorizados')
+      .insert({ email, nome, matricula });
+
+    if (error) throw error;
+
+    closeModal('modal-novo-membro');
+    await carregarMembros();
+    toast.success('Membro cadastrado. Ele pode criar a conta pelo login.');
+
+  } catch (e) {
+    if (e.message?.includes('duplicate') || e.message?.includes('unique')) {
+      toast.error('Este email já está cadastrado.');
+    } else {
+      toast.error('Erro ao cadastrar. Tente novamente.');
+    }
+  }
+}
+
 // ── Carregar membros do Supabase ──
 async function carregarMembros() {
   try {
     const membros = await getMembrosLiga();
     members = membros.map(m => ({
+      id: m.id,
       name: m.nome,
       liga: m.ligas?.nome || '—',
       presenca: 0,
@@ -102,7 +134,7 @@ function renderOverview(data) {
     <td style="color:var(--mid)">${m.entregas}</td>
     <td><span class="pill ${statusMap[m.status] || 'ok'}">${statusLabel[m.status] || 'Regular'}</span></td>
     <td style="color:${m.adv > 0 ? 'rgba(255,120,120,.8)' : 'var(--muted)'}; font-family:var(--font-mono); font-size:11px">${m.adv > 0 ? m.adv + 'x' : '—'}</td>
-    <td><button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.name}')">Anotar</button></td>
+    <td><button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button></td>
   </tr>`).join('')}</tbody>`;
 }
 
@@ -118,7 +150,7 @@ function renderMembros(data) {
     <td style="color:${m.adv > 0 ? 'rgba(255,120,120,.8)' : 'var(--muted)'}; font-family:var(--font-mono); font-size:11px">${m.adv > 0 ? m.adv + 'x' : '—'}</td>
     <td style="color:var(--muted)">2026.1</td>
     <td style="display:flex;gap:.375rem">
-      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.name}')">Anotar</button>
+      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button>
       <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
     </td>
   </tr>`).join('')}</tbody>`;
@@ -136,43 +168,109 @@ function applyFilters() {
   renderMembros(filtered);
 }
 
-// ── Render aulas ──
-function renderAulas() {
-  const grid = document.getElementById('aulas-dir-grid');
-  const statusPillMap = { ok: 'ok', warn: 'warn', next: 'next', planned: 'planned' };
-  const statusLabelMap = { ok: 'Concluída', warn: 'Entregas pendentes', next: 'Próxima', planned: 'Planejada' };
-  grid.innerHTML = aulas.map(a => `
-    <div class="aula-dir-card">
-      <div class="aula-num">Aula ${a.num}</div>
-      <div class="aula-title-sm">${a.title}</div>
-      <div class="aula-meta">
-        <span class="pill ${statusPillMap[a.status]}">${statusLabelMap[a.status]}</span>
-        <div style="display:flex;align-items:center;gap:.5rem">
-          <span class="aula-stats">${a.entregas !== '—' ? a.entregas + ' entregas' : 'Prazo: ' + a.prazo}</span>
-          <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
-        </div>
-      </div>
-    </div>`).join('');
+// ── Carregar + render aulas ──
+async function carregarAulas() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const aulas = await getTodasAulas(ligaIdAtual);
+    renderizarAulas(aulas);
+  } catch (e) {
+    console.error('Erro ao carregar aulas:', e);
+  }
 }
 
-// ── Render entregas ──
-let filterAulaVal = '';
+function renderizarAulas(aulas) {
+  const grid = document.getElementById('aulas-dir-grid');
+  if (!grid) return;
+  const statusPillMap = { ok: 'ok', next: 'next', planned: 'planned' };
+  const statusLabelMap = { ok: 'Concluída', next: 'Próxima', planned: 'Planejada' };
+  const now = new Date();
+  grid.innerHTML = aulas.map(a => {
+    const numero = String(a.numero).padStart(2, '0');
+    const prazo = a.prazo_entrega ? new Date(a.prazo_entrega) : null;
+    let status = 'planned';
+    if (a.publicada) status = prazo && prazo < now ? 'ok' : 'next';
+    const prazoFmt = prazo
+      ? prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
+      : '—';
+    return `
+      <div class="aula-dir-card">
+        <div class="aula-num">Aula ${numero}</div>
+        <div class="aula-title-sm">${a.titulo}</div>
+        <div class="aula-meta">
+          <span class="pill ${statusPillMap[status]}">${statusLabelMap[status]}</span>
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <span class="aula-stats">Prazo: ${prazoFmt}</span>
+            <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Carregar + render entregas ──
+async function carregarEntregas() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const aulas = await getTodasAulas(ligaIdAtual);
+
+    const todasEntregas = [];
+    for (const aula of aulas) {
+      const entregas = await getEntregasAula(aula.id);
+      entregas.forEach(e => todasEntregas.push({ ...e, aula_titulo: aula.titulo }));
+    }
+
+    entregasCache = todasEntregas;
+    renderizarEntregas(todasEntregas);
+  } catch (e) {
+    console.error('Erro ao carregar entregas:', e);
+  }
+}
+
 function filterEntregas(v) {
   filterAulaVal = v;
-  const filtered = entregasData.filter(e => filterAulaVal === '' || e.aula === filterAulaVal);
-  renderEntregas(filtered);
+  const filtered = entregasCache.filter(e => filterAulaVal === '' || e.aula_titulo === filterAulaVal);
+  renderizarEntregas(filtered);
 }
-function renderEntregas(data) {
+
+function renderizarEntregas(data) {
   const tbl = document.getElementById('entregas-tbl');
-  tbl.innerHTML = `<thead><tr><th>Membro</th><th>Liga</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead>
-  <tbody>${data.map(e => `<tr>
-    <td style="font-weight:500">${e.membro}</td>
-    <td><span class="pill ${e.liga === 'IbBot' ? 'r' : 'b'}">${e.liga}</span></td>
-    <td style="color:var(--mid)">${e.aula}</td>
-    <td>${e.repo !== '—' ? `<a href="https://${e.repo}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:10px;text-decoration:none">${e.repo} ↗</a>` : '<span style="color:var(--muted)">—</span>'}</td>
-    <td style="color:var(--muted);font-family:var(--font-mono);font-size:10px">${e.data}</td>
-    <td><span class="pill ${e.status === 'ok' ? 'ok' : 'late'}">${e.status === 'ok' ? 'Entregue' : 'Atrasada'}</span></td>
-  </tr>`).join('')}</tbody>`;
+  if (!tbl) return;
+  tbl.innerHTML = `<thead><tr><th>Membro</th><th>Aula</th><th>Repositório</th><th>Entrega</th><th>Status</th></tr></thead>
+  <tbody>${data.map(e => {
+    const nome = e.membros?.nome || '—';
+    const aula = e.aula_titulo || '—';
+    const repo = e.repo_url;
+    const repoHtml = repo
+      ? `<a href="${repo}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:10px;text-decoration:none">${repo.replace(/^https?:\/\//, '')} ↗</a>`
+      : '<span style="color:var(--muted)">—</span>';
+    const entregueEm = e.entregue_em
+      ? new Date(e.entregue_em).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
+      : '—';
+    const statusOk = e.status === 'entregue';
+    return `<tr>
+      <td style="font-weight:500">${nome}</td>
+      <td style="color:var(--mid)">${aula}</td>
+      <td>${repoHtml}</td>
+      <td style="color:var(--muted);font-family:var(--font-mono);font-size:10px">${entregueEm}</td>
+      <td><span class="pill ${statusOk ? 'ok' : 'late'}">${statusOk ? 'Entregue' : 'Atrasada'}</span></td>
+    </tr>`;
+  }).join('')}</tbody>`;
+}
+
+// ── Atualizar métricas do topo ──
+async function atualizarMetricas() {
+  try {
+    const membros = await getMembrosLiga();
+    const totalMembros = membros.length;
+
+    const elMembros = document.querySelector('[data-metric="membros"]') ||
+                      document.getElementById('metric-membros');
+    if (elMembros) elMembros.textContent = totalMembros;
+
+  } catch (e) {
+    console.error('Erro ao atualizar métricas:', e);
+  }
 }
 
 // ── Presença ──
@@ -202,108 +300,232 @@ function savePresenca() {
   document.getElementById('chamada-badge').className = 'chamada-badge closed';
 }
 
+// ── Encontros — Supabase ──
+async function carregarEncontros() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const encontros = await getEncontros(ligaIdAtual);
+
+    const select = document.getElementById('select-encontro');
+    if (!select) return;
+
+    if (encontros.length === 0) {
+      select.innerHTML = '<option value="">Nenhum encontro cadastrado</option>';
+      return;
+    }
+
+    select.innerHTML = encontros.map(e => `
+      <option value="${e.id}">${e.titulo} — ${new Date(e.data).toLocaleDateString('pt-BR')}</option>
+    `).join('');
+
+  } catch (e) {
+    console.error('Erro ao carregar encontros:', e);
+  }
+}
+
+async function handleCriarEncontro() {
+  const titulo = document.getElementById('encontro-titulo')?.value?.trim();
+  const data   = document.getElementById('encontro-data')?.value;
+
+  if (!titulo || !data) return;
+
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    await criarEncontro(ligaIdAtual, titulo, data);
+    closeModal('modal-encontro');
+    await carregarEncontros();
+    toast.success('Encontro criado.');
+  } catch (e) {
+    console.error('Erro ao criar encontro:', e);
+  }
+}
+
 // ── Chamada — Supabase ──
-async function handleAbrirChamada(encontroId) {
+async function handleAbrirChamada() {
+  const encontroId = document.getElementById('select-encontro')?.value;
+  if (!encontroId) {
+    toast.error('Selecione um encontro primeiro.');
+    return;
+  }
+
   try {
     const { codigo, expira } = await abrirChamada(encontroId);
-    exibirCodigoChamada(codigo, expira);
 
-    const channel = assinarPresencasEncontro(encontroId, (payload) => {
+    const qrDisplay = document.getElementById('qr-display');
+    if (qrDisplay) qrDisplay.textContent = codigo;
+
+    const expiraEl = document.getElementById('qr-expira');
+    if (expiraEl) {
+      const mins = Math.floor((new Date(expira) - new Date()) / 60000);
+      expiraEl.textContent = `Expira em ${mins} minutos`;
+    }
+
+    openModal('qr-modal');
+
+    window._chamadaChannel = assinarPresencasEncontro(encontroId, (payload) => {
       atualizarPresencaTempoReal(payload.new);
     });
 
-    window._chamadaChannel = channel;
+    const btnAbrir = document.getElementById('btn-abrir-chamada');
+    if (btnAbrir) {
+      btnAbrir.textContent = 'Fechar Chamada';
+      btnAbrir.onclick = () => handleFecharChamada(encontroId);
+    }
+
   } catch (e) {
     console.error('Erro ao abrir chamada:', e);
+    toast.error('Erro ao abrir chamada. Tente novamente.');
   }
 }
 
 async function handleFecharChamada(encontroId) {
+  closeModal('qr-modal');
   try {
     await fecharChamada(encontroId);
+
     if (window._chamadaChannel) {
       window._chamadaChannel.unsubscribe();
       window._chamadaChannel = null;
     }
-    ocultarCodigoChamada();
+
+    const btnAbrir = document.getElementById('btn-abrir-chamada');
+    if (btnAbrir) {
+      btnAbrir.textContent = 'Abrir Chamada';
+      btnAbrir.onclick = handleAbrirChamada;
+    }
+
   } catch (e) {
     console.error('Erro ao fechar chamada:', e);
   }
-}
-
-function exibirCodigoChamada(codigo, expira) {
-  document.getElementById('qr-code-text').textContent = codigo;
-  const expiracaoMs = new Date(expira).getTime() - Date.now();
-  qrSeconds = Math.max(0, Math.floor(expiracaoMs / 1000));
-  openModal('qr-modal');
-  document.getElementById('chamada-badge').textContent = 'Aberta';
-  document.getElementById('chamada-badge').className = 'chamada-badge open';
-  clearInterval(qrTimer);
-  qrTimer = setInterval(() => {
-    qrSeconds--;
-    const m = String(Math.floor(qrSeconds / 60)).padStart(2, '0');
-    const s = String(qrSeconds % 60).padStart(2, '0');
-    document.getElementById('qr-timer-val').textContent = `${m}:${s}`;
-    if (qrSeconds <= 0) { clearInterval(qrTimer); closeModal('qr-modal'); }
-  }, 1000);
-}
-
-function ocultarCodigoChamada() {
-  clearInterval(qrTimer);
-  closeModal('qr-modal');
-  document.getElementById('chamada-badge').textContent = 'Fechada';
-  document.getElementById('chamada-badge').className = 'chamada-badge closed';
 }
 
 function atualizarPresencaTempoReal(novaPresenca) {
   renderPresenca();
 }
 
-// ── QR Code (fallback local quando não há encontroId) ──
-let qrTimer, qrSeconds = 600;
-function openQR() {
-  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  document.getElementById('qr-code-text').textContent = code;
-  qrSeconds = 600;
-  openModal('qr-modal');
-  document.getElementById('chamada-badge').textContent = 'Aberta';
-  document.getElementById('chamada-badge').className = 'chamada-badge open';
-  clearInterval(qrTimer);
-  qrTimer = setInterval(() => {
-    qrSeconds--;
-    const m = String(Math.floor(qrSeconds / 60)).padStart(2, '0');
-    const s = String(qrSeconds % 60).padStart(2, '0');
-    document.getElementById('qr-timer-val').textContent = `${m}:${s}`;
-    if (qrSeconds <= 0) { clearInterval(qrTimer); closeModal('qr-modal'); }
-  }, 1000);
+// ── Advertência — Supabase ──
+async function popularSelectAdvertencia() {
+  const select = document.getElementById('advertencia-membro');
+  if (!select) return;
+  try {
+    const ligaDoUser = await getMinhaLigaId();
+    const membros = await getMembrosLiga(ligaDoUser || null);
+    const mostraLiga = !ligaDoUser;
+    select.innerHTML = '<option value="" disabled selected>Selecione o membro</option>' +
+      (membros || []).map(m => {
+        const texto = mostraLiga ? `${m.nome} — ${m.ligas?.nome || '—'}` : m.nome;
+        return `<option value="${m.id}">${texto}</option>`;
+      }).join('');
+  } catch (e) {
+    console.error('Erro ao popular select de advertência:', e);
+  }
 }
 
-// ── Advertência ──
-let advTarget = '';
-function openAdvModal(name) {
-  advTarget = name;
-  document.getElementById('adv-modal-sub').textContent = `Membro: ${name}`;
-  document.getElementById('adv-desc').value = '';
-  openModal('adv-modal');
+async function openAdvModal(membroId, name) {
+  const sub = document.getElementById('adv-modal-sub');
+  if (sub) sub.textContent = name ? `Membro: ${name}` : 'Registrar advertência ou anotação';
+  const desc = document.getElementById('adv-descricao');
+  if (desc) desc.value = '';
+  await popularSelectAdvertencia();
+  const select = document.getElementById('advertencia-membro');
+  if (select) select.value = membroId || '';
+  openModal('modal-advertencia');
 }
-function saveAdv() {
-  closeModal('adv-modal');
+
+async function handleSalvarAdvertencia() {
+  const membroId = document.getElementById('advertencia-membro')?.value;
+  const tipo     = document.getElementById('adv-tipo')?.value;
+  const descricao = document.getElementById('adv-descricao')?.value?.trim();
+
+  if (!membroId) {
+    toast.error('Selecione um membro');
+    return;
+  }
+  if (!tipo || !descricao) return;
+
+  try {
+    await registrarAdvertencia(membroId, tipo, descricao);
+    closeModal('modal-advertencia');
+    const selectReset = document.getElementById('advertencia-membro');
+    if (selectReset) selectReset.value = '';
+    await carregarAdvertencias();
+    toast.success('Advertência registrada.');
+  } catch (e) {
+    console.error('Erro ao registrar advertência:', e);
+  }
+}
+
+async function carregarAdvertencias() {
+  try {
+    const ligaIdAtual = await getMinhaLigaId();
+    const advertencias = await getTodasAdvertencias(ligaIdAtual);
+    renderizarAdvertencias(advertencias);
+  } catch (e) {
+    console.error('Erro ao carregar advertências:', e);
+  }
+}
+
+function renderizarAdvertencias(advertencias) {
+  const tbody = document.getElementById('tbody-advertencias') ||
+                document.querySelector('#tab-advertencias tbody');
+  if (!tbody) return;
+
+  if (!advertencias || advertencias.length === 0) {
+    tbody.innerHTML = `
+      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-family:var(--font-mono);font-size:10px;letter-spacing:.08em">
+        Nenhuma advertência registrada
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = advertencias.map(adv => `
+    <tr>
+      <td>${adv.membros?.nome || '—'}</td>
+      <td><span class="pill ${adv.tipo === 'grave' ? 'adv' : 'warn'}">${adv.tipo}</span></td>
+      <td>${adv.descricao}</td>
+      <td>${new Date(adv.criado_em).toLocaleDateString('pt-BR')}</td>
+      <td><button class="btn-sm ghost" onclick="verAdvertencia('${adv.id}')">Ver</button></td>
+    </tr>
+  `).join('');
+}
+
+function verAdvertencia(id) {
+  console.log('ver advertência', id);
 }
 
 // ── Avisos — Supabase ──
-async function handlePublicarAviso(titulo, mensagem) {
+async function handlePublicarAviso() {
+  const titulo = document.getElementById('aviso-titulo')?.value?.trim();
+  const mensagem = document.getElementById('aviso-mensagem')?.value?.trim();
+  const destinatario = document.getElementById('aviso-destinatario')?.value;
+
+  if (!titulo || !mensagem) return;
+
+  let ligaIdAviso = null;
+  if (destinatario && destinatario !== 'todos') {
+    const { data } = await supabase
+      .from('ligas')
+      .select('id')
+      .eq('nome', destinatario)
+      .single();
+    ligaIdAviso = data?.id || null;
+  }
+
   try {
-    await publicarAviso(titulo, mensagem);
+    await publicarAviso(titulo, mensagem, ligaIdAviso);
     mostrarSucessoAviso();
+    document.getElementById('aviso-titulo').value = '';
+    document.getElementById('aviso-mensagem').value = '';
     const avisos = await getAvisos();
     renderizarAvisos(avisos);
   } catch (e) {
-    mostrarErroAviso('Erro ao publicar aviso.');
+    console.error('Erro ao publicar aviso:', e);
   }
 }
 
 function renderizarAvisos(avisos) {
   const lista = document.getElementById('avisos-lista');
+  if (!lista) return;
   lista.innerHTML = avisos.map(a => `
     <div class="aviso-item">
       <div class="aviso-head">
@@ -316,19 +538,10 @@ function renderizarAvisos(avisos) {
 }
 
 function mostrarSucessoAviso() {
-  document.getElementById('aviso-titulo').value = '';
-  document.getElementById('aviso-msg').value = '';
-}
-
-function mostrarErroAviso(msg) {
-  alert(msg);
-}
-
-async function publishAviso() {
-  const titulo = document.getElementById('aviso-titulo').value.trim();
-  const msg = document.getElementById('aviso-msg').value.trim();
-  if (!titulo || !msg) return;
-  await handlePublicarAviso(titulo, msg);
+  const t = document.getElementById('aviso-titulo');
+  const m = document.getElementById('aviso-msg');
+  if (t) t.value = '';
+  if (m) m.value = '';
 }
 
 async function carregarAvisos() {
@@ -351,14 +564,7 @@ function exportCSV() {
   a.click();
 }
 
-function exportPresenca() { alert('CSV gerado — substituir por download real via Supabase'); }
-
-// ── closeModal override — limpa timer do QR quando fecha ──
-const _closeModal = closeModal;
-function closeModalWithQR(id) {
-  _closeModal(id);
-  if (id === 'qr-modal') { clearInterval(qrTimer); }
-}
+function exportPresenca() { toast.info('CSV gerado — substituir por download real via Supabase'); }
 
 // ── Escape handler ──
 initModalEscape();
@@ -374,18 +580,22 @@ document.getElementById('btn-export-frequencia')?.addEventListener('click', () =
 
 // ── Init ──
 await carregarMembros();
-renderAulas();
-renderEntregas(entregasData);
+await carregarAulas();
+await carregarEntregas();
+await atualizarMetricas();
 await carregarAvisos();
+await carregarAdvertencias();
+await carregarEncontros();
 
 // ── Expõe pro onclick inline ──
 window.showTab = showTab;
 window.openModal = openModal;
-window.closeModal = closeModalWithQR;
-window.openQR = openQR;
+window.closeModal = closeModal;
 window.openAdvModal = openAdvModal;
-window.saveAdv = saveAdv;
-window.publishAviso = publishAviso;
+window.handleSalvarAdvertencia = handleSalvarAdvertencia;
+window.handleCadastrarMembro = handleCadastrarMembro;
+window.verAdvertencia = verAdvertencia;
+window.publishAviso = handlePublicarAviso;
 window.exportCSV = exportCSV;
 window.filterMembers = filterMembers;
 window.filterLiga = filterLiga;
@@ -395,4 +605,5 @@ window.markAll = markAll;
 window.savePresenca = savePresenca;
 window.exportPresenca = exportPresenca;
 window.handleAbrirChamada = handleAbrirChamada;
+window.handleCriarEncontro = handleCriarEncontro;
 window.handleFecharChamada = handleFecharChamada;

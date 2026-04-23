@@ -353,3 +353,29 @@ body { font-size: 13px; min-height: 100vh; }
 /* Animação onboarding */
 @keyframes slideIn { from { opacity:0; transform: translateX(16px); } to { opacity:1; transform: translateX(0); } }
 .ob-slide { animation: slideIn .25s ease both; }
+
+/* Avisos */
+.aviso-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.aviso-item:last-child { border-bottom: none; }
+.aviso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .375rem;
+}
+.aviso-titulo { font-size: 13px; font-weight: 600; }
+.aviso-data {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+.aviso-msg {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--mid);
+  line-height: 1.6;
+}
