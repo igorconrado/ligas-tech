@@ -31,8 +31,13 @@
     <button class="modal-close" onclick="closeModal('modal-advertencia')">✕</button>
     <div class="modal-title">ADVERTÊNCIA</div>
     <div class="modal-sub" id="adv-modal-sub">Registrar advertência ou anotação</div>
-    <input type="hidden" id="adv-membro-id">
     <div class="adv-form">
+      <div class="form-group">
+        <label class="form-label">Membro</label>
+        <select class="form-select" id="advertencia-membro" required>
+          <option value="" disabled selected>Selecione o membro</option>
+        </select>
+      </div>
       <div class="form-group">
         <label class="form-label">Tipo</label>
         <select class="form-select" id="adv-tipo">

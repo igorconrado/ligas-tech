@@ -404,26 +404,50 @@ function atualizarPresencaTempoReal(novaPresenca) {
 }
 
 // ── Advertência — Supabase ──
-function openAdvModal(membroId, name) {
+async function popularSelectAdvertencia() {
+  const select = document.getElementById('advertencia-membro');
+  if (!select) return;
+  try {
+    const ligaDoUser = await getMinhaLigaId();
+    const membros = await getMembrosLiga(ligaDoUser || null);
+    const mostraLiga = !ligaDoUser;
+    select.innerHTML = '<option value="" disabled selected>Selecione o membro</option>' +
+      (membros || []).map(m => {
+        const texto = mostraLiga ? `${m.nome} — ${m.ligas?.nome || '—'}` : m.nome;
+        return `<option value="${m.id}">${texto}</option>`;
+      }).join('');
+  } catch (e) {
+    console.error('Erro ao popular select de advertência:', e);
+  }
+}
+
+async function openAdvModal(membroId, name) {
   const sub = document.getElementById('adv-modal-sub');
   if (sub) sub.textContent = name ? `Membro: ${name}` : 'Registrar advertência ou anotação';
-  const idInput = document.getElementById('adv-membro-id');
-  if (idInput) idInput.value = membroId || '';
   const desc = document.getElementById('adv-descricao');
   if (desc) desc.value = '';
+  await popularSelectAdvertencia();
+  const select = document.getElementById('advertencia-membro');
+  if (select) select.value = membroId || '';
   openModal('modal-advertencia');
 }
 
 async function handleSalvarAdvertencia() {
-  const membroId = document.getElementById('adv-membro-id')?.value;
+  const membroId = document.getElementById('advertencia-membro')?.value;
   const tipo     = document.getElementById('adv-tipo')?.value;
   const descricao = document.getElementById('adv-descricao')?.value?.trim();
 
-  if (!membroId || !tipo || !descricao) return;
+  if (!membroId) {
+    toast.error('Selecione um membro');
+    return;
+  }
+  if (!tipo || !descricao) return;
 
   try {
     await registrarAdvertencia(membroId, tipo, descricao);
     closeModal('modal-advertencia');
+    const selectReset = document.getElementById('advertencia-membro');
+    if (selectReset) selectReset.value = '';
     await carregarAdvertencias();
     toast.success('Advertência registrada.');
   } catch (e) {
