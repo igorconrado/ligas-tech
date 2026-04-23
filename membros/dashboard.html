@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — Área de Membros · IbBot & IbTech</title>
+<title>Visão Geral — Área de Membros · IbBot & IbTech</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="/assets/css/tokens.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
 <!-- ONBOARDING OVERLAY -->
-<div class="onboarding-overlay" id="onboarding">
+<div class="onboarding-overlay" id="onboarding" style="display:none">
   <div class="onboarding-box">
     <div class="ob-steps">
       <div class="ob-step active" id="step-0"></div>
@@ -30,352 +30,78 @@
   </div>
 </div>
 
-<!-- LAYOUT -->
-<div class="layout">
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo">
-        <span class="w">Ib</span><span class="r">Bot</span>
-        <span class="slash"> / </span>
-        <span class="w">Ib</span><span class="b">Tech</span>
+  <div style="margin-bottom:var(--sp-5); display:flex; align-items:center; justify-content:space-between; gap:var(--sp-4)">
+    <h1 style="font-family:var(--font-display);font-size:var(--fs-h1);letter-spacing:.02em">Visão Geral</h1>
+    <span class="topbar-liga b" id="topbar-liga"></span>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Presença</div>
+      <div class="metric-val g" id="metric-presenca-val">—</div>
+      <div class="metric-sub" id="metric-presenca-sub"><span class="skeleton skeleton--text"></span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Entregas</div>
+      <div class="metric-val b" id="metric-entregas-val">—</div>
+      <div class="metric-sub" id="metric-entregas-sub"><span class="skeleton skeleton--text"></span></div>
+    </div>
+    <div class="metric destaque">
+      <div class="metric-label">Próximo encontro</div>
+      <div class="metric-val w" id="metric-proximo-val" style="font-size:18px;margin-top:4px">—</div>
+      <div class="metric-sub" id="metric-proximo-sub"><span class="skeleton skeleton--text"></span></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Semestre</div>
+      <div class="metric-val w" id="metric-semestre-val">—</div>
+      <div class="metric-sub" id="metric-semestre-sub"></div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Próximas aulas</div></div>
+      <div class="panel-body">
+        <table class="tbl">
+          <thead><tr><th>Aula</th><th>Prazo</th><th>Status</th></tr></thead>
+          <tbody id="tbody-proximas-aulas"></tbody>
+        </table>
       </div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Geral</div>
-      <a class="nav-item active b" onclick="showTab('dashboard',this)">
-        <span class="nav-dot b"></span> Dashboard
-      </a>
-      <a class="nav-item" onclick="showTab('cronograma',this)">
-        <span class="nav-dot w"></span> Cronograma
-      </a>
-
-      <div class="nav-section">Capacitação</div>
-      <a class="nav-item" onclick="showTab('aulas',this)">
-        <span class="nav-dot b"></span> Aulas
-      </a>
-      <a class="nav-item" onclick="showTab('entregas',this)">
-        <span class="nav-dot w"></span> Minhas entregas
-      </a>
-      <a class="nav-item" onclick="showTab('presenca',this)">
-        <span class="nav-dot w"></span> Minha presença
-      </a>
-
-      <div class="nav-section">Conta</div>
-      <a class="nav-item" onclick="showTab('perfil',this)">
-        <span class="nav-dot w"></span> Meu perfil
-      </a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-av" id="sidebar-av">M</div>
-      <div class="user-info">
-        <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
-        <div class="user-role" id="sidebar-role">Membro</div>
-      </div>
-      <div class="logout-btn" id="btn-logout" title="Sair" role="button" aria-label="Sair" tabindex="0">↩</div>
-    </div>
-    <div class="sidebar-stats">
-      <div class="sb-stat">
-        <span class="sb-label">Presença</span>
-        <span class="sb-val" id="sb-presenca">—</span>
-      </div>
-      <div class="sb-stat">
-        <span class="sb-label">Próx. entrega</span>
-        <span class="sb-val" id="sb-proxima">—</span>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Entregas recentes</div></div>
+      <div class="panel-body">
+        <table class="tbl">
+          <thead><tr><th>Aula</th><th>Prazo</th><th>Status</th></tr></thead>
+          <tbody id="tbody-dash-entregas"></tbody>
+        </table>
       </div>
     </div>
-  </aside>
+  </div>
 
-  <!-- MAIN -->
-  <main class="main" id="main-content">
-    <div class="topbar">
-      <div class="topbar-left">
-        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
-        <span class="topbar-liga b" id="topbar-liga"></span>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-date" id="topbar-date"></span>
+  <div class="panel-full">
+    <div class="panel-head"><div class="panel-title">Progresso no semestre</div></div>
+    <div class="panel-body">
+      <div class="prog-section">
+        <div class="prog-item">
+          <div class="prog-header"><span class="prog-title">Presença</span><span class="prog-pct" id="pct-presenca">0%</span></div>
+          <div class="prog-bar"><div class="prog-fill b" id="bar-presenca" style="width:0%"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-header"><span class="prog-title">Entregas</span><span class="prog-pct" id="pct-entregas">0%</span></div>
+          <div class="prog-bar"><div class="prog-fill g" id="bar-entregas" style="width:0%"></div></div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-header"><span class="prog-title">Aulas concluídas</span><span class="prog-pct" id="pct-aulas">0%</span></div>
+          <div class="prog-bar"><div class="prog-fill a" id="bar-aulas" style="width:0%"></div></div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div class="tab-page active" id="tab-dashboard">
-        <div class="metrics">
-          <div class="metric">
-            <div class="metric-label">Presença</div>
-            <div class="metric-val g" id="metric-presenca-val">—</div>
-            <div class="metric-sub" id="metric-presenca-sub"><span class="skeleton skeleton--text"></span></div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">Entregas</div>
-            <div class="metric-val b" id="metric-entregas-val">—</div>
-            <div class="metric-sub" id="metric-entregas-sub"><span class="skeleton skeleton--text"></span></div>
-          </div>
-          <div class="metric destaque">
-            <div class="metric-label">Próximo encontro</div>
-            <div class="metric-val w" id="metric-proximo-val" style="font-size:18px;margin-top:4px">—</div>
-            <div class="metric-sub" id="metric-proximo-sub"><span class="skeleton skeleton--text"></span></div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">Semestre</div>
-            <div class="metric-val w" id="metric-semestre-val">—</div>
-            <div class="metric-sub" id="metric-semestre-sub"></div>
-          </div>
-        </div>
-
-        <div class="panels">
-          <div class="panel">
-            <div class="panel-head">
-              <div class="panel-title">Próximas aulas</div>
-              <button class="btn-sm ghost" onclick="showTab('aulas', null)">Ver todas</button>
-            </div>
-            <div class="panel-body">
-              <table class="tbl">
-                <thead><tr><th>Aula</th><th>Data</th><th>Status</th></tr></thead>
-                <tbody id="tbody-proximas-aulas"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head">
-              <div class="panel-title">Minhas entregas</div>
-              <button class="btn-sm ghost" onclick="showTab('entregas', null)">Ver todas</button>
-            </div>
-            <div class="panel-body">
-              <table class="tbl">
-                <thead><tr><th>Aula</th><th>Prazo</th><th>Status</th></tr></thead>
-                <tbody id="tbody-dash-entregas"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-full">
-          <div class="panel-head"><div class="panel-title">Progresso no semestre</div></div>
-          <div class="panel-body">
-            <div class="prog-section">
-              <div class="prog-item">
-                <div class="prog-header">
-                  <span class="prog-title">Presença</span>
-                  <span class="prog-pct" id="pct-presenca">0%</span>
-                </div>
-                <div class="prog-bar"><div class="prog-fill b" id="bar-presenca" style="width:0%"></div></div>
-              </div>
-              <div class="prog-item">
-                <div class="prog-header">
-                  <span class="prog-title">Entregas</span>
-                  <span class="prog-pct" id="pct-entregas">0%</span>
-                </div>
-                <div class="prog-bar"><div class="prog-fill g" id="bar-entregas" style="width:0%"></div></div>
-              </div>
-              <div class="prog-item">
-                <div class="prog-header">
-                  <span class="prog-title">Aulas concluídas</span>
-                  <span class="prog-pct" id="pct-aulas">0%</span>
-                </div>
-                <div class="prog-bar"><div class="prog-fill a" id="bar-aulas" style="width:0%"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- AULAS -->
-      <div class="tab-page" id="tab-aulas">
-        <div style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div id="aulas-header-title" style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Aulas</div>
-            <div id="aulas-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px"><span class="skeleton skeleton--text"></span></div>
-          </div>
-        </div>
-        <div class="aulas-grid" id="aulas-grid"></div>
-      </div>
-
-      <!-- ENTREGAS -->
-      <div class="tab-page" id="tab-entregas">
-        <div style="margin-bottom:1.25rem">
-          <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Minhas entregas</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Envie o link do repositório GitHub pra cada aula</div>
-        </div>
-        <div class="panel-full">
-          <table class="tbl">
-            <thead><tr><th>Aula</th><th>Prazo</th><th>Repositório</th><th>Status</th></tr></thead>
-            <tbody id="tbody-entregas">
-              <tr id="estado-vazio-entregas">
-                <td colspan="4" style="text-align:center;padding:3rem 1rem;">
-                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">Nenhuma entrega cadastrada</div>
-                  <div style="font-size:13px;color:var(--muted);font-weight:300">Quando suas entregas forem cadastradas pela diretoria, elas aparecerão aqui</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="entrega-box" id="entrega-box" style="display:none">
-          <div class="entrega-title" id="entrega-title">Enviar entrega</div>
-          <div class="entrega-input-row">
-            <input
-              class="entrega-input"
-              id="repo-input"
-              placeholder="https://github.com/seu-usuario/ibtech-aula02-seunome"
-              type="url"
-            >
-            <button class="entrega-submit" onclick="submitEntrega()">Enviar →</button>
-          </div>
-          <div class="entrega-hint">Use o formato: github.com/usuario/ibtech-aula02-seunome · O repositório precisa ser público</div>
-          <div id="entrega-feedback" style="display:none;margin-top:.625rem;font-family:var(--font-mono);font-size:11px;"></div>
-        </div>
-      </div>
-
-      <!-- PRESENÇA -->
-      <div class="tab-page" id="tab-presenca">
-        <div style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Minha presença</div>
-            <div id="presenca-header-sub" style="font-size:12px;color:var(--muted);margin-top:2px"><span class="skeleton skeleton--text"></span></div>
-          </div>
-          <div id="presenca-percent-box" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:4px;padding:.75rem 1rem;text-align:center">
-            <div id="presenca-percent" style="font-family:var(--font-display);font-size:28px;color:var(--green)">—</div>
-            <div id="presenca-percent-label" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.06em">Regular</div>
-          </div>
-        </div>
-
-        <div class="presenca-box" style="margin-bottom:1.25rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:1rem 1.25rem">
-          <div style="font-size:13px;font-weight:500;margin-bottom:.625rem">Registrar presença</div>
-          <div class="otp-wrap">
-            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-1" onInput="otpNext(this, 'otp-2')">
-            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-2" onInput="otpNext(this, 'otp-3')" onKeydown="otpPrev(event, 'otp-1')">
-            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-3" onInput="otpNext(this, 'otp-4')" onKeydown="otpPrev(event, 'otp-2')">
-            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-4" onInput="otpNext(this, 'otp-5')" onKeydown="otpPrev(event, 'otp-3')">
-            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-5" onInput="otpNext(this, 'otp-6')" onKeydown="otpPrev(event, 'otp-4')">
-            <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-6" onKeydown="otpPrev(event, 'otp-5')" onInput="otpFinal(this)">
-          </div>
-          <p class="otp-hint">O código é exibido pela diretoria no início de cada encontro</p>
-          <div id="presenca-feedback" style="display:none;margin-top:.5rem;font-family:var(--font-mono);font-size:11px"></div>
-        </div>
-
-        <div class="presenca-timeline" id="presenca-timeline"></div>
-      </div>
-
-      <!-- CRONOGRAMA -->
-      <div class="tab-page" id="tab-cronograma">
-        <div style="margin-bottom:1.25rem">
-          <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Cronograma</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Semestre 2026.1 · IbBot & IbTech</div>
-        </div>
-        <div class="timeline" id="timeline-container">
-          <!-- Itens gerados pelo JS -->
-        </div>
-      </div>
-
-      <!-- PERFIL -->
-      <div class="tab-page" id="tab-perfil">
-        <div style="margin-bottom:1.25rem">
-          <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Meu perfil</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Suas informações visíveis na diretoria</div>
-        </div>
-        <div class="perfil-grid">
-          <div>
-            <div class="perfil-card" style="margin-bottom:.625rem">
-              <div class="perfil-av"><span id="perfil-av-text">M</span></div>
-              <div style="margin-top:1rem">
-                <div class="perfil-name" id="perfil-name-display"><span class="skeleton skeleton--text"></span></div>
-                <div class="perfil-role">Membro ativo</div>
-                <span class="perfil-liga-badge b" id="perfil-liga-badge"></span>
-              </div>
-              <div class="perfil-stats">
-                <div class="perfil-stat"><div class="perfil-stat-num" id="perfil-stat-presenca">—</div><div class="perfil-stat-label">Presença</div></div>
-                <div class="perfil-stat"><div class="perfil-stat-num" id="perfil-stat-entregas">—</div><div class="perfil-stat-label">Entregas</div></div>
-              </div>
-            </div>
-            <button class="btn-sm ghost" style="width:100%;text-align:center" onclick="document.getElementById('foto-input').click()">Trocar foto</button>
-            <input
-              type="file"
-              id="foto-input"
-              accept="image/*"
-              style="display:none"
-              onchange="handleFoto(this)"
-            >
-          </div>
-          <div class="perfil-form">
-            <div style="font-family:var(--font-display);font-size:16px;letter-spacing:.02em;margin-bottom:1.25rem">Editar informações</div>
-            <div class="perfil-form-grid">
-              <div class="form-group">
-                <label class="form-label">Nome completo</label>
-                <input class="form-input" id="p-nome" type="text">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Email</label>
-                <input class="form-input" id="perfil-email" type="email" disabled style="opacity:.5">
-              </div>
-              <div class="form-group">
-                <label class="form-label">LinkedIn</label>
-                <input class="form-input" id="p-linkedin" placeholder="linkedin.com/in/usuario" type="url">
-              </div>
-              <div class="form-group">
-                <label class="form-label">GitHub</label>
-                <input class="form-input" id="p-github" placeholder="github.com/usuario" type="url">
-              </div>
-              <div class="form-group full">
-                <label class="form-label">Bio curta</label>
-                <textarea class="form-input form-textarea" id="p-bio" placeholder="Uma frase sobre você — aparece no perfil da diretoria"></textarea>
-              </div>
-            </div>
-            <button class="btn-sm b" id="btn-salvar-perfil" onclick="savePerfil()">
-              <span id="btn-salvar-texto">SALVAR →</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </main>
-</div>
-
+</main>
 <script type="module" src="/assets/js/pages/dashboard.js"></script>
-
-<div class="cursor" id="cursor"></div>
-<script>
-(function(){
-  const c = document.getElementById('cursor');
-  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
-  document.addEventListener('mousemove', e => {
-    c.style.left = e.clientX + 'px';
-    c.style.top = e.clientY + 'px';
-  });
-  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
-  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
-  document.querySelectorAll('a, button, input, label, [onclick]').forEach(el => {
-    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
-    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
-  });
-})();
-</script>
-<script>
-function otpNext(el, nextId) {
-  el.classList.toggle('filled', el.value !== '');
-  if (el.value && nextId) {
-    document.getElementById(nextId)?.focus();
-  }
-}
-function otpPrev(event, prevId) {
-  if (event.key === 'Backspace' && !event.target.value) {
-    document.getElementById(prevId)?.focus();
-  }
-}
-function otpFinal(el) {
-  el.classList.toggle('filled', el.value !== '');
-  const codigo = ['otp-1','otp-2','otp-3','otp-4','otp-5','otp-6']
-    .map(id => document.getElementById(id)?.value || '')
-    .join('');
-  if (codigo.length === 6) {
-    if (typeof registrarPresencaCodigo === 'function') {
-      registrarPresencaCodigo(codigo);
-    }
-  }
-}
-</script>
 </body>
 </html>
