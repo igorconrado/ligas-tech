@@ -61,7 +61,15 @@ function escape(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function buildSidebar(nav, activeRoute, homeHref) {
+function readInitialSidebarState() {
+  try {
+    return localStorage.getItem(SIDEBAR_STATE_KEY) === 'collapsed' ? 'collapsed' : 'expanded';
+  } catch (e) {
+    return 'expanded';
+  }
+}
+
+function buildSidebar(nav, activeRoute, homeHref, initialState) {
   const groupsHtml = nav.map(g => `
     <section class="sidebar__group">
       <h4 class="sidebar__group-label">${escape(g.group)}</h4>
@@ -80,11 +88,15 @@ function buildSidebar(nav, activeRoute, homeHref) {
     </section>
   `).join('');
 
+  const isExpanded = initialState === 'expanded';
+  const toggleIcon = isExpanded ? icons.chevronLeft : icons.chevronRight;
+  const toggleLabel = isExpanded ? 'Recolher menu' : 'Expandir menu';
+
   return `
-    <aside class="sidebar" data-state="expanded" aria-label="Navegação principal">
+    <aside class="sidebar" data-state="${initialState}" aria-label="Navegação principal">
       <div class="sidebar__brand">
         <a href="${escape(homeHref)}" class="sidebar__logo">IB&amp;</a>
-        <button class="sidebar__toggle" type="button" aria-label="Recolher menu" aria-expanded="true">${icons.chevronLeft}</button>
+        <button class="sidebar__toggle" type="button" aria-label="${toggleLabel}" aria-expanded="${isExpanded}">${toggleIcon}</button>
       </div>
       <nav class="sidebar__nav">${groupsHtml}</nav>
       <div class="sidebar__footer">
@@ -131,10 +143,12 @@ async function mount({ activeRoute, pageTitle } = {}) {
   const parent = existingMain.parentElement;
   existingMain.remove();
 
+  const initialState = readInitialSidebarState();
+
   const shellWrap = document.createElement('div');
-  shellWrap.className = 'shell';
+  shellWrap.className = 'shell' + (initialState === 'collapsed' ? ' shell--collapsed' : '');
   shellWrap.innerHTML = `
-    ${buildSidebar(nav, activeRoute, homeHref)}
+    ${buildSidebar(nav, activeRoute, homeHref, initialState)}
     <div class="shell__backdrop"></div>
     <div class="shell__main">
       ${buildTopbar({ pageTitle, initial })}
@@ -144,19 +158,6 @@ async function mount({ activeRoute, pageTitle } = {}) {
 
   if (skipLink) skipLink.after(shellWrap);
   else parent.prepend(shellWrap);
-
-  // Apply persisted sidebar state
-  try {
-    const saved = localStorage.getItem(SIDEBAR_STATE_KEY);
-    if (saved === 'collapsed') {
-      shellWrap.querySelector('.sidebar').dataset.state = 'collapsed';
-      shellWrap.classList.add('shell--collapsed');
-      const toggle = shellWrap.querySelector('.sidebar__toggle');
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Expandir menu');
-      toggle.innerHTML = icons.chevronRight;
-    }
-  } catch (e) { /* quieto */ }
 
   // Toggle collapse
   const toggle = shellWrap.querySelector('.sidebar__toggle');
