@@ -175,16 +175,8 @@ async function mount({ activeRoute, pageTitle } = {}) {
   // Logout
   shellWrap.querySelector('.sidebar__logout')?.addEventListener('click', fazerLogout);
 
-  // Hamburger + backdrop (drawer mobile — expandido na sub-task 6)
-  const hamburger = shellWrap.querySelector('.topbar__hamburger');
-  hamburger?.addEventListener('click', () => {
-    shellWrap.classList.toggle('shell--drawer-open');
-    hamburger.setAttribute('aria-expanded', String(shellWrap.classList.contains('shell--drawer-open')));
-  });
-  shellWrap.querySelector('.shell__backdrop')?.addEventListener('click', () => {
-    shellWrap.classList.remove('shell--drawer-open');
-    hamburger?.setAttribute('aria-expanded', 'false');
-  });
+  // Drawer mobile
+  setupDrawer(shellWrap);
 
   // Avatar (dropdown — expandido na sub-task 8)
   shellWrap.querySelector('.topbar__avatar')?.addEventListener('click', () => {
@@ -192,6 +184,57 @@ async function mount({ activeRoute, pageTitle } = {}) {
   });
 
   return ctx;
+}
+
+function setupDrawer(shellWrap) {
+  const sidebar = shellWrap.querySelector('.sidebar');
+  const hamburger = shellWrap.querySelector('.topbar__hamburger');
+  const backdrop = shellWrap.querySelector('.shell__backdrop');
+  const nav = shellWrap.querySelector('.sidebar__nav');
+  if (!sidebar || !hamburger || !backdrop || !nav) return;
+
+  const mq = window.matchMedia('(max-width: 1024px)');
+
+  const onEsc = (e) => { if (e.key === 'Escape') close(true); };
+
+  function open() {
+    shellWrap.classList.add('shell--drawer-open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    sidebar.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    nav.querySelector('.sidebar__item')?.focus();
+    document.addEventListener('keydown', onEsc);
+  }
+  function close(returnFocus = false) {
+    shellWrap.classList.remove('shell--drawer-open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    if (mq.matches) sidebar.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', onEsc);
+    if (returnFocus) hamburger.focus();
+  }
+
+  hamburger.addEventListener('click', () => {
+    shellWrap.classList.contains('shell--drawer-open') ? close(true) : open();
+  });
+  backdrop.addEventListener('click', () => close());
+
+  // Fechar ao clicar em qualquer item da nav
+  nav.addEventListener('click', (e) => {
+    if (e.target.closest('.sidebar__item')) close();
+  });
+
+  // aria-hidden inicial segue o breakpoint
+  sidebar.setAttribute('aria-hidden', mq.matches ? 'true' : 'false');
+  mq.addEventListener('change', (ev) => {
+    sidebar.setAttribute('aria-hidden', ev.matches ? 'true' : 'false');
+    if (!ev.matches) {
+      // Saiu do mobile: garante drawer fechado e scroll liberado
+      shellWrap.classList.remove('shell--drawer-open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+  });
 }
 
 export const shell = { mount };
