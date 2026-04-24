@@ -1,10 +1,10 @@
 // ── Página: Avisos (membro) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getAvisos } from '/assets/js/supabase/avisos.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows } from '/assets/js/ui/skeleton.js';
 
-await initPage({ requireRole: 'membro' });
+await shell.mount({ activeRoute: '/membros/avisos', pageTitle: 'Avisos' });
 
 const container = document.getElementById('avisos-lista');
 container.innerHTML = skeletonRows(3);

@@ -1,11 +1,11 @@
 // ── Página: Aulas (membro) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonCards } from '/assets/js/ui/skeleton.js';
 
-await initPage({ requireRole: 'membro' });
+await shell.mount({ activeRoute: '/membros/aulas', pageTitle: 'Aulas' });
 
 const $ = (id) => document.getElementById(id);
 

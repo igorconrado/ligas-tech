@@ -1,11 +1,11 @@
 // ── Página: Meus Encontros / presença (membro) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getMinhasPresencas, registrarPresenca, calcularAlertaFrequencia } from '/assets/js/supabase/presenca.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 
-await initPage({ requireRole: 'membro' });
+await shell.mount({ activeRoute: '/membros/encontros', pageTitle: 'Meus Encontros' });
 
 const $ = (id) => document.getElementById(id);
 

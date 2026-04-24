@@ -1,10 +1,10 @@
 // ── Página: Cronograma (membro) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getEncontros } from '/assets/js/supabase/presenca.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows } from '/assets/js/ui/skeleton.js';
 
-const { usuario } = await initPage({ requireRole: 'membro' });
+const { usuario } = await shell.mount({ activeRoute: '/membros/cronograma', pageTitle: 'Cronograma' });
 
 const container = document.getElementById('timeline-container');
 container.innerHTML = skeletonRows(4);

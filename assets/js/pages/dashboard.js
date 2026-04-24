@@ -3,14 +3,14 @@
 // advertências) vivem em páginas próprias agora. Essa página cuida só
 // do overview: KPIs + 2 panels + progress bars + onboarding wizard.
 
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getMeuPerfil, completarOnboarding } from '/assets/js/supabase/membros.js';
 import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
 import { getMinhasPresencas, calcularAlertaFrequencia } from '/assets/js/supabase/presenca.js';
 import { skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 
-const { session } = await initPage({ requireRole: 'membro' });
+const { session } = await shell.mount({ activeRoute: '/membros/dashboard', pageTitle: 'Visão Geral' });
 
 const $ = (id) => document.getElementById(id);
 

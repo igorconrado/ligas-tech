@@ -1,5 +1,5 @@
 // ── Página: Membros (diretoria) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { supabase } from '/assets/js/supabase/client.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
@@ -9,7 +9,7 @@ import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
 
-const { usuario } = await initPage({ requireRole: 'diretoria' });
+const { usuario } = await shell.mount({ activeRoute: '/membros/diretoria/membros', pageTitle: 'Membros' });
 const ligaId = usuario?.liga_id || null;
 
 const $ = (id) => document.getElementById(id);

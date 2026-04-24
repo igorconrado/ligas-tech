@@ -1,12 +1,12 @@
 // ── Página: Aulas (diretoria) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getTodasAulas, togglePublicarAula } from '/assets/js/supabase/aulas.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonCards } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
 
-const { usuario } = await initPage({ requireRole: 'diretoria' });
+const { usuario } = await shell.mount({ activeRoute: '/membros/diretoria/aulas', pageTitle: 'Aulas' });
 const ligaId = usuario?.liga_id || null;
 
 const grid = document.getElementById('aulas-dir-grid');

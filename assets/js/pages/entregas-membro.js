@@ -1,11 +1,11 @@
 // ── Página: Minhas Entregas (membro) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getAulasComEntregas, submeterEntrega } from '/assets/js/supabase/aulas.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 
-await initPage({ requireRole: 'membro' });
+await shell.mount({ activeRoute: '/membros/entregas', pageTitle: 'Minhas Entregas' });
 
 const $ = (id) => document.getElementById(id);
 

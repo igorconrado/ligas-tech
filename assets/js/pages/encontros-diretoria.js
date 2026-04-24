@@ -1,5 +1,5 @@
 // ── Página: Encontros/Chamada (diretoria) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
 import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro } from '/assets/js/supabase/presenca.js';
@@ -8,7 +8,7 @@ import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { toast } from '/assets/js/ui/toast.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
 
-const { usuario } = await initPage({ requireRole: 'diretoria' });
+const { usuario } = await shell.mount({ activeRoute: '/membros/diretoria/encontros', pageTitle: 'Encontros' });
 const ligaId = usuario?.liga_id || null;
 
 const $ = (id) => document.getElementById(id);

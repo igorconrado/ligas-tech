@@ -1,11 +1,13 @@
 // ── Página: Meu Perfil (membro e diretoria) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getMeuPerfil, atualizarPerfil } from '/assets/js/supabase/membros.js';
 import { getMinhasPresencas } from '/assets/js/supabase/presenca.js';
 import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
 import { toast } from '/assets/js/ui/toast.js';
 
-const { session } = await initPage({ requireRole: 'any' });
+const pathname = window.location.pathname;
+const activeRoute = pathname.includes('/diretoria/') ? '/membros/diretoria/perfil' : '/membros/perfil';
+const { session } = await shell.mount({ activeRoute, pageTitle: 'Meu Perfil' });
 
 const $ = (id) => document.getElementById(id);
 

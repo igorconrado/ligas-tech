@@ -1,10 +1,10 @@
 // ── Página: Entregas (diretoria) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getTodasAulas, getEntregasAula } from '/assets/js/supabase/aulas.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 
-const { usuario } = await initPage({ requireRole: 'diretoria' });
+const { usuario } = await shell.mount({ activeRoute: '/membros/diretoria/entregas', pageTitle: 'Entregas' });
 const ligaId = usuario?.liga_id || null;
 
 const tbl = document.getElementById('entregas-tbl');

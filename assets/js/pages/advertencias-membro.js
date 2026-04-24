@@ -1,10 +1,10 @@
 // ── Página: Minhas Advertências (membro) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getMinhasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 
-await initPage({ requireRole: 'membro' });
+await shell.mount({ activeRoute: '/membros/advertencias', pageTitle: 'Minhas Advertências' });
 
 const tbody = document.getElementById('minhas-adv-tbl');
 tbody.innerHTML = skeletonTableRows(3, 3);

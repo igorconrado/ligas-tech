@@ -1,5 +1,5 @@
 // ── Página: Advertências (diretoria) ──
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
 import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
@@ -8,7 +8,7 @@ import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
 
-const { usuario } = await initPage({ requireRole: 'diretoria' });
+const { usuario } = await shell.mount({ activeRoute: '/membros/diretoria/advertencias', pageTitle: 'Advertências' });
 const ligaId = usuario?.liga_id || null;
 
 const $ = (id) => document.getElementById(id);
