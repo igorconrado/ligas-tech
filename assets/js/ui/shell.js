@@ -144,9 +144,15 @@ async function mount({ activeRoute, pageTitle } = {}) {
   existingMain.remove();
 
   const initialState = readInitialSidebarState();
+  const ligaNome = usuario?.ligas?.nome;
+  const accentClass = ligaNome === 'IbBot' ? 'shell--bot'
+    : ligaNome === 'IbTech' ? 'shell--tech'
+    : '';
 
   const shellWrap = document.createElement('div');
-  shellWrap.className = 'shell' + (initialState === 'collapsed' ? ' shell--collapsed' : '');
+  shellWrap.className = 'shell'
+    + (accentClass ? ' ' + accentClass : '')
+    + (initialState === 'collapsed' ? ' shell--collapsed' : '');
   shellWrap.innerHTML = `
     ${buildSidebar(nav, activeRoute, homeHref, initialState)}
     <div class="shell__backdrop"></div>

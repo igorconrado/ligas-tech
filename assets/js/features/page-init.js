@@ -19,7 +19,7 @@ export async function initPage({ requireRole = 'any' } = {}) {
 
   const { data: usuario } = await supabase
     .from('usuarios')
-    .select('role, liga_id')
+    .select('role, liga_id, ligas(nome)')
     .eq('id', session.user.id)
     .single();
 
