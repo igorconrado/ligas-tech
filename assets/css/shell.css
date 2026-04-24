@@ -24,6 +24,7 @@
   z-index: var(--z-header);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   transition: width var(--dur-base) var(--ease-out-quart),
               transform var(--dur-base) var(--ease-out-quart);
 }
@@ -66,8 +67,10 @@
 
 .sidebar__nav {
   flex: 1;
+  min-height: 0;
   padding: var(--sp-4) var(--sp-3);
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .sidebar__group { margin-bottom: var(--sp-6); }
 .sidebar__group:last-child { margin-bottom: 0; }
@@ -175,8 +178,8 @@
 
 .topbar {
   height: var(--topbar-height);
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface-1);
+  border-bottom: 1px solid var(--border-default);
   padding: 0 var(--sp-5);
   display: flex;
   align-items: center;
@@ -223,6 +226,65 @@
   transition: background var(--dur-fast);
 }
 .topbar__avatar:hover { background: var(--bg-surface-3); }
+
+/* Avatar dropdown (hidden by default, .is-open shows) */
+.topbar__dropdown {
+  position: absolute;
+  top: calc(100% + var(--sp-2));
+  right: 0;
+  min-width: 240px;
+  background: var(--bg-surface-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+  padding: var(--sp-2);
+  display: none;
+  z-index: var(--z-header);
+}
+.topbar__dropdown.is-open { display: block; }
+
+.topbar__dropdown-header {
+  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--sp-2);
+}
+.topbar__dropdown-name {
+  font-family: var(--font-body);
+  font-size: var(--fs-body-s);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+.topbar__dropdown-email {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+  word-break: break-all;
+}
+
+.topbar__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  width: 100%;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: var(--fs-body-s);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.topbar__dropdown-item:hover {
+  background: var(--bg-surface-2);
+  color: var(--text-primary);
+}
 
 /* Content area dentro do shell */
 .shell__main > main,
