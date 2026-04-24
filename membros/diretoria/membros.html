@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Membros — Diretoria · IbBot & IbTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/global.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/dashboard-diretoria.css">
+<link rel="stylesheet" href="/assets/css/pages/ux-improvements.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
+<link rel="stylesheet" href="/assets/css/shell.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
+<!-- MODAL CADASTRO MEMBRO -->
+<div class="modal-overlay" id="modal-novo-membro" onclick="if(event.target===this)closeModal('modal-novo-membro')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-novo-membro')" aria-label="Fechar">✕</button>
+    <div class="modal-title">NOVO MEMBRO</div>
+    <div class="modal-sub" style="margin-bottom:1.5rem">Cadastrar e atribuir liga e role</div>
+    <div class="cadastro-form">
+      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="novo-nome" placeholder="Nome do membro"></div>
+      <div class="form-group"><label class="form-label">Email institucional</label><input class="form-input" type="email" id="novo-email" placeholder="matricula@alunos.ibmec.edu.br"></div>
+      <div class="form-group">
+        <label class="form-label">Liga</label>
+        <select class="form-select" id="nova-liga"><option value="IbTech">IbTech</option><option value="IbBot">IbBot</option></select>
+      </div>
+      <div class="form-group full"><label class="form-label">Semestre de entrada</label><input class="form-input" type="text" value="2026.1"></div>
+    </div>
+    <button class="btn-sm b" style="margin-top:1rem;width:100%" onclick="handleCadastrarMembro()">Cadastrar membro →</button>
+  </div>
+</div>
+
+<!-- MODAL ADVERTÊNCIA -->
+<div class="modal-overlay" id="modal-advertencia" onclick="if(event.target===this)closeModal('modal-advertencia')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-advertencia')" aria-label="Fechar">✕</button>
+    <div class="modal-title">ADVERTÊNCIA</div>
+    <div class="modal-sub" id="adv-modal-sub">Registrar advertência ou anotação</div>
+    <div class="adv-form">
+      <div class="form-group">
+        <label class="form-label">Membro</label>
+        <select class="form-select" id="advertencia-membro" required><option value="" disabled selected>Selecione o membro</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select" id="adv-tipo"><option value="leve">Leve</option><option value="grave">Grave</option></select></div>
+      <div class="form-group"><label class="form-label">Descrição</label><textarea class="adv-textarea" id="adv-descricao" placeholder="Descreva o motivo..."></textarea></div>
+      <button class="btn-sm r" style="align-self:flex-end" onclick="handleSalvarAdvertencia()">Registrar →</button>
+    </div>
+  </div>
+</div>
+
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
+  <div class="panel-full">
+    <div class="panel-head">
+      <div class="panel-title">Todos os membros</div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <input placeholder="Buscar..." id="filter-search" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body);width:160px">
+        <select id="filter-liga" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)">
+          <option value="">Todas as ligas</option><option value="IbTech">IbTech</option><option value="IbBot">IbBot</option>
+        </select>
+        <button class="btn-sm ghost" onclick="exportCSV()">Exportar CSV</button>
+        <button class="btn-sm b" onclick="openModal('modal-novo-membro')">+ Novo membro</button>
+      </div>
+    </div>
+    <table class="tbl" id="membros-tbl"></table>
+  </div>
+</main>
+<script type="module" src="/assets/js/pages/membros-diretoria.js"></script>
+</body>
+</html>

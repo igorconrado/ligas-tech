@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avisos — Diretoria · IbBot & IbTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/global.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/dashboard-diretoria.css">
+<link rel="stylesheet" href="/assets/css/pages/ux-improvements.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
+<link rel="stylesheet" href="/assets/css/shell.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:var(--sp-4)">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em;margin-bottom:1.25rem">Avisos publicados</div>
+      <div id="avisos-lista"></div>
+    </div>
+    <div class="panel" style="align-self:start">
+      <div class="panel-head"><div class="panel-title">Novo aviso</div></div>
+      <div class="panel-body">
+        <div class="aviso-form">
+          <div class="form-group"><label class="form-label">Título</label><input class="aviso-input form-input" id="aviso-titulo" placeholder="Título do aviso"></div>
+          <div class="form-group"><label class="form-label">Mensagem</label><textarea class="aviso-input aviso-textarea" id="aviso-mensagem" placeholder="Escreva o aviso..."></textarea></div>
+          <div class="form-group">
+            <label class="form-label">Destinatários</label>
+            <select class="form-select" id="aviso-destinatario">
+              <option value="todos">Todos os membros</option>
+              <option value="IbTech">IbTech</option>
+              <option value="IbBot">IbBot</option>
+            </select>
+          </div>
+          <button class="btn-sm b" style="align-self:flex-end" onclick="publishAviso()">Publicar →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script type="module" src="/assets/js/pages/avisos-diretoria.js"></script>
+</body>
+</html>

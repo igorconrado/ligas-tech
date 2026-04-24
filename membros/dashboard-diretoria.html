@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diretoria — Área de Membros · IbBot & IbTech</title>
+<title>Visão Geral — Diretoria · IbBot & IbTech</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="/assets/css/tokens.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -15,354 +15,56 @@
 <link rel="stylesheet" href="/assets/css/ui/skeleton.css">
 <link rel="stylesheet" href="/assets/css/ui/confirm.css">
 <link rel="stylesheet" href="/assets/css/ui/a11y.css">
+<link rel="stylesheet" href="/assets/css/shell.css">
 </head>
 <body>
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1300px">
 
-<!-- MODAL QR CODE -->
-<div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
-  <div class="modal-box" id="qr-code" style="text-align:center">
-    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Fechar">✕</button>
-    <div class="modal-title">CHAMADA ABERTA</div>
-    <div class="modal-sub">Membros digitam o código ou escaneiam o QR pra marcar presença</div>
-    <div class="qr-code" id="qr-display">—</div>
-    <div class="qr-timer">Expira em <span id="qr-expira" style="color:var(--amber)">10:00</span></div>
-    <button class="btn-sm ghost" style="width:100%" onclick="closeModal('qr-modal')">Fechar chamada</button>
+  <h1 style="font-family:var(--font-display);font-size:var(--fs-h1);letter-spacing:.02em;margin-bottom:var(--sp-5)">Visão Geral</h1>
+
+  <div class="metrics">
+    <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">—</div><div class="metric-sub" id="metric-membros-sub"></div></div>
+    <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g" id="metric-presenca-media">—</div><div class="metric-sub">Último encontro</div></div>
+    <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">—</div><div class="metric-sub" id="metric-entregas-pendentes-sub"></div></div>
+    <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r" id="metric-advertencias">—</div><div class="metric-sub">Esse semestre</div></div>
   </div>
-</div>
 
-<!-- MODAL ADVERTÊNCIA -->
-<div class="modal-overlay" id="modal-advertencia" onclick="if(event.target===this)closeModal('modal-advertencia')">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-advertencia')" aria-label="Fechar">✕</button>
-    <div class="modal-title">ADVERTÊNCIA</div>
-    <div class="modal-sub" id="adv-modal-sub">Registrar advertência ou anotação</div>
-    <div class="adv-form">
-      <div class="form-group">
-        <label class="form-label">Membro</label>
-        <select class="form-select" id="advertencia-membro" required>
-          <option value="" disabled selected>Selecione o membro</option>
-        </select>
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Últimas presenças</div>
+        <a class="btn-sm ghost" href="/membros/diretoria/encontros">Ver tudo</a>
       </div>
-      <div class="form-group">
-        <label class="form-label">Tipo</label>
-        <select class="form-select" id="adv-tipo">
-          <option value="leve">Leve</option>
-          <option value="grave">Grave</option>
-        </select>
+      <div class="panel-body">
+        <table class="tbl">
+          <thead><tr><th>Encontro</th><th>Liga</th><th>Taxa</th></tr></thead>
+          <tbody id="tbody-ultimas-presencas"></tbody>
+        </table>
       </div>
-      <div class="form-group">
-        <label class="form-label">Descrição</label>
-        <textarea class="adv-textarea" id="adv-descricao" placeholder="Descreva o motivo..."></textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Entregas atrasadas</div>
+        <a class="btn-sm ghost" href="/membros/diretoria/entregas">Ver tudo</a>
       </div>
-      <button class="btn-sm r" style="align-self:flex-end" onclick="handleSalvarAdvertencia()">Registrar →</button>
+      <div class="panel-body">
+        <table class="tbl">
+          <thead><tr><th>Membro</th><th>Aula</th><th>Status</th></tr></thead>
+          <tbody id="tbody-entregas-atrasadas"></tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- MODAL CADASTRO MEMBRO -->
-<div class="modal-overlay" id="modal-novo-membro" onclick="if(event.target===this)closeModal('modal-novo-membro')">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-novo-membro')" aria-label="Fechar">✕</button>
-    <div class="modal-title">NOVO MEMBRO</div>
-    <div class="modal-sub" style="margin-bottom:1.5rem">Cadastrar e atribuir liga e role</div>
-    <div class="cadastro-form">
-      <div class="form-group">
-        <label class="form-label">Nome completo</label>
-        <input class="form-input" type="text" id="novo-nome" placeholder="Nome do membro">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email institucional</label>
-        <input class="form-input" type="email" id="novo-email" placeholder="matricula@alunos.ibmec.edu.br">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Liga</label>
-        <select class="form-select" id="nova-liga">
-          <option value="IbTech">IbTech</option>
-          <option value="IbBot">IbBot</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Role</label>
-        <select class="form-select">
-          <option>Membro</option>
-          <option>Coordenador</option>
-          <option>Diretor</option>
-        </select>
-      </div>
-      <div class="form-group full">
-        <label class="form-label">Semestre de entrada</label>
-        <input class="form-input" type="text" value="2026.1">
-      </div>
+  <div class="panel-full">
+    <div class="panel-head"><div class="panel-title">Visão geral dos membros</div></div>
+    <div class="panel-body">
+      <table class="tbl" id="overview-tbl"></table>
     </div>
-    <button class="btn-sm b" style="margin-top:1rem;width:100%" onclick="handleCadastrarMembro()">Cadastrar membro →</button>
   </div>
-</div>
 
-<!-- LAYOUT -->
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo"><span class="w">Ib</span><span class="r">Bot</span><span class="slash"> / </span><span class="w">Ib</span><span class="b">Tech</span></div>
-      <div class="brand-tag">Painel da diretoria</div>
-    </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section">Visão geral</div>
-      <a class="nav-item active" onclick="showTab('dashboard',this)"><span class="nav-dot r"></span> Dashboard</a>
-      <a class="nav-item" onclick="showTab('avisos',this)"><span class="nav-dot w"></span> Avisos</a>
-
-      <div class="nav-section">Membros</div>
-      <a class="nav-item" onclick="showTab('membros',this)"><span class="nav-dot w"></span> Gestão de membros</a>
-      <a class="nav-item" onclick="showTab('advertencias',this)"><span class="nav-dot r"></span> Advertências <span class="nav-badge">3</span></a>
-
-      <div class="nav-section">Encontros</div>
-      <a class="nav-item" onclick="showTab('presenca',this)"><span class="nav-dot g"></span> Registro de presença</a>
-
-      <div class="nav-section">Capacitação</div>
-      <a class="nav-item" onclick="showTab('aulas',this)"><span class="nav-dot b"></span> Gestão de aulas</a>
-      <a class="nav-item" onclick="showTab('entregas',this)"><span class="nav-dot w"></span> Entregas <span class="nav-badge">5</span></a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-av" id="sidebar-av">—</div>
-      <div class="user-info">
-        <div class="user-name" id="sidebar-name"><span class="skeleton skeleton--text"></span></div>
-        <div class="user-role" id="sidebar-role">—</div>
-      </div>
-      <div class="logout-btn" id="btn-logout" title="Sair" role="button" aria-label="Sair" tabindex="0">↩</div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main" id="main-content">
-    <div class="topbar">
-      <div class="topbar-left">
-        <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
-      </div>
-      <div class="topbar-right">
-        <span class="topbar-date" id="topbar-date"></span>
-        <button class="btn-sm ghost" onclick="openModal('modal-novo-membro')">+ Novo membro</button>
-        <button class="btn-sm r" onclick="handleAbrirChamada()">Abrir chamada</button>
-      </div>
-    </div>
-
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div class="tab-page active" id="tab-dashboard">
-        <div class="metrics">
-          <div class="metric"><div class="metric-label">Membros ativos</div><div class="metric-val w" id="metric-membros">—</div><div class="metric-sub" id="metric-membros-sub"></div></div>
-          <div class="metric"><div class="metric-label">Presença média</div><div class="metric-val g" id="metric-presenca-media">—</div><div class="metric-sub">Último encontro</div></div>
-          <div class="metric"><div class="metric-label">Entregas pendentes</div><div class="metric-val r" id="pending-count">—</div><div class="metric-sub" id="metric-entregas-pendentes-sub"></div></div>
-          <div class="metric"><div class="metric-label">Advertências ativas</div><div class="metric-val r" id="metric-advertencias">—</div><div class="metric-sub">Esse semestre</div></div>
-        </div>
-
-        <div class="panels">
-          <div class="panel">
-            <div class="panel-head">
-              <div class="panel-title">Últimas presenças</div>
-              <button class="btn-sm ghost" onclick="showTab('presenca',null)">Ver tudo</button>
-            </div>
-            <div class="panel-body">
-              <table class="tbl">
-                <thead><tr><th>Encontro</th><th>Liga</th><th>Taxa</th></tr></thead>
-                <tbody id="tbody-ultimas-presencas"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-head">
-              <div class="panel-title">Entregas atrasadas</div>
-              <button class="btn-sm ghost" onclick="showTab('entregas',null)">Ver tudo</button>
-            </div>
-            <div class="panel-body">
-              <table class="tbl">
-                <thead><tr><th>Membro</th><th>Aula</th><th>Status</th></tr></thead>
-                <tbody id="tbody-entregas-atrasadas"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-full">
-          <div class="panel-head"><div class="panel-title">Visão geral dos membros</div></div>
-          <div class="panel-body">
-            <table class="tbl" id="overview-tbl"></table>
-          </div>
-        </div>
-      </div>
-
-      <!-- MEMBROS -->
-      <div class="tab-page" id="tab-membros">
-        <div class="panel-full">
-          <div class="panel-head">
-            <div class="panel-title">Todos os membros</div>
-            <div style="display:flex;gap:.5rem;align-items:center">
-              <input placeholder="Buscar..." style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body);width:160px" oninput="filterMembers(this.value)">
-              <select style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)" onchange="filterLiga(this.value)">
-                <option value="">Todas as ligas</option>
-                <option value="IbTech">IbTech</option>
-                <option value="IbBot">IbBot</option>
-              </select>
-              <button class="btn-sm ghost" onclick="exportCSV()">Exportar CSV</button>
-              <button class="btn-sm b" onclick="openModal('modal-novo-membro')">+ Novo membro</button>
-            </div>
-          </div>
-          <table class="tbl" id="membros-tbl"></table>
-        </div>
-      </div>
-
-      <!-- ADVERTÊNCIAS -->
-      <div class="tab-page" id="tab-advertencias">
-        <div class="panel-full">
-          <div class="panel-head">
-            <div class="panel-title">Advertências e anotações</div>
-            <button class="btn-sm r" onclick="openAdvModal()">+ Registrar</button>
-          </div>
-          <table class="tbl">
-            <thead><tr><th>Membro</th><th>Liga</th><th>Tipo</th><th>Motivo</th><th>Data</th><th>Registrado por</th><th></th></tr></thead>
-            <tbody id="adv-tbl"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PRESENÇA -->
-      <div class="tab-page" id="tab-presenca">
-        <div class="panel-full">
-          <div class="chamada-header">
-            <div class="chamada-status">
-              <div class="panel-title">Chamada — Aula 03 · IbTech</div>
-              <span class="chamada-badge closed" id="chamada-badge">Fechada</span>
-            </div>
-            <div style="display:flex;gap:.5rem">
-              <select id="select-encontro" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)">
-                <option>IbTech · 20 mar · Aula 03</option>
-                <option>IbBot · 18 mar · Reunião</option>
-                <option>IbTech · 13 mar · Aula 02</option>
-              </select>
-              <button class="btn-sm ghost" onclick="openModal('modal-encontro')" style="margin-left:.5rem">+ Novo encontro</button>
-              <button class="btn-sm ghost" onclick="markAll()">Marcar todos</button>
-              <button class="btn-sm g" id="btn-abrir-chamada" onclick="handleAbrirChamada()">Gerar QR Code</button>
-              <button class="btn-sm b" onclick="savePresenca()">Salvar chamada</button>
-            </div>
-          </div>
-          <div class="member-grid" id="presenca-grid"></div>
-          <div class="chamada-footer">
-            <div class="chamada-count"><strong id="presenca-count">0</strong> / <span id="presenca-total">0</span> presentes</div>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-              <button class="btn-sm ghost" id="btn-export-todos">Exportar tudo</button>
-              <button class="btn-sm ghost" id="btn-export-membros">Por membro</button>
-              <button class="btn-sm ghost" id="btn-export-encontros">Por encontro</button>
-              <button class="btn-sm ghost" id="btn-export-frequencia">Frequência</button>
-              <button class="btn-sm b" onclick="savePresenca()">Salvar →</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- AULAS -->
-      <div class="tab-page" id="tab-aulas">
-        <div style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
-          <div><div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em">Gestão de aulas</div><div style="font-size:12px;color:var(--muted);margin-top:2px">IbTech · Semestre 2026.1</div></div>
-          <button class="btn-sm b">+ Nova aula</button>
-        </div>
-        <div class="aulas-dir-grid" id="aulas-dir-grid"></div>
-      </div>
-
-      <!-- ENTREGAS -->
-      <div class="tab-page" id="tab-entregas">
-        <div class="panel-full">
-          <div class="panel-head">
-            <div class="panel-title">Entregas por aula</div>
-            <select style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)" onchange="filterEntregas(this.value)">
-              <option value="">Todas as aulas</option>
-              <option value="Aula 01">Aula 01 — Lógica em C</option>
-              <option value="Aula 02">Aula 02 — Frontend</option>
-            </select>
-          </div>
-          <table class="tbl" id="entregas-tbl"></table>
-        </div>
-      </div>
-
-      <!-- AVISOS -->
-      <div class="tab-page" id="tab-avisos">
-        <div style="display:grid;grid-template-columns:1fr 360px;gap:1rem">
-          <div>
-            <div style="font-family:var(--font-display);font-size:22px;letter-spacing:.02em;margin-bottom:1.25rem">Avisos publicados</div>
-            <div id="avisos-lista"></div>
-          </div>
-          <div class="panel" style="align-self:start">
-            <div class="panel-head"><div class="panel-title">Novo aviso</div></div>
-            <div class="panel-body">
-              <div class="aviso-form">
-                <div class="form-group">
-                  <label class="form-label">Título</label>
-                  <input class="aviso-input form-input" id="aviso-titulo" placeholder="Título do aviso">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Mensagem</label>
-                  <textarea class="aviso-input aviso-textarea" id="aviso-mensagem" placeholder="Escreva o aviso..."></textarea>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Destinatários</label>
-                  <select class="form-select" id="aviso-destinatario">
-                    <option value="todos">Todos os membros</option>
-                    <option value="IbTech">IbTech</option>
-                    <option value="IbBot">IbBot</option>
-                  </select>
-                </div>
-                <button class="btn-sm b" style="align-self:flex-end" onclick="publishAviso()">Publicar →</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </main>
-</div>
-
+</main>
 <script type="module" src="/assets/js/pages/dashboard-diretoria.js"></script>
-
-<div class="cursor" id="cursor"></div>
-<script>
-(function(){
-  const c = document.getElementById('cursor');
-  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
-  document.addEventListener('mousemove', e => {
-    c.style.left = e.clientX + 'px';
-    c.style.top = e.clientY + 'px';
-  });
-  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
-  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
-  document.querySelectorAll('a, button, input, label, [onclick]').forEach(el => {
-    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
-    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
-  });
-})();
-</script>
-
-<!-- MODAL NOVO ENCONTRO -->
-<div class="modal-overlay" id="modal-encontro" onclick="if(event.target===this)closeModal('modal-encontro')">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-encontro')" aria-label="Fechar">✕</button>
-    <div class="modal-title">Novo Encontro</div>
-    <div class="modal-sub">Cadastra um encontro para abrir chamada de presença.</div>
-    <div class="form-group" style="margin-bottom:.75rem">
-      <label class="form-label">Título</label>
-      <input class="form-input" type="text" id="encontro-titulo"
-             placeholder="Ex: Aula 03 — Arrays em C">
-    </div>
-    <div class="form-group" style="margin-bottom:1.25rem">
-      <label class="form-label">Data</label>
-      <input class="form-input" type="date" id="encontro-data">
-    </div>
-    <div style="display:flex;gap:.5rem;justify-content:flex-end">
-      <button class="btn-sm ghost" onclick="closeModal('modal-encontro')">Cancelar</button>
-      <button class="btn-sm b" onclick="handleCriarEncontro()">Criar encontro →</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>

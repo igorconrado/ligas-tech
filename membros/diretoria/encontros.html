@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontros — Diretoria · IbBot & IbTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/global.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/dashboard-diretoria.css">
+<link rel="stylesheet" href="/assets/css/pages/ux-improvements.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/confirm.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
+<link rel="stylesheet" href="/assets/css/shell.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
+<!-- MODAL QR CODE -->
+<div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
+  <div class="modal-box" id="qr-code" style="text-align:center">
+    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Fechar">✕</button>
+    <div class="modal-title">CHAMADA ABERTA</div>
+    <div class="modal-sub">Membros digitam o código ou escaneiam o QR pra marcar presença</div>
+    <div class="qr-code" id="qr-display">—</div>
+    <div class="qr-timer">Expira em <span id="qr-expira" style="color:var(--amber)">10:00</span></div>
+    <button class="btn-sm ghost" style="width:100%" onclick="closeModal('qr-modal')">Fechar chamada</button>
+  </div>
+</div>
+
+<!-- MODAL NOVO ENCONTRO -->
+<div class="modal-overlay" id="modal-encontro" onclick="if(event.target===this)closeModal('modal-encontro')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-encontro')" aria-label="Fechar">✕</button>
+    <div class="modal-title">Novo Encontro</div>
+    <div class="modal-sub">Cadastra um encontro para abrir chamada de presença.</div>
+    <div class="form-group" style="margin-bottom:.75rem"><label class="form-label">Título</label><input class="form-input" type="text" id="encontro-titulo" placeholder="Ex: Aula 03 — Arrays em C"></div>
+    <div class="form-group" style="margin-bottom:1.25rem"><label class="form-label">Data</label><input class="form-input" type="date" id="encontro-data"></div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <button class="btn-sm ghost" onclick="closeModal('modal-encontro')">Cancelar</button>
+      <button class="btn-sm b" onclick="handleCriarEncontro()">Criar encontro →</button>
+    </div>
+  </div>
+</div>
+
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
+  <div class="panel-full">
+    <div class="chamada-header">
+      <div class="chamada-status">
+        <div class="panel-title">Chamada</div>
+        <span class="chamada-badge closed" id="chamada-badge">Fechada</span>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <select id="select-encontro" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)"></select>
+        <button class="btn-sm ghost" onclick="openModal('modal-encontro')" style="margin-left:.5rem">+ Novo encontro</button>
+        <button class="btn-sm ghost" onclick="markAll()">Marcar todos</button>
+        <button class="btn-sm g" id="btn-abrir-chamada" onclick="handleAbrirChamada()">Gerar QR Code</button>
+        <button class="btn-sm b" onclick="savePresenca()">Salvar chamada</button>
+      </div>
+    </div>
+    <div class="member-grid" id="presenca-grid"></div>
+    <div class="chamada-footer">
+      <div class="chamada-count"><strong id="presenca-count">0</strong> / <span id="presenca-total">0</span> presentes</div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn-sm ghost" id="btn-export-todos">Exportar tudo</button>
+        <button class="btn-sm ghost" id="btn-export-membros">Por membro</button>
+        <button class="btn-sm ghost" id="btn-export-encontros">Por encontro</button>
+        <button class="btn-sm ghost" id="btn-export-frequencia">Frequência</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script type="module" src="/assets/js/pages/encontros-diretoria.js"></script>
+</body>
+</html>
