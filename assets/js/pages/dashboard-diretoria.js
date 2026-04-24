@@ -3,7 +3,7 @@
 // advertências, perfil) vivem em páginas próprias em /membros/diretoria/*.
 // Esta página cuida só do overview: 4 KPIs + 2 panels + overview-tbl.
 
-import { initPage } from '/assets/js/features/page-init.js';
+import { shell } from '/assets/js/ui/shell.js';
 import { getMembrosLiga, getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getTodasAulas, getEntregasAula } from '/assets/js/supabase/aulas.js';
 import { getEncontros, getPresencasEncontro } from '/assets/js/supabase/presenca.js';
@@ -12,7 +12,10 @@ import { renderOverviewTable } from '/assets/js/features/members-table.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonText, skeletonTableRows } from '/assets/js/ui/skeleton.js';
 
-const { usuario } = await initPage({ requireRole: 'diretoria' });
+const { usuario } = await shell.mount({
+  activeRoute: '/membros/dashboard-diretoria',
+  pageTitle: 'Visão Geral',
+});
 const ligaId = usuario?.liga_id || null;
 const perfil = await getMeuPerfil();
 
