@@ -109,13 +109,27 @@ function buildSidebar(nav, activeRoute, homeHref, initialState) {
   `;
 }
 
-function buildTopbar({ pageTitle, initial }) {
+function buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref }) {
   return `
     <header class="topbar">
       <button class="topbar__hamburger" type="button" aria-label="Abrir menu" aria-expanded="false">${icons.menu}</button>
       <h1 class="topbar__title">${escape(pageTitle)}</h1>
       <div class="topbar__user">
-        <button class="topbar__avatar" type="button" aria-haspopup="menu" aria-expanded="false">${escape(initial)}</button>
+        <button class="topbar__avatar" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="topbar-dropdown">${escape(initial)}</button>
+        <div class="topbar__dropdown" id="topbar-dropdown" role="menu" aria-hidden="true">
+          <div class="topbar__dropdown-header">
+            <p class="topbar__dropdown-name">${escape(userName)}</p>
+            <p class="topbar__dropdown-email">${escape(userEmail)}</p>
+          </div>
+          <a href="${escape(perfilHref)}" class="topbar__dropdown-item" role="menuitem">
+            <span class="sidebar__icon">${icons.profile}</span>
+            <span>Meu perfil</span>
+          </a>
+          <button type="button" class="topbar__dropdown-item topbar__dropdown-logout" role="menuitem">
+            <span class="sidebar__icon">${icons.logout}</span>
+            <span>Sair</span>
+          </button>
+        </div>
       </div>
     </header>
   `;
@@ -130,7 +144,10 @@ async function mount({ activeRoute, pageTitle } = {}) {
 
   const nav = isDiretoria ? NAV_DIRETORIA : NAV_MEMBRO;
   const homeHref = isDiretoria ? '/membros/dashboard-diretoria' : '/membros/dashboard';
-  const emailLocal = session?.user?.email?.split('@')[0] || 'U';
+  const perfilHref = isDiretoria ? '/membros/diretoria/perfil' : '/membros/perfil';
+  const userEmail = session?.user?.email || '';
+  const emailLocal = userEmail.split('@')[0] || 'U';
+  const userName = emailLocal;
   const initial = (emailLocal[0] || 'U').toUpperCase();
 
   const existingMain = document.getElementById('main-content');
@@ -157,7 +174,7 @@ async function mount({ activeRoute, pageTitle } = {}) {
     ${buildSidebar(nav, activeRoute, homeHref, initialState)}
     <div class="shell__backdrop"></div>
     <div class="shell__main">
-      ${buildTopbar({ pageTitle, initial })}
+      ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref })}
     </div>
   `;
   shellWrap.querySelector('.shell__main').appendChild(existingMain);
@@ -184,12 +201,47 @@ async function mount({ activeRoute, pageTitle } = {}) {
   // Drawer mobile
   setupDrawer(shellWrap);
 
-  // Avatar (dropdown — expandido na sub-task 8)
-  shellWrap.querySelector('.topbar__avatar')?.addEventListener('click', () => {
-    // placeholder — sub-task 8 implementa dropdown completo
-  });
+  // Avatar dropdown
+  setupAvatarDropdown(shellWrap);
 
   return ctx;
+}
+
+function setupAvatarDropdown(shellWrap) {
+  const avatar = shellWrap.querySelector('.topbar__avatar');
+  const dropdown = shellWrap.querySelector('.topbar__dropdown');
+  if (!avatar || !dropdown) return;
+
+  const onDocClick = (e) => {
+    if (!dropdown.contains(e.target) && e.target !== avatar) close();
+  };
+  const onEsc = (e) => { if (e.key === 'Escape') { e.preventDefault(); close(true); } };
+
+  function open() {
+    dropdown.classList.add('is-open');
+    dropdown.setAttribute('aria-hidden', 'false');
+    avatar.setAttribute('aria-expanded', 'true');
+    // next tick pra não capturar o próprio click que abriu
+    setTimeout(() => {
+      document.addEventListener('click', onDocClick);
+      document.addEventListener('keydown', onEsc);
+    }, 0);
+  }
+  function close(returnFocus = false) {
+    dropdown.classList.remove('is-open');
+    dropdown.setAttribute('aria-hidden', 'true');
+    avatar.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('click', onDocClick);
+    document.removeEventListener('keydown', onEsc);
+    if (returnFocus) avatar.focus();
+  }
+
+  avatar.addEventListener('click', () => {
+    dropdown.classList.contains('is-open') ? close() : open();
+  });
+
+  // Logout item dentro do dropdown
+  dropdown.querySelector('.topbar__dropdown-logout')?.addEventListener('click', fazerLogout);
 }
 
 function setupDrawer(shellWrap) {
