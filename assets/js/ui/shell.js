@@ -15,6 +15,7 @@
 
 import { initPage } from '/assets/js/features/page-init.js';
 import { fazerLogout } from '/assets/js/supabase/auth.js';
+import { getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { icons } from '/assets/js/ui/icons.js';
 
 const SIDEBAR_STATE_KEY = 'sidebar-state';
@@ -146,9 +147,18 @@ async function mount({ activeRoute, pageTitle } = {}) {
   const homeHref = isDiretoria ? '/membros/dashboard-diretoria' : '/membros/dashboard';
   const perfilHref = isDiretoria ? '/membros/diretoria/perfil' : '/membros/perfil';
   const userEmail = session?.user?.email || '';
-  const emailLocal = userEmail.split('@')[0] || 'U';
-  const userName = emailLocal;
-  const initial = (emailLocal[0] || 'U').toUpperCase();
+
+  // Nome: prefere membros.nome (perfil); fallback pra parte local do email
+  let userName = '';
+  try {
+    const perfil = await getMeuPerfil();
+    userName = perfil?.nome?.trim() || '';
+  } catch (_) { /* silencia: usa fallback abaixo */ }
+  if (!userName) userName = userEmail.split('@')[0] || 'Usuário';
+
+  // Inicial: primeira letra (com acentos). Se só tem dígitos, cai em 'U'.
+  const firstLetter = userName.match(/[\p{L}]/u)?.[0];
+  const initial = (firstLetter || 'U').toUpperCase();
 
   const existingMain = document.getElementById('main-content');
   if (!existingMain) {
