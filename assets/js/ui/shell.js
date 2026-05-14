@@ -53,6 +53,9 @@ const NAV_DIRETORIA = [
     { label: 'Membros',      href: '/membros/diretoria/membros',      icon: 'members' },
     { label: 'Advertências', href: '/membros/diretoria/advertencias', icon: 'warnings' },
   ]},
+  { group: 'SITE', items: [
+    { label: 'Novidades',    href: '/membros/diretoria/novidades',    icon: 'blog' },
+  ]},
 ];
 
 function escape(s) {

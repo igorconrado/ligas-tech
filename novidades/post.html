@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novidades — IbBot & IbTech · Ibmec BH</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/novidades.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <span class="logo-ib">Ib</span><span class="logo-bot">Bot</span>
+    <span class="slash">/</span>
+    <span class="logo-ib">Ib</span><span class="logo-tech">Tech</span>
+  </a>
+  <div class="nav-links">
+    <a href="/ibbot">IbBot</a>
+    <a href="/ibtech">IbTech</a>
+    <a href="/#diretoria">Diretoria</a>
+    <a href="/novidades" class="active">Novidades</a>
+    <a href="/processo-seletivo">Processo Seletivo</a>
+    <a href="/contato">Contato</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">Ibmec BH · 2026</span>
+    <a class="nav-btn" href="/membros/login">Área de Membros →</a>
+  </div>
+</nav>
+
+<!-- DETALHE -->
+<div style="padding-top:52px">
+  <div class="post-detail">
+    <a class="back-link" href="/novidades">← Voltar para Novidades</a>
+
+    <div class="post-detail-head">
+      <span id="post-categoria" class="post-tag tag-blue"></span>
+      <span id="post-liga" class="post-liga" hidden></span>
+    </div>
+
+    <h1 id="post-titulo" class="post-detail-title"></h1>
+
+    <div class="post-detail-meta">
+      <span id="post-date" class="post-detail-date"></span>
+    </div>
+
+    <hr class="post-divider">
+
+    <div id="post-conteudo" class="post-body"></div>
+  </div>
+</div>
+
+<script type="module" src="/assets/js/pages/novidades-post.js"></script>
+<script src="/assets/js/global.js" defer></script>
+</body>
+</html>
