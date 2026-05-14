@@ -232,15 +232,23 @@ window.handleCriar = async function() {
     sessionStorage.setItem('primeiro_acesso', '1');
     window.location.href = await getDashboardUrl();
   } catch (e) {
+    setBtn('btn-criar', false, 'Criar conta e entrar →');
+
+    if (e.code === 'EMAIL_NOT_CONFIRMED') {
+      showErr('err-criar', e.message);
+      return;
+    }
+
     // Se a conta já existe, tenta logar direto com a senha informada
     try {
       await fazerLogin(emailAtual, senha);
       window.location.href = await getDashboardUrl();
       return;
-    } catch (_) { /* login falhou, mostra erro original */ }
+    } catch (e2) {
+      console.error('[handleCriar] fazerLogin também falhou:', e2);
+    }
 
-    setBtn('btn-criar', false, 'Criar conta e entrar →');
-    showErr('err-criar', 'Erro ao criar conta. Tente novamente.');
+    showErr('err-criar', `Erro ao criar conta: ${e.message || 'desconhecido'}`);
   }
 };
 

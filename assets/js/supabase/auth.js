@@ -80,7 +80,17 @@ export async function criarConta(email, senha) {
     email: emailNorm,
     password: senha
   });
-  if (loginError) throw loginError;
+
+  if (loginError) {
+    console.error('[criarConta] signInWithPassword falhou:', loginError);
+    // Confirmação de email pendente — orientar o usuário
+    if (loginError.message?.toLowerCase().includes('email not confirmed')) {
+      const err = new Error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');
+      err.code = 'EMAIL_NOT_CONFIRMED';
+      throw err;
+    }
+    throw loginError;
+  }
 
   // 3. Garante linhas nas tabelas usuarios e membros
   await garantirLinhasDB(login.user.id, emailNorm);
