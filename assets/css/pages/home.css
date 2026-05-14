@@ -198,19 +198,19 @@
 }
 .split-card.r::before { background: linear-gradient(90deg, var(--red), transparent 60%); }
 .split-card.b::before { background: linear-gradient(90deg, var(--blue), transparent 60%); }
-.split-bg-char {
+.split-bg-logo {
   position: absolute;
-  right: -0.05em;
-  bottom: -0.1em;
-  font-family: var(--font-display);
-  font-size: clamp(200px, 30vw, 380px);
-  line-height: 1;
-  opacity: .03;
+  right: -10%;
+  bottom: -10%;
+  width: clamp(200px, 30vw, 360px);
+  height: clamp(200px, 30vw, 360px);
+  object-fit: contain;
+  opacity: .04;
   pointer-events: none;
   user-select: none;
   transition: opacity .4s;
 }
-.split-card:hover .split-bg-char { opacity: .05; }
+.split-card:hover .split-bg-logo { opacity: .07; }
 .split-label {
   font-family: var(--font-mono);
   font-size: 10px;

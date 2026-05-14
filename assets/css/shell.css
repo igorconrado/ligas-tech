@@ -39,12 +39,15 @@
   gap: var(--sp-2);
 }
 .sidebar__logo {
-  font-family: var(--font-display);
-  font-size: var(--fs-h3);
-  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
-  letter-spacing: var(--tr-tight);
-  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sidebar__logo-img {
+  height: 28px;
+  width: auto;
+  color: var(--text-primary);
 }
 .sidebar[data-state="collapsed"] .sidebar__logo { display: none; }
 .sidebar[data-state="collapsed"] .sidebar__brand { justify-content: center; padding: 0 var(--sp-2); }
