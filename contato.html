@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contato — IbBot & IbTech · Ibmec BH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/components.css">
+  <link rel="stylesheet" href="/assets/css/pages/contato.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <span class="logo-ib">Ib</span><span class="logo-bot">Bot</span>
+    <span class="slash">/</span>
+    <span class="logo-ib">Ib</span><span class="logo-tech">Tech</span>
+  </a>
+  <div class="nav-links">
+    <a href="/ibbot">IbBot</a>
+    <a href="/ibtech">IbTech</a>
+    <a href="/#diretoria">Diretoria</a>
+    <a href="/processo-seletivo">Processo Seletivo</a>
+    <a href="/contato" class="active">Contato</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">Ibmec BH · 2026</span>
+    <a class="nav-btn" href="/membros/login">Área de Membros →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-kicker">
+      <span class="kicker-dot-r"></span>
+      IbBot
+      <span style="color:var(--border2)">·</span>
+      <span class="kicker-dot-b"></span>
+      IbTech
+    </div>
+    <h1 class="hero-title">CONTATO</h1>
+    <p class="hero-sub">Parcerias, patrocínios ou dúvidas — fale diretamente com as Ligas Tech.</p>
+  </div>
+</div>
+
+<!-- CONTACT SECTION -->
+<div class="contact-section">
+  <div class="contact-grid">
+
+    <!-- FORMULÁRIO -->
+    <div>
+      <h2 class="contact-form-title">MANDE<br>SUA MENSAGEM.</h2>
+      <form id="contato-form" novalidate>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label" for="c-nome">Nome completo *</label>
+            <input class="form-input" id="c-nome" type="text" placeholder="Seu nome">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-email">Email *</label>
+            <input class="form-input" id="c-email" type="email" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-empresa">Empresa / Instituição</label>
+            <input class="form-input" id="c-empresa" type="text" placeholder="Opcional">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="c-tipo">Tipo de contato *</label>
+            <select class="form-select" id="c-tipo">
+              <option value="">Selecione</option>
+              <option value="parceria">Parceria</option>
+              <option value="patrocinio">Patrocínio</option>
+              <option value="duvida">Dúvida</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="c-mensagem">Mensagem *</label>
+            <textarea class="form-textarea" id="c-mensagem" placeholder="Descreva como podemos ajudar ou como podemos colaborar..." style="min-height:140px"></textarea>
+          </div>
+        </div>
+        <button class="contact-submit" id="contato-btn" type="submit">Enviar mensagem →</button>
+      </form>
+    </div>
+
+    <!-- INFO DE CONTATO -->
+    <div class="contact-info">
+      <div class="contact-info-title">Canais diretos</div>
+      <div class="contact-channels">
+        <a class="contact-channel r" href="https://instagram.com/ibbotbh" target="_blank" rel="noopener">
+          <span class="channel-icon">IG</span>
+          <span class="channel-name">IbBot</span>
+          <span class="channel-handle">@ibbotbh ↗</span>
+        </a>
+        <a class="contact-channel b" href="https://instagram.com/ibtechbh" target="_blank" rel="noopener">
+          <span class="channel-icon">IG</span>
+          <span class="channel-name">IbTech</span>
+          <span class="channel-handle">@ibtechbh ↗</span>
+        </a>
+        <a class="contact-channel r" href="https://www.linkedin.com/company/ibbot" target="_blank" rel="noopener">
+          <span class="channel-icon">LI</span>
+          <span class="channel-name">IbBot</span>
+          <span class="channel-handle">linkedin ↗</span>
+        </a>
+        <a class="contact-channel b" href="https://www.linkedin.com/company/ibtechbh" target="_blank" rel="noopener">
+          <span class="channel-icon">LI</span>
+          <span class="channel-name">IbTech</span>
+          <span class="channel-handle">linkedin ↗</span>
+        </a>
+        <a class="contact-channel r" href="mailto:ibbotbh@gmail.com">
+          <span class="channel-icon">@</span>
+          <span class="channel-name">IbBot</span>
+          <span class="channel-handle">ibbotbh@gmail.com</span>
+        </a>
+        <a class="contact-channel b" href="mailto:ligaibtech@gmail.com">
+          <span class="channel-icon">@</span>
+          <span class="channel-name">IbTech</span>
+          <span class="channel-handle">ligaibtech@gmail.com</span>
+        </a>
+      </div>
+      <p class="contact-note">Respondemos em até 3 dias úteis. Para assuntos urgentes, prefira o Instagram.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-l">
+    <span style="color:var(--text)">Ib</span><span style="color:var(--red)">Bot</span>
+    <span style="color:rgba(255,255,255,.1);margin:0 .3em">/</span>
+    <span style="color:var(--text)">Ib</span><span style="color:var(--blue)">Tech</span>
+    <span style="color:var(--muted);margin-left:.75rem">— © 2026 Ligas Tech Ibmec BH. Todos os direitos reservados.</span>
+  </div>
+  <div class="footer-r">
+    <a href="https://instagram.com/ibbotbh" target="_blank" rel="noopener">@ibbotbh ↗</a>
+    <a href="https://instagram.com/ibtechbh" target="_blank" rel="noopener">@ibtechbh ↗</a>
+    <a href="/membros/login">Área de Membros</a>
+  </div>
+</footer>
+
+<script type="module" src="/assets/js/pages/contato.js"></script>
+
+<div class="cursor" id="cursor"></div>
+<script>
+(function(){
+  const c = document.getElementById('cursor');
+  if (!c || window.matchMedia('(pointer: coarse)').matches) return;
+  document.addEventListener('mousemove', e => {
+    c.style.left = e.clientX + 'px';
+    c.style.top  = e.clientY + 'px';
+  });
+  document.addEventListener('mouseleave', () => c.classList.add('is-hidden'));
+  document.addEventListener('mouseenter', () => c.classList.remove('is-hidden'));
+  document.querySelectorAll('a, button, [onclick], label').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-link'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-link'));
+  });
+  document.querySelectorAll('.nav-links a[href*="ibtech"]').forEach(el => {
+    el.addEventListener('mouseenter', () => c.classList.add('is-blue'));
+    el.addEventListener('mouseleave', () => c.classList.remove('is-blue'));
+  });
+  const reveals = document.querySelectorAll('.section-kicker, .section-title, .section-body, .contact-form-title');
+  reveals.forEach(el => el.classList.add('reveal'));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+  }, { threshold: 0.15 });
+  reveals.forEach(el => io.observe(el));
+})();
+</script>
+
+</body>
+</html>
