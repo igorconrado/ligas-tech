@@ -18,14 +18,10 @@ SET search_path = public
 AS $$
 BEGIN
   -- Insere em usuarios só se ainda não existe
+  -- membros NÃO é criado aqui: exige liga_id e nome (NOT NULL), disponíveis só no onboarding
   INSERT INTO public.usuarios (id, email, role, liga_id)
   VALUES (NEW.id, NEW.email, 'membro', NULL)
   ON CONFLICT (id) DO NOTHING;
-
-  -- Insere em membros só se ainda não existe
-  INSERT INTO public.membros (usuario_id, ativo, onboarding_completo)
-  VALUES (NEW.id, true, false)
-  ON CONFLICT (usuario_id) DO NOTHING;
 
   RETURN NEW;
 END;

@@ -9,7 +9,7 @@ export async function emailAutorizado(email) {
     .from('emails_autorizados')
     .select('id, nome')
     .eq('email', email.trim().toLowerCase())
-    .single();
+    .maybeSingle();
   if (error || !data) return { autorizado: false, nome: null };
   return { autorizado: true, nome: data.nome };
 }
@@ -25,23 +25,8 @@ export async function emailTemConta(email) {
 }
 
 async function garantirLinhasDB(userId, email) {
-  const { data: existingUser } = await supabase
-    .from('usuarios')
-    .select('id')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (!existingUser) {
-    await supabase
-      .from('usuarios')
-      .insert({
-        id: userId,
-        email,
-        role: 'membro',
-        liga_id: null
-      });
-  }
-
+  // O trigger on_auth_user_created já cria a linha em usuarios;
+  // aqui só marca tem_conta para o fluxo de login identificar retornantes
   await supabase
     .from('emails_autorizados')
     .update({ tem_conta: true })
@@ -103,7 +88,7 @@ export async function fazerLogin(email, senha) {
 
 export async function fazerLogout() {
   await supabase.auth.signOut();
-  window.location.href = '/membros/login';
+  window.location.href = '/membros/login.html';
 }
 
 export async function getSession() {
@@ -114,7 +99,7 @@ export async function getSession() {
 export async function requireAuth() {
   const session = await getSession();
   if (!session) {
-    window.location.href = '/membros/login';
+    window.location.href = '/membros/login.html';
     return null;
   }
   return session;
