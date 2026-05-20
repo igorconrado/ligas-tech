@@ -5,8 +5,8 @@ export async function getAulasComEntregas() {
   if (!user) return [];
 
   const { data: membro } = await supabase
-    .from('membros').select('id, liga_id').eq('usuario_id', user.id).single();
-  if (!membro) return [];
+    .from('membros').select('id, liga_id').eq('usuario_id', user.id).maybeSingle();
+  if (!membro?.liga_id) return [];
 
   const { data: aulas } = await supabase
     .from('aulas')
