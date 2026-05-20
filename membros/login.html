@@ -239,13 +239,12 @@ window.handleCriar = async function() {
       return;
     }
 
-    // Se a conta já existe, tenta logar direto com a senha informada
-    try {
-      await fazerLogin(emailAtual, senha);
-      window.location.href = await getDashboardUrl();
+    if (e.code === 'ACCOUNT_EXISTS') {
+      document.getElementById('display-email-logar').textContent = emailAtual;
+      showStep('step-logar');
+      showErr('err-logar', 'Esta conta já existe. Digite sua senha para entrar.');
+      document.getElementById('input-senha-logar').focus();
       return;
-    } catch (e2) {
-      console.error('[handleCriar] fazerLogin também falhou:', e2);
     }
 
     showErr('err-criar', `Erro ao criar conta: ${e.message || 'desconhecido'}`);

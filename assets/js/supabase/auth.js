@@ -42,22 +42,6 @@ async function garantirLinhasDB(userId, email) {
       });
   }
 
-  const { data: existingMembro } = await supabase
-    .from('membros')
-    .select('id')
-    .eq('usuario_id', userId)
-    .maybeSingle();
-
-  if (!existingMembro) {
-    await supabase
-      .from('membros')
-      .insert({
-        usuario_id: userId,
-        onboarding_completo: false,
-        ativo: true
-      });
-  }
-
   await supabase
     .from('emails_autorizados')
     .update({ tem_conta: true })
@@ -67,13 +51,20 @@ async function garantirLinhasDB(userId, email) {
 export async function criarConta(email, senha) {
   const emailNorm = email.trim().toLowerCase();
 
-  // 1. Cria no Supabase Auth (se já existir, ignora e faz login)
+  // 1. Cria no Supabase Auth
   const { error } = await supabase.auth.signUp({
     email: emailNorm,
     password: senha
   });
   const alreadyExists = error && (error.status === 422 || error.message?.includes('already registered'));
   if (error && !alreadyExists) throw error;
+
+  // Se a conta já existe no Auth, o usuário precisa usar a senha antiga
+  if (alreadyExists) {
+    const err = new Error('Esta conta já foi criada. Use sua senha para entrar.');
+    err.code = 'ACCOUNT_EXISTS';
+    throw err;
+  }
 
   // 2. Loga
   const { data: login, error: loginError } = await supabase.auth.signInWithPassword({
@@ -83,7 +74,6 @@ export async function criarConta(email, senha) {
 
   if (loginError) {
     console.error('[criarConta] signInWithPassword falhou:', loginError);
-    // Confirmação de email pendente — orientar o usuário
     if (loginError.message?.toLowerCase().includes('email not confirmed')) {
       const err = new Error('Confirme seu email antes de entrar. Verifique sua caixa de entrada.');
       err.code = 'EMAIL_NOT_CONFIRMED';
