@@ -61,12 +61,18 @@ async function savePerfil() {
   const texto = $('btn-salvar-texto');
   if (!btn || !texto) return;
 
+  const nome = $('p-nome').value.trim();
+  if (!nome) {
+    toast.error('O nome não pode estar vazio');
+    return;
+  }
+
   btn.disabled = true;
   texto.textContent = 'SALVANDO...';
 
   try {
     await atualizarPerfil({
-      nome: $('p-nome').value.trim(),
+      nome,
       linkedin: $('p-linkedin').value.trim() || null,
       github: $('p-github').value.trim() || null,
       bio: $('p-bio').value.trim() || null,

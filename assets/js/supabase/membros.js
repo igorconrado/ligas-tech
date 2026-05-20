@@ -37,9 +37,13 @@ export async function atualizarPerfil(updates) {
     .update(updates)
     .eq('usuario_id', user.id)
     .select()
-    .single();
+    .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error('[atualizarPerfil] erro Supabase:', error);
+    throw error;
+  }
+  if (!data) throw new Error('Perfil não encontrado — conclua o onboarding primeiro.');
   return data;
 }
 
