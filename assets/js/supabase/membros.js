@@ -32,19 +32,15 @@ export async function atualizarPerfil(updates) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('membros')
     .update(updates)
-    .eq('usuario_id', user.id)
-    .select()
-    .maybeSingle();
+    .eq('usuario_id', user.id);
 
   if (error) {
     console.error('[atualizarPerfil] erro Supabase:', error);
     throw error;
   }
-  if (!data) throw new Error('Perfil não encontrado — conclua o onboarding primeiro.');
-  return data;
 }
 
 export async function completarOnboarding(dados) {
@@ -66,23 +62,21 @@ export async function completarOnboarding(dados) {
     .eq('usuario_id', user.id)
     .maybeSingle();
 
-  let data, error;
+  let error;
 
   if (existing) {
-    ({ data, error } = await supabase
+    ({ error } = await supabase
       .from('membros')
       .update(payload)
-      .eq('usuario_id', user.id)
-      .select()
-      .single());
+      .eq('usuario_id', user.id));
   } else {
-    ({ data, error } = await supabase
+    ({ error } = await supabase
       .from('membros')
-      .insert({ ...payload, usuario_id: user.id, ativo: true })
-      .select()
-      .single());
+      .insert({ ...payload, usuario_id: user.id, ativo: true }));
   }
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error('[completarOnboarding] erro Supabase:', error);
+    throw error;
+  }
 }
