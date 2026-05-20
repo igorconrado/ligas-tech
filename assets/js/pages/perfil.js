@@ -91,5 +91,5 @@ async function savePerfil() {
   }
 }
 
-window.savePerfil = savePerfil;
+document.getElementById('btn-salvar-perfil')?.addEventListener('click', savePerfil);
 carregar();
