@@ -109,4 +109,9 @@ try {
   renderEntregas(aulas);
 } catch (e) {
   console.error('Erro ao carregar entregas:', e);
+  renderEmptyState(tbody, {
+    icon: icons.inbox,
+    title: 'Erro ao carregar entregas',
+    description: 'Tente recarregar a página.',
+  });
 }

@@ -11,6 +11,16 @@ const { session } = await shell.mount({ activeRoute, pageTitle: 'Meu Perfil' });
 
 const $ = (id) => document.getElementById(id);
 
+const ROLE_LABELS = {
+  presidente: 'Presidente',
+  vp: 'Vice-Presidente',
+  ops: 'Operações',
+  rh: 'Recursos Humanos',
+  diretor: 'Diretor(a)',
+  coordenador: 'Coordenador(a)',
+  membro: 'Membro',
+};
+
 function ligaCor(perfil) {
   const nome = perfil?.ligas?.nome?.toLowerCase() || '';
   if (nome.includes('ibbot')) return 'r';
@@ -38,6 +48,8 @@ async function carregar() {
   const cor = ligaCor(perfil);
 
   $('perfil-name-display').textContent = nome;
+  const roleEl = $('perfil-role-display');
+  if (roleEl) roleEl.textContent = ROLE_LABELS[perfil.role] || perfil.role || 'Membro';
   setAvatar(perfil.avatar_url, inicial);
   $('p-nome').value = nome;
   $('p-linkedin').value = perfil.linkedin || '';

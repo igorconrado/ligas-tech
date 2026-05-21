@@ -1,16 +1,26 @@
 // ── Página: Cronograma (membro) ──
 import { shell } from '/assets/js/ui/shell.js';
+import { getMeuPerfil } from '/assets/js/supabase/membros.js';
 import { getEncontros } from '/assets/js/supabase/presenca.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows } from '/assets/js/ui/skeleton.js';
 
-const { usuario } = await shell.mount({ activeRoute: '/membros/cronograma', pageTitle: 'Cronograma' });
+await shell.mount({ activeRoute: '/membros/cronograma', pageTitle: 'Cronograma' });
 
 const container = document.getElementById('timeline-container');
 container.innerHTML = skeletonRows(4);
 
 try {
-  const encontros = await getEncontros(usuario.liga_id);
+  const perfil = await getMeuPerfil();
+  if (!perfil?.liga_id) {
+    renderEmptyState(container, {
+      icon: icons.calendar,
+      title: 'Liga não encontrada',
+      description: 'Seu perfil ainda não foi vinculado a uma liga. Fale com a diretoria.',
+    });
+    throw new Error('sem liga_id');
+  }
+  const encontros = await getEncontros(perfil.liga_id);
   const itens = [...encontros]
     .sort((a, b) => new Date(a.data) - new Date(b.data))
     .map(e => ({
@@ -48,5 +58,11 @@ try {
     }).join('');
   }
 } catch (e) {
+  if (e.message === 'sem liga_id') return;
   console.error('Erro ao carregar cronograma:', e);
+  renderEmptyState(container, {
+    icon: icons.calendar,
+    title: 'Erro ao carregar cronograma',
+    description: 'Tente recarregar a página.',
+  });
 }

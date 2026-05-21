@@ -30,4 +30,9 @@ try {
   }
 } catch (e) {
   console.error('Erro ao carregar avisos:', e);
+  renderEmptyState(container, {
+    icon: icons.check,
+    title: 'Erro ao carregar avisos',
+    description: 'Tente recarregar a página.',
+  });
 }

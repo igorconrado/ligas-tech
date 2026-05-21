@@ -28,4 +28,9 @@ try {
   }
 } catch (e) {
   console.error('Erro ao carregar advertências:', e);
+  renderEmptyState(tbody, {
+    icon: icons.check,
+    title: 'Erro ao carregar advertências',
+    description: 'Tente recarregar a página.',
+  });
 }

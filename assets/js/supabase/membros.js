@@ -4,14 +4,13 @@ export async function getMeuPerfil() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data, error } = await supabase
-    .from('membros')
-    .select('*, ligas(nome, cor)')
-    .eq('usuario_id', user.id)
-    .maybeSingle();
+  const [{ data, error }, { data: usuarioData }] = await Promise.all([
+    supabase.from('membros').select('*, ligas(nome, cor)').eq('usuario_id', user.id).maybeSingle(),
+    supabase.from('usuarios').select('role').eq('id', user.id).maybeSingle(),
+  ]);
 
   if (error) throw error;
-  return data;
+  return data ? { ...data, role: usuarioData?.role || 'membro' } : null;
 }
 
 export async function getMembrosLiga(ligaId = null) {

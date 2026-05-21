@@ -97,4 +97,9 @@ try {
   renderPresencas(presencas);
 } catch (e) {
   console.error('Erro ao carregar presenças:', e);
+  renderEmptyState(timeline, {
+    icon: icons.calendar,
+    title: 'Erro ao carregar presenças',
+    description: 'Tente recarregar a página.',
+  });
 }

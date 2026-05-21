@@ -316,22 +316,6 @@
 
 /* ────────── ISOLATION — reset de estilos globais da landing ────────── */
 
-/* global.css seta cursor:none para o cursor customizado da home.
-   No shell o cursor nativo deve aparecer normalmente. */
-.shell,
-.shell * {
-  cursor: auto;
-}
-.shell button,
-.shell a,
-.shell [role="button"],
-.shell .sidebar__toggle,
-.shell .sidebar__logout,
-.shell .topbar__hamburger,
-.shell .topbar__avatar {
-  cursor: pointer;
-}
-
 /* components.css tem `nav { position: fixed; ... }` para a navbar da landing.
    Dentro do shell o <nav> da sidebar deve ser estático e com display block
    (display:flex aqui quebraria o layout interno dos grupos). */
