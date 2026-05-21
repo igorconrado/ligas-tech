@@ -2,7 +2,7 @@
 import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
-import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro } from '/assets/js/supabase/presenca.js';
+import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro, corrigirPresenca } from '/assets/js/supabase/presenca.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -19,10 +19,11 @@ let members = [];
 let presenceMembers = [];
 let presentSet = new Set();
 let chamadaAberta = false;
+let encontroAtivoId = null;
 
 async function carregarMembros() {
   try {
-    const data = await getMembrosLiga();
+    const data = await getMembrosLiga(ligaId);
     members = data.map(m => ({ id: m.id, name: m.nome, liga: m.ligas?.nome || '—' }));
     renderPresenca();
   } catch (e) {
@@ -58,8 +59,6 @@ function renderPresenca() {
     $('presenca-total').textContent = 0;
     return;
   }
-  presenceMembers = members.filter(m => m.liga === (usuario?.liga_id ? 'IbTech' : m.liga)).map(m => m.name);
-  // simplifica: usa todos os membros da liga do diretor
   presenceMembers = members.map(m => m.name);
   grid.innerHTML = presenceMembers.map((name, i) => {
     const on = presentSet.has(i);
@@ -82,9 +81,23 @@ function markAll() {
   renderPresenca();
 }
 
-function savePresenca() {
-  $('chamada-badge').textContent = 'Salva';
-  $('chamada-badge').className = 'chamada-badge closed';
+async function savePresenca() {
+  if (!encontroAtivoId) { toast.error('Nenhuma chamada aberta.'); return; }
+  const btn = $('btn-salvar-presenca');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+  try {
+    await Promise.all(members.map((m, i) =>
+      corrigirPresenca(m.id, encontroAtivoId, presentSet.has(i) ? 'presente' : 'ausente')
+    ));
+    $('chamada-badge').textContent = 'Salva';
+    $('chamada-badge').className = 'chamada-badge closed';
+    toast.success('Presença salva.');
+  } catch (e) {
+    console.error('Erro ao salvar presença:', e);
+    toast.error('Erro ao salvar presença.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar'; }
+  }
 }
 
 async function handleCriarEncontro() {
@@ -107,6 +120,7 @@ async function handleAbrirChamada() {
   if (!encontroId) { toast.error('Selecione um encontro primeiro.'); return; }
   try {
     const { codigo, expira } = await abrirChamada(encontroId);
+    encontroAtivoId = encontroId;
     if ($('qr-display')) $('qr-display').textContent = codigo;
     if ($('qr-expira')) {
       const mins = Math.floor((new Date(expira) - new Date()) / 60000);
@@ -140,6 +154,7 @@ async function handleFecharChamada(encontroId) {
     await fecharChamada(encontroId);
     if (window._chamadaChannel) { window._chamadaChannel.unsubscribe(); window._chamadaChannel = null; }
     chamadaAberta = false;
+    encontroAtivoId = null;
     renderPresenca();
     $('chamada-badge').textContent = 'Fechada';
     $('chamada-badge').className = 'chamada-badge closed';

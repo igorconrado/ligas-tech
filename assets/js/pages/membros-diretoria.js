@@ -24,7 +24,7 @@ async function carregar() {
   const tbl = $('membros-tbl');
   tbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
   try {
-    const data = await getMembrosLiga();
+    const data = await getMembrosLiga(ligaId);
     members = data.map(m => ({
       id: m.id, name: m.nome, liga: m.ligas?.nome || '—',
       presenca: 0, entregas: '—', status: 'ok', adv: 0,
