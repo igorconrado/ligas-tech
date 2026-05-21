@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Encontros — Diretoria · IbBot & IbTech</title>
+<title>Encontros â€” Diretoria Â· IbBot & IbTech</title>
 <link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -19,15 +19,15 @@
 <link rel="stylesheet" href="/assets/css/shell.css">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+<a href="#main-content" class="skip-link">Pular para o conteÃºdo</a>
 
 <!-- MODAL QR CODE -->
 <div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
   <div class="modal-box" id="qr-code" style="text-align:center">
-    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Fechar">?</button>
+    <button class="modal-close" onclick="closeModal('qr-modal')" aria-label="Fechar">âœ•</button>
     <div class="modal-title">CHAMADA ABERTA</div>
-    <div class="modal-sub">Membros digitam o código ou escaneiam o QR pra marcar presença</div>
-    <div class="qr-code" id="qr-display">—</div>
+    <div class="modal-sub">Membros digitam o cÃ³digo ou escaneiam o QR pra marcar presenÃ§a</div>
+    <div class="qr-code" id="qr-display">â€”</div>
     <div class="qr-timer">Expira em <span id="qr-expira" style="color:var(--amber)">10:00</span></div>
     <button class="btn-sm ghost" style="width:100%" onclick="closeModal('qr-modal')">Fechar chamada</button>
   </div>
@@ -36,14 +36,14 @@
 <!-- MODAL NOVO ENCONTRO -->
 <div class="modal-overlay" id="modal-encontro" onclick="if(event.target===this)closeModal('modal-encontro')">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-encontro')" aria-label="Fechar">?</button>
+    <button class="modal-close" onclick="closeModal('modal-encontro')" aria-label="Fechar">âœ•</button>
     <div class="modal-title">Novo Encontro</div>
-    <div class="modal-sub">Cadastra um encontro para abrir chamada de presença.</div>
-    <div class="form-group" style="margin-bottom:.75rem"><label class="form-label">Título</label><input class="form-input" type="text" id="encontro-titulo" placeholder="Ex: Aula 03 — Arrays em C"></div>
+    <div class="modal-sub">Cadastra um encontro para abrir chamada de presenÃ§a.</div>
+    <div class="form-group" style="margin-bottom:.75rem"><label class="form-label">TÃ­tulo</label><input class="form-input" type="text" id="encontro-titulo" placeholder="Ex: Aula 03 â€” Arrays em C"></div>
     <div class="form-group" style="margin-bottom:1.25rem"><label class="form-label">Data</label><input class="form-input" type="date" id="encontro-data"></div>
     <div style="display:flex;gap:.5rem;justify-content:flex-end">
       <button class="btn-sm ghost" onclick="closeModal('modal-encontro')">Cancelar</button>
-      <button class="btn-sm b" onclick="handleCriarEncontro()">Criar encontro ?</button>
+      <button class="btn-sm b" onclick="handleCriarEncontro()">Criar encontro â†’</button>
     </div>
   </div>
 </div>
@@ -70,7 +70,7 @@
         <button class="btn-sm ghost" id="btn-export-todos">Exportar tudo</button>
         <button class="btn-sm ghost" id="btn-export-membros">Por membro</button>
         <button class="btn-sm ghost" id="btn-export-encontros">Por encontro</button>
-        <button class="btn-sm ghost" id="btn-export-frequencia">Frequência</button>
+        <button class="btn-sm ghost" id="btn-export-frequencia">FrequÃªncia</button>
       </div>
     </div>
   </div>
