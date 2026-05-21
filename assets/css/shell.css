@@ -66,10 +66,10 @@
 
 .sidebar__nav {
   flex: 1;
-  padding: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
   overflow-y: auto;
 }
-.sidebar__group { margin-bottom: var(--sp-3); }
+.sidebar__group { margin-bottom: 6px; }
 .sidebar__group:last-child { margin-bottom: 0; }
 
 .sidebar__group-label {
@@ -78,7 +78,7 @@
   letter-spacing: var(--tr-caps);
   text-transform: uppercase;
   color: var(--text-tertiary);
-  margin: 0 0 2px var(--sp-2);
+  margin: 0 0 1px var(--sp-2);
   font-weight: 500;
 }
 .sidebar[data-state="collapsed"] .sidebar__group-label { display: none; }
