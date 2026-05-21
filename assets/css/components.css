@@ -33,10 +33,7 @@ nav {
   text-decoration: none;
 }
 
-.nav-logo .slash { color: var(--border2); font-size: 18px; }
-.logo-bot  { color: var(--red); }
-.logo-tech { color: var(--blue); }
-.logo-ib   { color: var(--text); }
+.nav-logo-img { height: 48px; width: auto; display: block; }
 
 .nav-links { display: flex; gap: 2.5rem; }
 

@@ -96,7 +96,7 @@ function buildSidebar(nav, activeRoute, homeHref, initialState) {
     <aside class="sidebar" data-state="${initialState}" aria-label="Navegação principal">
       <div class="sidebar__brand">
         <a href="${escape(homeHref)}" class="sidebar__logo" aria-label="Ligas Tech — página inicial">
-          <img src="/assets/icons/logo.svg" alt="Ligas Tech" class="sidebar__logo-img">
+          <img src="/assets/icons/Documento-removebg-preview.png" alt="Ligas Tech" class="sidebar__logo-img">
         </a>
         <button class="sidebar__toggle" type="button" aria-label="${toggleLabel}" aria-expanded="${isExpanded}">${toggleIcon}</button>
       </div>
