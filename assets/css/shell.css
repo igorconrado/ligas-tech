@@ -5,8 +5,8 @@
 
 .shell {
   --shell-accent: var(--text-primary);
-  --sidebar-width: 240px;
-  --topbar-height: 64px;
+  --sidebar-width: 192px;
+  --topbar-height: 44px;
 }
 
 .shell--bot  { --shell-accent: var(--accent-bot); }
@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--sp-4);
+  padding: 0 var(--sp-3);
   min-height: var(--topbar-height);
   border-bottom: 1px solid var(--border-subtle);
   gap: var(--sp-2);
@@ -64,10 +64,10 @@
 
 .sidebar__nav {
   flex: 1;
-  padding: var(--sp-4) var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
   overflow-y: auto;
 }
-.sidebar__group { margin-bottom: var(--sp-6); }
+.sidebar__group { margin-bottom: 10px; }
 .sidebar__group:last-child { margin-bottom: 0; }
 
 .sidebar__group-label {
@@ -76,7 +76,7 @@
   letter-spacing: var(--tr-caps);
   text-transform: uppercase;
   color: var(--text-tertiary);
-  margin: 0 0 var(--sp-2) var(--sp-3);
+  margin: 0 0 var(--sp-1) var(--sp-2);
   font-weight: 500;
 }
 .sidebar[data-state="collapsed"] .sidebar__group-label { display: none; }
@@ -92,13 +92,13 @@
 .sidebar__item {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-2) var(--sp-3);
+  gap: var(--sp-2);
+  padding: 7px var(--sp-3);
   border-left: 2px solid transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   color: var(--text-secondary);
   font-family: var(--font-body);
-  font-size: var(--fs-body-s);
+  font-size: var(--fs-label);
   font-weight: 500;
   text-decoration: none;
   transition: background var(--dur-fast), color var(--dur-fast), border-left-color var(--dur-fast);
@@ -120,7 +120,7 @@
   justify-content: center;
   color: inherit;
 }
-.sidebar__icon svg { width: 20px; height: 20px; }
+.sidebar__icon svg { width: 15px; height: 15px; }
 
 .sidebar[data-state="collapsed"] .sidebar__label { display: none; }
 .sidebar[data-state="collapsed"] .sidebar__item {
@@ -134,23 +134,23 @@
 }
 
 .sidebar__footer {
-  padding: var(--sp-3);
+  padding: var(--sp-2);
   border-top: 1px solid var(--border-subtle);
 }
 .sidebar__logout {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
   width: 100%;
-  padding: var(--sp-2) var(--sp-3);
+  padding: 5px var(--sp-2);
   border: none;
   background: transparent;
   color: var(--text-secondary);
   font-family: var(--font-body);
-  font-size: var(--fs-body-s);
+  font-size: var(--fs-label);
   font-weight: 500;
   cursor: pointer;
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   transition: background var(--dur-fast), color var(--dur-fast);
   text-align: left;
 }
@@ -222,6 +222,67 @@
 }
 .topbar__avatar:hover { background: var(--bg-surface-3); }
 
+/* ── Dropdown avatar ── */
+.topbar__dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + var(--sp-2));
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-3);
+  z-index: var(--z-modal);
+  overflow: hidden;
+}
+.topbar__dropdown.is-open { display: block; }
+
+.topbar__dropdown-header {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.topbar__dropdown-name {
+  font-size: var(--fs-body-s);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar__dropdown-email {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--fs-body-s);
+  font-weight: 500;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.topbar__dropdown-item:hover {
+  background: var(--bg-surface-3);
+  color: var(--text-primary);
+}
+.topbar__dropdown-logout { color: var(--text-secondary); }
+.topbar__dropdown-logout:hover { color: var(--danger); }
+
 /* Content area dentro do shell */
 .shell__main > main,
 .shell__main > #main-content {
@@ -252,4 +313,64 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sidebar, .shell__main { transition: none; }
+}
+
+/* ────────── ISOLATION — reset de estilos globais da landing ────────── */
+
+/* global.css seta cursor:none para o cursor customizado da home.
+   No shell o cursor nativo deve aparecer normalmente. */
+.shell,
+.shell * {
+  cursor: auto;
+}
+.shell button,
+.shell a,
+.shell [role="button"],
+.shell .sidebar__toggle,
+.shell .sidebar__logout,
+.shell .topbar__hamburger,
+.shell .topbar__avatar {
+  cursor: pointer;
+}
+
+/* components.css tem `nav { position: fixed; ... }` para a navbar da landing.
+   Dentro do shell o <nav> da sidebar deve ser estático e com display block
+   (display:flex aqui quebraria o layout interno dos grupos). */
+.shell nav {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  height: auto;
+  z-index: auto;
+  padding: 0;
+  border-bottom: none;
+  background: none;
+  backdrop-filter: none;
+  display: block;
+}
+
+/* components.css tem .topbar com height:52px e backdrop-filter.
+   O topbar do shell já tem seus estilos — garantir que não conflitem. */
+.shell .topbar {
+  height: var(--topbar-height);
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 var(--sp-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  position: sticky;
+  top: 0;
+  z-index: calc(var(--z-header) - 1);
+  backdrop-filter: none;
+}
+
+/* components.css tem .sidebar com background e border do layout antigo.
+   O shell usa tokens semânticos — garantir que as cores corretas prevaleçam. */
+.shell .sidebar {
+  background: var(--bg-surface-1);
+  border-right: 1px solid var(--border-subtle);
+  z-index: var(--z-header);
 }

@@ -5,19 +5,16 @@ export async function registrarAdvertencia(membroId, tipo, descricao) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('advertencias')
     .insert({
       membro_id: membroId,
-      tipo, // 'leve' ou 'grave'
+      tipo,
       descricao,
       registrado_por: user.id
-    })
-    .select()
-    .single();
+    });
 
   if (error) throw error;
-  return data;
 }
 
 // Diretoria: listar advertências de um membro
@@ -53,7 +50,7 @@ export async function getMinhasAdvertencias() {
     .from('membros')
     .select('id')
     .eq('usuario_id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!membro) return [];
 

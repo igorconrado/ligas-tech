@@ -380,3 +380,11 @@ body { font-size: var(--fs-label); min-height: 100vh; }
   color: var(--mid);
   line-height: 1.6;
 }
+
+/* Onboarding overlay fica fora do .shell no DOM, então herda cursor:none do body.
+   Restaurar cursor nativo para todo o overlay e seus filhos interativos. */
+.onboarding-overlay,
+.onboarding-overlay * { cursor: auto; }
+.onboarding-overlay input,
+.onboarding-overlay textarea { cursor: text; }
+.onboarding-overlay button { cursor: pointer; }

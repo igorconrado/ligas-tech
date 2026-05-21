@@ -8,17 +8,18 @@ export async function registrarPresenca(codigoDigitado) {
     .from('membros')
     .select('id, liga_id')
     .eq('usuario_id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!membro) throw new Error('Perfil de membro não encontrado');
 
-  const { data: encontro } = await supabase
+  let encontroQuery = supabase
     .from('encontros')
     .select('id, codigo_expira_em, aberto')
     .eq('codigo_presenca', codigoDigitado.trim())
-    .eq('liga_id', membro.liga_id)
-    .eq('aberto', true)
-    .single();
+    .eq('aberto', true);
+  if (membro.liga_id) encontroQuery = encontroQuery.eq('liga_id', membro.liga_id);
+
+  const { data: encontro } = await encontroQuery.maybeSingle();
 
   if (!encontro) throw new Error('Código inválido ou expirado');
   if (new Date(encontro.codigo_expira_em) < new Date()) throw new Error('Código expirado. Peça um novo à diretoria');
@@ -28,7 +29,7 @@ export async function registrarPresenca(codigoDigitado) {
     .select('id')
     .eq('membro_id', membro.id)
     .eq('encontro_id', encontro.id)
-    .single();
+    .maybeSingle();
 
   if (jaExiste) throw new Error('Presença já registrada neste encontro');
 
@@ -45,7 +46,7 @@ export async function getMinhasPresencas() {
   if (!user) return [];
 
   const { data: membro } = await supabase
-    .from('membros').select('id').eq('usuario_id', user.id).single();
+    .from('membros').select('id').eq('usuario_id', user.id).maybeSingle();
   if (!membro) return [];
 
   const { data, error } = await supabase
@@ -71,15 +72,13 @@ export async function abrirChamada(encontroId) {
   const codigo = Math.floor(100000 + Math.random() * 900000).toString();
   const expira = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('encontros')
     .update({ codigo_presenca: codigo, codigo_expira_em: expira, aberto: true })
-    .eq('id', encontroId)
-    .select()
-    .single();
+    .eq('id', encontroId);
 
   if (error) throw error;
-  return { codigo, expira, encontro: data };
+  return { codigo, expira };
 }
 
 export async function fecharChamada(encontroId) {

@@ -5,7 +5,7 @@ export async function getAvisos() {
   if (!user) return [];
 
   const { data: usuario } = await supabase
-    .from('usuarios').select('liga_id').eq('id', user.id).single();
+    .from('usuarios').select('liga_id').eq('id', user.id).maybeSingle();
 
   const { data, error } = await supabase
     .from('avisos')
@@ -22,12 +22,9 @@ export async function publicarAviso(titulo, mensagem, ligaId = null) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('avisos')
-    .insert({ titulo, mensagem, liga_id: ligaId, publicado_por: user.id })
-    .select()
-    .single();
+    .insert({ titulo, mensagem, liga_id: ligaId, publicado_por: user.id });
 
   if (error) throw error;
-  return data;
 }

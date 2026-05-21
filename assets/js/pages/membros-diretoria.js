@@ -24,7 +24,7 @@ async function carregar() {
   const tbl = $('membros-tbl');
   tbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
   try {
-    const data = await getMembrosLiga();
+    const data = await getMembrosLiga(ligaId);
     members = data.map(m => ({
       id: m.id, name: m.nome, liga: m.ligas?.nome || '—',
       presenca: 0, entregas: '—', status: 'ok', adv: 0,
@@ -50,12 +50,18 @@ $('filter-liga').addEventListener('change', (e) => { filterLigaVal = e.target.va
 async function handleCadastrarMembro() {
   const nome = $('novo-nome')?.value?.trim();
   const email = $('novo-email')?.value?.trim();
-  const liga = $('nova-liga')?.value;
-  if (!nome || !email || !liga) { toast.error('Preencha todos os campos.'); return; }
+  const ligaNome = $('nova-liga')?.value;
+  if (!nome || !email || !ligaNome) { toast.error('Preencha todos os campos.'); return; }
   if (!email.endsWith('@alunos.ibmec.edu.br')) { toast.error('Use o email @alunos.ibmec.edu.br'); return; }
   const matricula = email.replace('@alunos.ibmec.edu.br', '');
   try {
-    const { error } = await supabase.from('emails_autorizados').insert({ email, nome, matricula });
+    const { data: ligaData } = await supabase
+      .from('ligas').select('id').eq('nome', ligaNome).maybeSingle();
+    const liga_id = ligaData?.id || null;
+
+    const { error } = await supabase
+      .from('emails_autorizados')
+      .insert({ email, nome, matricula, liga_id });
     if (error) throw error;
     closeModal('modal-novo-membro');
     await carregar();
