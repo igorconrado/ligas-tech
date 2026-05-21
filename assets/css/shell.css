@@ -336,7 +336,8 @@
 }
 
 /* components.css tem `nav { position: fixed; ... }` para a navbar da landing.
-   Dentro do shell o <nav> da sidebar deve ser estático. */
+   Dentro do shell o <nav> da sidebar deve ser estático e com display block
+   (display:flex aqui quebraria o layout interno dos grupos). */
 .shell nav {
   position: static;
   top: auto;
@@ -348,8 +349,7 @@
   border-bottom: none;
   background: none;
   backdrop-filter: none;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 /* components.css tem .topbar com height:52px e backdrop-filter.
