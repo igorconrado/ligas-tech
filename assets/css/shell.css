@@ -43,7 +43,7 @@
   display: flex;
   align-items: center;
 }
-.sidebar__logo-img { height: 28px; width: auto; display: block; }
+.sidebar__logo-img { height: 40px; width: auto; display: block; }
 .sidebar[data-state="collapsed"] .sidebar__logo { display: none; }
 .sidebar[data-state="collapsed"] .sidebar__brand { justify-content: center; padding: 0 var(--sp-2); }
 
