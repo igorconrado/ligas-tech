@@ -5,7 +5,14 @@ import { getEncontros } from '/assets/js/supabase/presenca.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows } from '/assets/js/ui/skeleton.js';
 
-await shell.mount({ activeRoute: '/membros/cronograma', pageTitle: 'Cronograma' });
+try {
+  await shell.mount({ activeRoute: '/membros/cronograma', pageTitle: 'Cronograma' });
+} catch (e) {
+  if (e.message !== 'Redirecionando' && e.message !== 'Não autenticado') {
+    document.body.innerHTML = `<div style="padding:2rem;color:#fff;font-family:monospace">Erro ao iniciar página: ${e.message}</div>`;
+  }
+  throw e;
+}
 
 const container = document.getElementById('timeline-container');
 container.innerHTML = skeletonRows(4);
@@ -58,11 +65,12 @@ try {
     }).join('');
   }
 } catch (e) {
-  if (e.message === 'sem liga_id') return;
-  console.error('Erro ao carregar cronograma:', e);
-  renderEmptyState(container, {
-    icon: icons.calendar,
-    title: 'Erro ao carregar cronograma',
-    description: 'Tente recarregar a página.',
-  });
+  if (e.message !== 'sem liga_id') {
+    console.error('Erro ao carregar cronograma:', e);
+    renderEmptyState(container, {
+      icon: icons.calendar,
+      title: 'Erro ao carregar cronograma',
+      description: 'Tente recarregar a página.',
+    });
+  }
 }
