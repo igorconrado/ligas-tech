@@ -69,16 +69,9 @@ export function calcularAlertaFrequencia(presencas, totalEncontros) {
 }
 
 export async function abrirChamada(encontroId) {
-  const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-  const expira = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-
-  const { error } = await supabase
-    .from('encontros')
-    .update({ codigo_presenca: codigo, codigo_expira_em: expira, aberto: true })
-    .eq('id', encontroId);
-
+  const { data, error } = await supabase.rpc('abrir_chamada', { encontro_id: encontroId });
   if (error) throw error;
-  return { codigo, expira };
+  return { codigo: data.codigo, expira: data.expira };
 }
 
 export async function fecharChamada(encontroId) {
