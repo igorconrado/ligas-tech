@@ -1,10 +1,10 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login ‚Äî √Årea de Membros ¬∑ IbBot & IbTech</title>
-<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Login ó ¡rea de Membros ∑ IbBot & IbTech</title>
+<link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="/assets/css/tokens.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="/assets/css/ui/a11y.css">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Pular para o conte√∫do</a>
+<a href="#main-content" class="skip-link">Pular para o conte˙do</a>
 <main class="page" id="main-content">
 
   <!-- LEFT -->
@@ -27,8 +27,8 @@
         <span class="slash">/</span>
         <span class="w">Ib</span><span class="b">Tech</span>
       </a>
-      <h1 class="left-heading">√ÅREA DE<br>MEMBROS.</h1>
-      <p class="left-sub">Acesse o portal das ligas ‚Äî cronograma, aulas, entregas e presen√ßa. Exclusivo pra membros ativos da Ibmec BH.</p>
+      <h1 class="left-heading">¡REA DE<br>MEMBROS.</h1>
+      <p class="left-sub">Acesse o portal das ligas ó cronograma, aulas, entregas e presenÁa. Exclusivo pra membros ativos da Ibmec BH.</p>
     </div>
     <div class="left-bottom">
       <div class="left-tags">
@@ -37,7 +37,7 @@
         <span class="ltag w">Cronograma</span>
         <span class="ltag w">Aulas</span>
         <span class="ltag w">Entregas</span>
-        <span class="ltag w">Presen√ßa</span>
+        <span class="ltag w">PresenÁa</span>
         <span class="ltag w">Diretoria</span>
       </div>
     </div>
@@ -46,7 +46,7 @@
   <!-- RIGHT -->
   <div class="right">
     <div class="login-box">
-      <div class="login-kicker">√Årea restrita ¬∑ Ibmec BH</div>
+      <div class="login-kicker">¡rea restrita ∑ Ibmec BH</div>
       <div class="login-title">ENTRAR</div>
       <div class="login-sub">Use seu email institucional pra acessar.</div>
 
@@ -61,18 +61,18 @@
         </div>
         <div class="form-error" id="err-email" style="display:none"></div>
         <button class="login-btn" id="btn-continuar" onclick="handleContinuar()">
-          Continuar ‚Üí
+          Continuar ?
         </button>
       </div>
 
       <!-- STEP 2: Bloqueado -->
       <div id="step-bloqueado" style="display:none">
         <div class="login-blocked">
-          <div class="blocked-icon">‚Äî</div>
-          <p class="blocked-title">√Årea exclusiva para membros</p>
-          <p class="blocked-sub">Este email n√£o est√° na lista de membros autorizados. Se voc√™ foi aprovado no processo seletivo e est√° tendo problemas, entre em contato com a diretoria.</p>
+          <div class="blocked-icon">ó</div>
+          <p class="blocked-title">¡rea exclusiva para membros</p>
+          <p class="blocked-sub">Este email n„o est· na lista de membros autorizados. Se vocÍ foi aprovado no processo seletivo e est· tendo problemas, entre em contato com a diretoria.</p>
         </div>
-        <button class="login-back" onclick="voltarEmail()">‚Üê Usar outro email</button>
+        <button class="login-back" onclick="voltarEmail()">? Usar outro email</button>
       </div>
 
       <!-- STEP 3: Criar senha (primeiro acesso) -->
@@ -82,7 +82,7 @@
         <div class="form-group" style="margin-bottom:.75rem">
           <label class="form-label">Criar senha</label>
           <input class="form-input" type="password" id="input-senha-criar"
-                 placeholder="M√≠nimo 8 caracteres"
+                 placeholder="MÌnimo 8 caracteres"
                  autocomplete="new-password">
         </div>
         <div class="form-group" style="margin-bottom:1.25rem">
@@ -93,25 +93,25 @@
         </div>
         <div class="form-error" id="err-criar" style="display:none"></div>
         <button class="login-btn" id="btn-criar" onclick="handleCriar()">
-          Criar conta e entrar ‚Üí
+          Criar conta e entrar ?
         </button>
-        <button class="login-back" onclick="voltarEmail()">‚Üê Usar outro email</button>
+        <button class="login-back" onclick="voltarEmail()">? Usar outro email</button>
       </div>
 
-      <!-- STEP 4: Logar (j√° tem conta) -->
+      <!-- STEP 4: Logar (j· tem conta) -->
       <div id="step-logar" style="display:none">
         <div class="login-email-display" id="display-email-logar"></div>
         <div class="form-group" style="margin-bottom:1.25rem">
           <label class="form-label">Senha</label>
           <input class="form-input" type="password" id="input-senha-logar"
-                 placeholder="‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢"
+                 placeholder="ïïïïïïïï"
                  autocomplete="current-password">
         </div>
         <div class="form-error" id="err-logar" style="display:none"></div>
         <button class="login-btn" id="btn-logar" onclick="handleLogar()">
-          Entrar ‚Üí
+          Entrar ?
         </button>
-        <button class="login-back" onclick="voltarEmail()">‚Üê Usar outro email</button>
+        <button class="login-back" onclick="voltarEmail()">? Usar outro email</button>
       </div>
 
       <!-- STEP loading -->
@@ -124,7 +124,7 @@
 
       <div class="login-footer">
         Problemas pra acessar? Fale com a diretoria.<br>
-        <a href="/">‚Üê Voltar pro site</a>
+        <a href="/">? Voltar pro site</a>
       </div>
     </div>
   </div>
@@ -134,7 +134,7 @@
 <script type="module">
 import { emailValido, emailAutorizado, emailTemConta, criarConta, fazerLogin, getSession, getDashboardUrl } from '/assets/js/supabase/auth.js';
 
-// Redireciona se j√° logado
+// Redireciona se j· logado
 getSession().then(async s => { if (s) window.location.href = await getDashboardUrl(); });
 
 let emailAtual = '';
@@ -184,24 +184,24 @@ window.handleContinuar = async function() {
   document.getElementById('loading-text').textContent = 'Verificando...';
 
   try {
-    // 1. Verifica se est√° autorizado
+    // 1. Verifica se est· autorizado
     const { autorizado } = await emailAutorizado(emailAtual);
     if (!autorizado) {
       showStep('step-bloqueado');
       return;
     }
 
-    // 2. Verifica se j√° tem conta
+    // 2. Verifica se j· tem conta
     document.getElementById('loading-text').textContent = 'Carregando...';
     const temConta = await emailTemConta(emailAtual);
 
     if (temConta) {
-      // J√° tem conta ‚Üí pede s√≥ a senha
+      // J· tem conta ? pede sÛ a senha
       document.getElementById('display-email-logar').textContent = emailAtual;
       showStep('step-logar');
       document.getElementById('input-senha-logar').focus();
     } else {
-      // Primeiro acesso ‚Üí cria senha
+      // Primeiro acesso ? cria senha
       document.getElementById('display-email-criar').textContent = emailAtual;
       showStep('step-criar');
       document.getElementById('input-senha-criar').focus();
@@ -217,9 +217,9 @@ window.handleCriar = async function() {
   const senha2 = document.getElementById('input-senha-criar2').value;
   hideErr('err-criar');
 
-  if (senha.length < 8) return showErr('err-criar', 'A senha precisa ter no m√≠nimo 8 caracteres.');
+  if (senha.length < 8) return showErr('err-criar', 'A senha precisa ter no mÌnimo 8 caracteres.');
   if (senha !== senha2) {
-    showErr('err-criar', 'As senhas n√£o coincidem.');
+    showErr('err-criar', 'As senhas n„o coincidem.');
     document.getElementById('input-senha-criar2').value = '';
     document.getElementById('input-senha-criar2').focus();
     return;
@@ -232,14 +232,14 @@ window.handleCriar = async function() {
     sessionStorage.setItem('primeiro_acesso', '1');
     window.location.href = await getDashboardUrl();
   } catch (e) {
-    // Se a conta j√° existe, tenta logar direto com a senha informada
+    // Se a conta j· existe, tenta logar direto com a senha informada
     try {
       await fazerLogin(emailAtual, senha);
       window.location.href = await getDashboardUrl();
       return;
     } catch (_) { /* login falhou, mostra erro original */ }
 
-    setBtn('btn-criar', false, 'Criar conta e entrar ‚Üí');
+    setBtn('btn-criar', false, 'Criar conta e entrar ?');
     showErr('err-criar', 'Erro ao criar conta. Tente novamente.');
   }
 };
@@ -256,14 +256,14 @@ window.handleLogar = async function() {
     await fazerLogin(emailAtual, senha);
     window.location.href = await getDashboardUrl();
   } catch (e) {
-    setBtn('btn-logar', false, 'Entrar ‚Üí');
+    setBtn('btn-logar', false, 'Entrar ?');
     document.getElementById('input-senha-logar').value = '';
     document.getElementById('input-senha-logar').focus();
     showErr('err-logar', 'Senha incorreta. Tente novamente.');
   }
 };
 
-// Enter avan√ßa o step atual
+// Enter avanÁa o step atual
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   const visible = steps.find(s => document.getElementById(s)?.style.display !== 'none');
