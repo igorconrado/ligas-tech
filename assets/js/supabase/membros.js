@@ -16,7 +16,7 @@ export async function getMeuPerfil() {
 export async function getMembrosLiga(ligaId = null) {
   let query = supabase
     .from('membros')
-    .select('*, ligas(nome, cor), usuarios(role)')
+    .select('*, ligas(nome, cor)')
     .eq('ativo', true)
     .order('nome');
 
@@ -24,7 +24,7 @@ export async function getMembrosLiga(ligaId = null) {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function atualizarPerfil(updates) {
