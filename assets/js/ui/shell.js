@@ -111,13 +111,16 @@ function buildSidebar(nav, activeRoute, homeHref, initialState) {
   `;
 }
 
-function buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref }) {
+function buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl }) {
+  const avatarContent = avatarUrl
+    ? `<img src="${escape(avatarUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
+    : escape(initial);
   return `
     <header class="topbar">
       <button class="topbar__hamburger" type="button" aria-label="Abrir menu" aria-expanded="false">${icons.menu}</button>
       <h1 class="topbar__title">${escape(pageTitle)}</h1>
       <div class="topbar__user">
-        <button class="topbar__avatar" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="topbar-dropdown">${escape(initial)}</button>
+        <button class="topbar__avatar" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="topbar-dropdown">${avatarContent}</button>
         <div class="topbar__dropdown" id="topbar-dropdown" role="menu" aria-hidden="true">
           <div class="topbar__dropdown-header">
             <p class="topbar__dropdown-name">${escape(userName)}</p>
@@ -149,8 +152,9 @@ async function mount({ activeRoute, pageTitle } = {}) {
   const perfilHref = isDiretoria ? '/membros/diretoria/perfil' : '/membros/perfil';
   const userEmail = session?.user?.email || '';
   const emailLocal = userEmail.split('@')[0] || 'U';
-  const userName = emailLocal;
-  const initial = (emailLocal[0] || 'U').toUpperCase();
+  const userName = usuario?.membros?.nome || emailLocal;
+  const initial = (userName[0] || 'U').toUpperCase();
+  const avatarUrl = usuario?.membros?.avatar_url || null;
 
   const existingMain = document.getElementById('main-content');
   if (!existingMain) {
@@ -176,7 +180,7 @@ async function mount({ activeRoute, pageTitle } = {}) {
     ${buildSidebar(nav, activeRoute, homeHref, initialState)}
     <div class="shell__backdrop"></div>
     <div class="shell__main">
-      ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref })}
+      ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl })}
     </div>
   `;
   shellWrap.querySelector('.shell__main').appendChild(existingMain);

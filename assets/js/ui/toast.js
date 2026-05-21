@@ -23,12 +23,12 @@ function injectStyle() {
   style.textContent = `
     #${CONTAINER_ID} {
       position: fixed;
-      top: 16px;
+      top: 60px;
       right: 16px;
       display: flex;
       flex-direction: column-reverse;
       gap: 8px;
-      z-index: var(--z-overlay, 50);
+      z-index: calc(var(--z-modal, 1000) + 1);
       pointer-events: none;
     }
     .ligas-toast {

@@ -175,11 +175,10 @@
   height: var(--topbar-height);
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0 var(--sp-5);
+  padding: 0 var(--sp-5) 0 var(--sp-4);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   position: sticky;
   top: 0;
   z-index: calc(var(--z-header) - 1);
@@ -356,11 +355,10 @@
   height: var(--topbar-height);
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0 var(--sp-5);
+  padding: 0 var(--sp-5) 0 var(--sp-4);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   position: sticky;
   top: 0;
   z-index: calc(var(--z-header) - 1);

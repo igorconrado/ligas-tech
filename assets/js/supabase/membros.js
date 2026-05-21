@@ -43,6 +43,33 @@ export async function atualizarPerfil(updates) {
   }
 }
 
+export async function uploadAvatar(file) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Não autenticado');
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${user.id}/avatar.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (uploadError) {
+    if (uploadError.message?.includes('Bucket not found')) {
+      throw new Error('Bucket de storage não configurado. Crie o bucket "avatars" no Supabase Dashboard → Storage.');
+    }
+    throw uploadError;
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(path);
+
+  // Adiciona cache-buster para forçar reload da imagem após troca
+  const url = `${publicUrl}?t=${Date.now()}`;
+  await atualizarPerfil({ avatar_url: url });
+  return url;
+}
+
 export async function completarOnboarding(dados) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');

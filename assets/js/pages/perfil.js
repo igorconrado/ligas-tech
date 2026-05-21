@@ -1,6 +1,6 @@
 // ── Página: Meu Perfil (membro e diretoria) ──
 import { shell } from '/assets/js/ui/shell.js';
-import { getMeuPerfil, atualizarPerfil } from '/assets/js/supabase/membros.js';
+import { getMeuPerfil, atualizarPerfil, uploadAvatar } from '/assets/js/supabase/membros.js';
 import { getMinhasPresencas } from '/assets/js/supabase/presenca.js';
 import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -18,6 +18,16 @@ function ligaCor(perfil) {
   return 'w';
 }
 
+function setAvatar(url, inicial) {
+  const av = $('perfil-av');
+  if (!av) return;
+  if (url) {
+    av.innerHTML = `<img src="${url}" alt="Avatar">`;
+  } else {
+    av.innerHTML = `<span id="perfil-av-text">${inicial}</span>`;
+  }
+}
+
 async function carregar() {
   const perfil = await getMeuPerfil();
   if (!perfil) return;
@@ -28,7 +38,7 @@ async function carregar() {
   const cor = ligaCor(perfil);
 
   $('perfil-name-display').textContent = nome;
-  $('perfil-av-text').textContent = inicial;
+  setAvatar(perfil.avatar_url, inicial);
   $('p-nome').value = nome;
   $('p-linkedin').value = perfil.linkedin || '';
   $('p-github').value = perfil.github || '';
@@ -98,4 +108,27 @@ async function savePerfil() {
 }
 
 document.getElementById('btn-salvar-perfil')?.addEventListener('click', savePerfil);
+
+document.getElementById('input-avatar')?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const MAX = 2 * 1024 * 1024;
+  if (file.size > MAX) {
+    toast.error('Imagem muito grande. Máximo: 2 MB');
+    e.target.value = '';
+    return;
+  }
+
+  try {
+    const url = await uploadAvatar(file);
+    setAvatar(url, '');
+    toast.success('Foto atualizada');
+  } catch (err) {
+    toast.error(err.message || 'Erro ao enviar foto');
+  } finally {
+    e.target.value = '';
+  }
+});
+
 carregar();
