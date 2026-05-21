@@ -43,8 +43,12 @@
   font-size: var(--fs-body-l);
   color: var(--text-primary);
   text-decoration: none;
-  letter-spacing: var(--tr-tight);
-  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sidebar__logo-img {
+  height: 28px;
+  width: auto;
+  color: var(--text-primary);
 }
 .sidebar[data-state="collapsed"] .sidebar__logo { display: none; }
 .sidebar[data-state="collapsed"] .sidebar__brand { justify-content: center; padding: 0 var(--sp-2); }
