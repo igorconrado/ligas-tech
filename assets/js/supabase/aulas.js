@@ -114,6 +114,12 @@ export async function getTodasAulas(ligaId) {
   return data || [];
 }
 
+// Diretoria: excluir aula
+export async function deletarAula(aulaId) {
+  const { error } = await supabase.from('aulas').delete().eq('id', aulaId);
+  if (error) throw error;
+}
+
 // Diretoria: ver entregas de uma aula específica
 export async function getEntregasAula(aulaId) {
   const { data, error } = await supabase

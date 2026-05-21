@@ -103,7 +103,14 @@ async function savePresenca() {
 async function handleCriarEncontro() {
   const titulo = $('encontro-titulo')?.value?.trim();
   const data = $('encontro-data')?.value;
-  if (!titulo || !data) return;
+  if (!titulo || !data) {
+    toast.error('Preencha o título e a data.');
+    return;
+  }
+  if (!ligaId) {
+    toast.error('Seu perfil não está vinculado a uma liga.');
+    return;
+  }
   try {
     await criarEncontro(ligaId, titulo, data);
     closeModal('modal-encontro');

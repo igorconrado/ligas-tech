@@ -60,4 +60,9 @@ try {
   }
 } catch (e) {
   console.error('Erro ao carregar aulas:', e);
+  renderEmptyState(grid, {
+    icon: icons.book,
+    title: 'Erro ao carregar aulas',
+    description: 'Tente recarregar a página.',
+  });
 }

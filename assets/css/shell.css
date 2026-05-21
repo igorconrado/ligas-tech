@@ -175,11 +175,10 @@
   height: var(--topbar-height);
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0 var(--sp-5);
+  padding: 0 var(--sp-5) 0 var(--sp-4);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   position: sticky;
   top: 0;
   z-index: calc(var(--z-header) - 1);
@@ -317,22 +316,6 @@
 
 /* ────────── ISOLATION — reset de estilos globais da landing ────────── */
 
-/* global.css seta cursor:none para o cursor customizado da home.
-   No shell o cursor nativo deve aparecer normalmente. */
-.shell,
-.shell * {
-  cursor: auto;
-}
-.shell button,
-.shell a,
-.shell [role="button"],
-.shell .sidebar__toggle,
-.shell .sidebar__logout,
-.shell .topbar__hamburger,
-.shell .topbar__avatar {
-  cursor: pointer;
-}
-
 /* components.css tem `nav { position: fixed; ... }` para a navbar da landing.
    Dentro do shell o <nav> da sidebar deve ser estático e com display block
    (display:flex aqui quebraria o layout interno dos grupos). */
@@ -356,11 +339,10 @@
   height: var(--topbar-height);
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0 var(--sp-5);
+  padding: 0 var(--sp-5) 0 var(--sp-4);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   position: sticky;
   top: 0;
   z-index: calc(var(--z-header) - 1);

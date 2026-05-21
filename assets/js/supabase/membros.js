@@ -4,14 +4,13 @@ export async function getMeuPerfil() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data, error } = await supabase
-    .from('membros')
-    .select('*, ligas(nome, cor)')
-    .eq('usuario_id', user.id)
-    .maybeSingle();
+  const [{ data, error }, { data: usuarioData }] = await Promise.all([
+    supabase.from('membros').select('*, ligas(nome, cor)').eq('usuario_id', user.id).maybeSingle(),
+    supabase.from('usuarios').select('role').eq('id', user.id).maybeSingle(),
+  ]);
 
   if (error) throw error;
-  return data;
+  return data ? { ...data, role: usuarioData?.role || 'membro' } : null;
 }
 
 export async function getMembrosLiga(ligaId = null) {
@@ -41,6 +40,33 @@ export async function atualizarPerfil(updates) {
     console.error('[atualizarPerfil] erro Supabase:', error);
     throw error;
   }
+}
+
+export async function uploadAvatar(file) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Não autenticado');
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${user.id}/avatar.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (uploadError) {
+    if (uploadError.message?.includes('Bucket not found')) {
+      throw new Error('Bucket de storage não configurado. Crie o bucket "avatars" no Supabase Dashboard → Storage.');
+    }
+    throw uploadError;
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(path);
+
+  // Adiciona cache-buster para forçar reload da imagem após troca
+  const url = `${publicUrl}?t=${Date.now()}`;
+  await atualizarPerfil({ avatar_url: url });
+  return url;
 }
 
 export async function completarOnboarding(dados) {

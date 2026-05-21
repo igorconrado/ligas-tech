@@ -19,9 +19,9 @@ export async function initPage({ requireRole = 'any' } = {}) {
 
   const { data: usuario } = await supabase
     .from('usuarios')
-    .select('role, liga_id, ligas(nome)')
+    .select('role, liga_id, ligas(nome), membros(nome, avatar_url)')
     .eq('id', session.user.id)
-    .single();
+    .maybeSingle();
 
   const isDiretoria = ROLES_DIRETORIA.includes(usuario?.role);
 

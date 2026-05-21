@@ -1,7 +1,8 @@
 // ── Página: Avisos (diretoria) ──
 import { shell } from '/assets/js/ui/shell.js';
 import { supabase } from '/assets/js/supabase/client.js';
-import { publicarAviso, getAvisos } from '/assets/js/supabase/avisos.js';
+import { publicarAviso, getAvisos, deletarAviso } from '/assets/js/supabase/avisos.js';
+import { confirmDialog } from '/assets/js/ui/confirm.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -24,7 +25,10 @@ function renderizar(avisos) {
     <div class="aviso-item">
       <div class="aviso-head">
         <div class="aviso-title-text">${a.titulo}</div>
-        <div class="aviso-date">${new Date(a.criado_em).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</div>
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <div class="aviso-date">${new Date(a.criado_em).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</div>
+          <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px;color:var(--red)" onclick="handleDeletarAviso('${a.id}', '${a.titulo.replace(/'/g, "\\'")}')">Excluir</button>
+        </div>
       </div>
       <div class="aviso-body">${a.mensagem}</div>
     </div>
@@ -54,7 +58,26 @@ async function handlePublicarAviso() {
     toast.error(e.message || 'Erro ao publicar aviso');
   }
 }
+async function handleDeletarAviso(avisoId, titulo) {
+  const ok = await confirmDialog({
+    title: 'Excluir aviso?',
+    message: `"${titulo}" será removido permanentemente.`,
+    confirmLabel: 'Excluir',
+    danger: true,
+  });
+  if (!ok) return;
+  try {
+    await deletarAviso(avisoId);
+    renderizar(await getAvisos());
+    toast.success('Aviso excluído.');
+  } catch (e) {
+    console.error('Erro ao excluir aviso:', e);
+    toast.error(e.message || 'Erro ao excluir aviso');
+  }
+}
+
 window.publishAviso = handlePublicarAviso;
+window.handleDeletarAviso = handleDeletarAviso;
 
 const lista = $('avisos-lista');
 lista.innerHTML = skeletonRows(3);
