@@ -99,7 +99,7 @@ async function submitEntrega() {
   }
 }
 
-window.submitEntrega = submitEntrega;
+document.getElementById('btn-submit-entrega')?.addEventListener('click', submitEntrega);
 
 // Initial load
 const tbody = $('tbody-entregas');

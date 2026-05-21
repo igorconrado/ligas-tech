@@ -32,15 +32,15 @@ export async function atualizarPerfil(updates) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('membros')
     .update(updates)
-    .eq('usuario_id', user.id)
-    .select()
-    .single();
+    .eq('usuario_id', user.id);
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error('[atualizarPerfil] erro Supabase:', error);
+    throw error;
+  }
 }
 
 export async function completarOnboarding(dados) {
@@ -55,30 +55,41 @@ export async function completarOnboarding(dados) {
     onboarding_completo: true
   };
 
-  // Check if membros row already exists
+  // Verifica se linha em membros já existe
   const { data: existing } = await supabase
     .from('membros')
     .select('id')
     .eq('usuario_id', user.id)
     .maybeSingle();
 
-  let data, error;
+  let error;
 
   if (existing) {
-    ({ data, error } = await supabase
+    ({ error } = await supabase
       .from('membros')
       .update(payload)
-      .eq('usuario_id', user.id)
-      .select()
-      .single());
+      .eq('usuario_id', user.id));
   } else {
-    ({ data, error } = await supabase
+    // Busca liga_id pré-atribuída pela diretoria em emails_autorizados
+    const { data: emailData } = await supabase
+      .from('emails_autorizados')
+      .select('liga_id')
+      .eq('email', user.email)
+      .maybeSingle();
+    const liga_id = emailData?.liga_id || null;
+
+    ({ error } = await supabase
       .from('membros')
-      .insert({ ...payload, usuario_id: user.id, ativo: true })
-      .select()
-      .single());
+      .insert({ ...payload, usuario_id: user.id, ativo: true, liga_id }));
+
+    // Sincroniza liga_id em usuarios também
+    if (liga_id) {
+      await supabase.from('usuarios').update({ liga_id }).eq('id', user.id);
+    }
   }
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    console.error('[completarOnboarding] erro Supabase:', error);
+    throw error;
+  }
 }
