@@ -41,6 +41,8 @@ function render() {
     (filterLigaVal === '' || m.liga === filterLigaVal)
   );
   renderMembrosTable($('membros-tbl'), filtered);
+  const countEl = $('membros-count');
+  if (countEl) countEl.textContent = filtered.length ? `(${filtered.length})` : '';
 }
 
 $('filter-search').addEventListener('input', (e) => { filterText = e.target.value.toLowerCase(); render(); });

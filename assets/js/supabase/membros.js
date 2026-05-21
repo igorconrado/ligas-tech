@@ -16,7 +16,7 @@ export async function getMeuPerfil() {
 export async function getMembrosLiga(ligaId = null) {
   let query = supabase
     .from('membros')
-    .select('*, ligas(nome, cor), usuarios(role)')
+    .select('*, ligas(nome, cor)')
     .eq('ativo', true)
     .order('nome');
 
@@ -24,7 +24,7 @@ export async function getMembrosLiga(ligaId = null) {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 }
 
 export async function atualizarPerfil(updates) {
@@ -96,22 +96,26 @@ export async function completarOnboarding(dados) {
       .update(payload)
       .eq('usuario_id', user.id));
   } else {
-    // Busca liga_id pré-atribuída pela diretoria em emails_autorizados
+    // Busca liga_id pré-atribuída ou usa IbTech como padrão
     const { data: emailData } = await supabase
       .from('emails_autorizados')
       .select('liga_id')
       .eq('email', user.email)
       .maybeSingle();
-    const liga_id = emailData?.liga_id || null;
+
+    let liga_id = emailData?.liga_id || null;
+    if (!liga_id) {
+      const { data: ibtech } = await supabase
+        .from('ligas').select('id').eq('nome', 'IbTech').maybeSingle();
+      liga_id = ibtech?.id || null;
+    }
 
     ({ error } = await supabase
       .from('membros')
       .insert({ ...payload, usuario_id: user.id, ativo: true, liga_id }));
 
-    // Sincroniza liga_id em usuarios também
-    if (liga_id) {
-      await supabase.from('usuarios').update({ liga_id }).eq('id', user.id);
-    }
+    // Sempre sincroniza liga_id em usuarios
+    await supabase.from('usuarios').update({ liga_id }).eq('id', user.id);
   }
 
   if (error) {
