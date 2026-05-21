@@ -29,7 +29,7 @@ export async function registrarPresenca(codigoDigitado) {
     .select('id')
     .eq('membro_id', membro.id)
     .eq('encontro_id', encontro.id)
-    .single();
+    .maybeSingle();
 
   if (jaExiste) throw new Error('Presença já registrada neste encontro');
 

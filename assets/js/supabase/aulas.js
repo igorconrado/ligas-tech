@@ -43,7 +43,7 @@ export async function submeterEntrega(aulaId, repoUrl) {
   if (!user) throw new Error('Não autenticado');
 
   const { data: membro } = await supabase
-    .from('membros').select('id').eq('usuario_id', user.id).single();
+    .from('membros').select('id').eq('usuario_id', user.id).maybeSingle();
   if (!membro) throw new Error('Perfil não encontrado');
 
   const match = repoUrl.match(/github\.com\/([^/]+)\/([^/\s]+)/);
@@ -57,17 +57,14 @@ export async function submeterEntrega(aulaId, repoUrl) {
   const repoData = await res.json();
   if (repoData.private) throw new Error('O repositório precisa ser público');
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('entregas')
     .upsert(
       { membro_id: membro.id, aula_id: aulaId, repo_url: repoUrl, status: 'entregue', entregue_em: new Date().toISOString() },
       { onConflict: 'membro_id,aula_id' }
-    )
-    .select()
-    .single();
+    );
 
   if (error) throw error;
-  return data;
 }
 
 // Diretoria: criar aula
@@ -75,7 +72,7 @@ export async function criarAula(dados) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('aulas')
     .insert({
       liga_id: dados.liga_id,
@@ -85,25 +82,19 @@ export async function criarAula(dados) {
       material_url: dados.material_url || null,
       slides_url: dados.slides_url || null,
       publicada: dados.publicada ?? false
-    })
-    .select()
-    .single();
+    });
 
   if (error) throw error;
-  return data;
 }
 
 // Diretoria: editar aula
 export async function editarAula(aulaId, updates) {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('aulas')
     .update(updates)
-    .eq('id', aulaId)
-    .select()
-    .single();
+    .eq('id', aulaId);
 
   if (error) throw error;
-  return data;
 }
 
 // Diretoria: publicar ou despublicar aula
