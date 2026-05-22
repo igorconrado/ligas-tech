@@ -53,6 +53,9 @@ const NAV_DIRETORIA = [
     { label: 'Membros',      href: '/membros/diretoria/membros',      icon: 'members' },
     { label: 'Advertências', href: '/membros/diretoria/advertencias', icon: 'warnings' },
   ]},
+  { group: 'MINHA ÁREA', items: [
+    { label: 'Área de Membros', href: '/membros/dashboard', icon: 'members' },
+  ]},
 ];
 
 function escape(s) {
@@ -69,8 +72,9 @@ function readInitialSidebarState() {
   }
 }
 
-function buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoriaUser, isDiretoriaRoute) {
-  const extraLink = isDiretoriaUser && !isDiretoriaRoute
+function buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoriaUser, isDiretoriaRoute, memberCargo) {
+  const showDiretoriaLink = (isDiretoriaUser || memberCargo === 'diretor') && !isDiretoriaRoute;
+  const extraLink = showDiretoriaLink
     ? `<section class="sidebar__group">
         <h4 class="sidebar__group-label">DIRETORIA</h4>
         <ul><li>
@@ -189,7 +193,7 @@ async function mount({ activeRoute, pageTitle } = {}) {
     + (accentClass ? ' ' + accentClass : '')
     + (initialState === 'collapsed' ? ' shell--collapsed' : '');
   shellWrap.innerHTML = `
-    ${buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoria, isDiretoriaRoute)}
+    ${buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoria, isDiretoriaRoute, usuario?.membros?.cargo)}
     <div class="shell__backdrop"></div>
     <div class="shell__main">
       ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl })}
