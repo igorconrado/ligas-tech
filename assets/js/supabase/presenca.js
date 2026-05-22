@@ -21,8 +21,7 @@ export async function registrarPresenca(codigoDigitado) {
 
   const { data: encontro } = await encontroQuery.maybeSingle();
 
-  if (!encontro) throw new Error('Código inválido ou expirado');
-  if (new Date(encontro.codigo_expira_em) < new Date()) throw new Error('Código expirado. Peça um novo à diretoria');
+  if (!encontro) throw new Error('Código inválido. Verifique o código e tente novamente.');
 
   const { data: jaExiste } = await supabase
     .from('presencas')

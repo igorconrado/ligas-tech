@@ -301,6 +301,17 @@ async function handleSalvarPresencaEdit() {
   }
 }
 
+async function syncPresencasFromDB(encontroId) {
+  const presencas = await getPresencasEncontro(encontroId);
+  presentSet.clear();
+  presencas.forEach(p => {
+    if (p.status === 'presente') {
+      const idx = members.findIndex(m => m.id === p.membro_id);
+      if (idx !== -1) presentSet.add(idx);
+    }
+  });
+}
+
 async function handleAbrirChamada() {
   const encontroId = $('select-encontro')?.value;
   if (!encontroId) { toast.error('Selecione um encontro primeiro.'); return; }
@@ -314,10 +325,16 @@ async function handleAbrirChamada() {
     }
     openModal('qr-modal');
     chamadaAberta = true;
+    // Carrega presenças já existentes antes de renderizar
+    await syncPresencasFromDB(encontroId);
     renderPresenca();
     $('chamada-badge').textContent = 'Aberta';
     $('chamada-badge').className = 'chamada-badge open';
-    window._chamadaChannel = assinarPresencasEncontro(encontroId, () => renderPresenca());
+    // Realtime: sincroniza do banco a cada novo registro
+    window._chamadaChannel = assinarPresencasEncontro(encontroId, async () => {
+      await syncPresencasFromDB(encontroId);
+      renderPresenca();
+    });
     const btn = $('btn-abrir-chamada');
     if (btn) { btn.textContent = 'Fechar Chamada'; btn.onclick = () => handleFecharChamada(encontroId); }
   } catch (e) {
