@@ -2,7 +2,7 @@
 import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { supabase } from '/assets/js/supabase/client.js';
-import { getMembrosLiga } from '/assets/js/supabase/membros.js';
+import { getMembrosLiga, atualizarMembroDiretoria } from '/assets/js/supabase/membros.js';
 import { registrarAdvertencia } from '/assets/js/supabase/advertencias.js';
 import { renderMembrosTable } from '/assets/js/features/members-table.js';
 import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
@@ -27,6 +27,7 @@ async function carregar() {
     const data = await getMembrosLiga(ligaId);
     members = data.map(m => ({
       id: m.id, name: m.nome, liga: m.ligas?.nome || '—',
+      cargo: m.cargo || 'membro',
       presenca: 0, entregas: '—', status: 'ok', adv: 0,
     }));
     render();
@@ -74,6 +75,35 @@ async function handleCadastrarMembro() {
     } else {
       toast.error('Erro ao cadastrar. Tente novamente.');
     }
+  }
+}
+
+// ── Editar membro ──
+function openEditModal(id, name, liga, cargo) {
+  const idEl = $('edit-membro-id'); if (idEl) idEl.value = id;
+  const nomeEl = $('edit-nome'); if (nomeEl) nomeEl.value = name;
+  const ligaEl = $('edit-liga'); if (ligaEl) ligaEl.value = liga;
+  const cargoEl = $('edit-cargo'); if (cargoEl) cargoEl.value = cargo;
+  openModal('modal-editar-membro');
+}
+
+async function handleEditarMembro() {
+  const id = $('edit-membro-id')?.value;
+  const nome = $('edit-nome')?.value?.trim();
+  const ligaNome = $('edit-liga')?.value;
+  const cargo = $('edit-cargo')?.value;
+  if (!id || !nome) { toast.error('Preencha o nome.'); return; }
+  try {
+    const { data: ligaData } = await supabase
+      .from('ligas').select('id').eq('nome', ligaNome).maybeSingle();
+    const liga_id = ligaData?.id || null;
+    await atualizarMembroDiretoria(id, { nome, cargo, liga_id });
+    closeModal('modal-editar-membro');
+    await carregar();
+    toast.success('Membro atualizado.');
+  } catch (e) {
+    console.error('Erro ao editar membro:', e);
+    toast.error(e.message || 'Erro ao salvar.');
   }
 }
 
@@ -136,6 +166,8 @@ function exportCSV() {
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.handleCadastrarMembro = handleCadastrarMembro;
+window.openEditModal = openEditModal;
+window.handleEditarMembro = handleEditarMembro;
 window.openAdvModal = openAdvModal;
 window.handleSalvarAdvertencia = handleSalvarAdvertencia;
 window.exportCSV = exportCSV;

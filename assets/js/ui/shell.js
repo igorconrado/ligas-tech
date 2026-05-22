@@ -53,6 +53,9 @@ const NAV_DIRETORIA = [
     { label: 'Membros',      href: '/membros/diretoria/membros',      icon: 'members' },
     { label: 'Advertências', href: '/membros/diretoria/advertencias', icon: 'warnings' },
   ]},
+  { group: 'MINHA ÁREA', items: [
+    { label: 'Área de Membros', href: '/membros/dashboard', icon: 'members' },
+  ]},
 ];
 
 function escape(s) {
@@ -69,7 +72,20 @@ function readInitialSidebarState() {
   }
 }
 
-function buildSidebar(nav, activeRoute, homeHref, initialState) {
+function buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoriaUser, isDiretoriaRoute, memberCargo) {
+  const showDiretoriaLink = (isDiretoriaUser || memberCargo === 'diretor') && !isDiretoriaRoute;
+  const extraLink = showDiretoriaLink
+    ? `<section class="sidebar__group">
+        <h4 class="sidebar__group-label">DIRETORIA</h4>
+        <ul><li>
+          <a href="/membros/dashboard-diretoria" class="sidebar__item" data-active="false" title="Ir para área da diretoria">
+            <span class="sidebar__icon">${icons.overview}</span>
+            <span class="sidebar__label">Área da Diretoria</span>
+          </a>
+        </li></ul>
+      </section>`
+    : '';
+
   const groupsHtml = nav.map(g => `
     <section class="sidebar__group">
       <h4 class="sidebar__group-label">${escape(g.group)}</h4>
@@ -100,7 +116,7 @@ function buildSidebar(nav, activeRoute, homeHref, initialState) {
         </a>
         <button class="sidebar__toggle" type="button" aria-label="${toggleLabel}" aria-expanded="${isExpanded}">${toggleIcon}</button>
       </div>
-      <nav class="sidebar__nav">${groupsHtml}</nav>
+      <nav class="sidebar__nav">${groupsHtml}${extraLink}</nav>
       <div class="sidebar__footer">
         <button class="sidebar__logout" type="button">
           <span class="sidebar__icon">${icons.logout}</span>
@@ -147,9 +163,9 @@ async function mount({ activeRoute, pageTitle } = {}) {
   const ctx = await initPage({ requireRole });
   const { session, usuario, isDiretoria } = ctx;
 
-  const nav = isDiretoria ? NAV_DIRETORIA : NAV_MEMBRO;
-  const homeHref = isDiretoria ? '/membros/dashboard-diretoria' : '/membros/dashboard';
-  const perfilHref = isDiretoria ? '/membros/diretoria/perfil' : '/membros/perfil';
+  const nav = isDiretoriaRoute ? NAV_DIRETORIA : NAV_MEMBRO;
+  const homeHref = isDiretoriaRoute ? '/membros/dashboard-diretoria' : '/membros/dashboard';
+  const perfilHref = isDiretoriaRoute ? '/membros/diretoria/perfil' : '/membros/perfil';
   const userEmail = session?.user?.email || '';
   const emailLocal = userEmail.split('@')[0] || 'U';
   const userName = usuario?.membros?.nome || emailLocal;
@@ -177,7 +193,7 @@ async function mount({ activeRoute, pageTitle } = {}) {
     + (accentClass ? ' ' + accentClass : '')
     + (initialState === 'collapsed' ? ' shell--collapsed' : '');
   shellWrap.innerHTML = `
-    ${buildSidebar(nav, activeRoute, homeHref, initialState)}
+    ${buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoria, isDiretoriaRoute, usuario?.membros?.cargo)}
     <div class="shell__backdrop"></div>
     <div class="shell__main">
       ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl })}

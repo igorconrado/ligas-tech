@@ -13,6 +13,14 @@ export async function getMeuPerfil() {
   return data ? { ...data, role: usuarioData?.role || 'membro' } : null;
 }
 
+export async function atualizarMembroDiretoria(membroId, updates) {
+  const { error } = await supabase
+    .from('membros')
+    .update(updates)
+    .eq('id', membroId);
+  if (error) throw error;
+}
+
 export async function getMembrosLiga(ligaId = null) {
   let query = supabase
     .from('membros')
