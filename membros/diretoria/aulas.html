@@ -21,12 +21,23 @@
 <body>
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
-<!-- MODAL NOVA AULA -->
+<!-- MODAL NOVA AULA / TAREFA -->
 <div class="modal-overlay" id="modal-aula" onclick="if(event.target===this)closeModal('modal-aula')">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('modal-aula')" aria-label="Fechar">✕</button>
-    <div class="modal-title">Nova Aula</div>
-    <div class="modal-sub">Cadastra uma nova aula para a liga.</div>
+    <div class="modal-title" id="modal-aula-title">Novo evento</div>
+    <div class="modal-sub" id="modal-aula-sub">Cadastra uma aula ou tarefa para a liga.</div>
+
+    <!-- Seletor de tipo -->
+    <div class="form-group" style="margin-bottom:.75rem">
+      <label class="form-label">Tipo</label>
+      <div style="display:flex;gap:.5rem">
+        <button type="button" class="btn-sm b" id="tipo-aula-btn" onclick="selecionarTipo('aula')">Aula</button>
+        <button type="button" class="btn-sm ghost" id="tipo-tarefa-btn" onclick="selecionarTipo('tarefa')">Tarefa</button>
+      </div>
+    </div>
+    <input type="hidden" id="aula-tipo" value="aula">
+
     <div class="form-group" style="margin-bottom:.75rem">
       <label class="form-label">Número</label>
       <input class="form-input" type="number" id="aula-numero" placeholder="Ex: 1" min="1">
@@ -35,21 +46,41 @@
       <label class="form-label">Título</label>
       <input class="form-input" type="text" id="aula-titulo" placeholder="Ex: Introdução ao Python">
     </div>
-    <div class="form-group" style="margin-bottom:.75rem">
-      <label class="form-label">Prazo de entrega</label>
-      <input class="form-input" type="date" id="aula-prazo">
+
+    <!-- Campos de Aula -->
+    <div id="campos-aula">
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label class="form-label">Link dos slides</label>
+        <input class="form-input" type="url" id="aula-slides" placeholder="https://...">
+      </div>
+      <div class="form-group" style="margin-bottom:1.25rem">
+        <label class="form-label">Link do material</label>
+        <input class="form-input" type="url" id="aula-material" placeholder="https://...">
+      </div>
     </div>
-    <div class="form-group" style="margin-bottom:.75rem">
-      <label class="form-label">Link dos slides</label>
-      <input class="form-input" type="url" id="aula-slides" placeholder="https://...">
+
+    <!-- Campos de Tarefa -->
+    <div id="campos-tarefa" style="display:none">
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label class="form-label">Prazo de entrega</label>
+        <input class="form-input" type="date" id="aula-prazo">
+      </div>
+      <div class="form-group" style="margin-bottom:1.25rem">
+        <label class="form-label">Link do material guia</label>
+        <input class="form-input" type="url" id="tarefa-material" placeholder="https://...">
+      </div>
     </div>
+
+    <!-- Anexo (disponível para aula e tarefa) -->
     <div class="form-group" style="margin-bottom:1.25rem">
-      <label class="form-label">Link do material</label>
-      <input class="form-input" type="url" id="aula-material" placeholder="https://...">
+      <label class="form-label">Anexar arquivo <span style="color:var(--muted);font-weight:400">(PDF, PPTX, ZIP…)</span></label>
+      <input class="form-input" type="file" id="aula-arquivo" accept=".pdf,.pptx,.ppt,.docx,.doc,.zip,.rar,.xlsx,.xls,.csv,.txt,.md">
+      <div id="aula-arquivo-hint" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
     </div>
+
     <div style="display:flex;gap:.5rem;justify-content:flex-end">
       <button class="btn-sm ghost" onclick="closeModal('modal-aula')">Cancelar</button>
-      <button class="btn-sm b" onclick="handleCriarAula()">Criar aula →</button>
+      <button class="btn-sm b" id="modal-aula-confirm" onclick="handleCriarAula()">Criar aula →</button>
     </div>
   </div>
 </div>
@@ -57,9 +88,9 @@
 <main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
   <div style="margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
     <div>
-      <div style="font-size:12px;color:var(--muted)">Publicar, despublicar e editar aulas da liga</div>
+      <div style="font-size:12px;color:var(--muted)">Publicar, despublicar e editar aulas e tarefas da liga</div>
     </div>
-    <button class="btn-sm b" onclick="openModal('modal-aula')">+ Nova aula</button>
+    <button class="btn-sm b" onclick="openModal('modal-aula')">+ Novo evento</button>
   </div>
   <div class="aulas-dir-grid" id="aulas-dir-grid"></div>
 </main>

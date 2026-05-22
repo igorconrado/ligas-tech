@@ -17,6 +17,10 @@ export const icons = {
   profile:      `<svg ${A}><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3 3-5 6-5s6 2 6 5"/></svg>`,
   members:      `<svg ${A}><circle cx="7" cy="7" r="3"/><path d="M2 16c0-3 2-5 5-5s5 2 5 5"/><circle cx="14" cy="8" r="2.5"/><path d="M13 16c0-2 1-3 3-3s3 1 3 3"/></svg>`,
 
+  // Notificações
+  bell:         `<svg ${A}><path d="M10 2a6 6 0 0 0-6 6v3l-2 3h16l-2-3V8a6 6 0 0 0-6-6z"/><path d="M10 18a2 2 0 0 0 2-2H8a2 2 0 0 0 2 2z"/></svg>`,
+  inbox:        `<svg ${A}><path d="M3 9l2-5h10l2 5"/><path d="M3 9v8h14V9"/><path d="M3 9h5l1 2h2l1-2h5"/></svg>`,
+
   // Chrome (toggle, drawer, logout)
   chevronLeft:  `<svg ${A}><path d="M12 5l-5 5 5 5"/></svg>`,
   chevronRight: `<svg ${A}><path d="M8 5l5 5-5 5"/></svg>`,

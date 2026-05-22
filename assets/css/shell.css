@@ -314,6 +314,123 @@
   .sidebar, .shell__main { transition: none; }
 }
 
+/* ────────── SINO DE NOTIFICAÇÕES ────────── */
+
+.notif-wrap {
+  position: relative;
+}
+
+.notif-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px; height: 34px;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.notif-btn:hover { background: var(--bg-surface-2); color: var(--text-primary); }
+.notif-btn svg { width: 16px; height: 16px; }
+
+.notif-badge {
+  position: absolute;
+  top: -5px; right: -5px;
+  min-width: 16px; height: 16px;
+  background: var(--danger, #ef4444);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+.notif-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + var(--sp-2));
+  right: 0;
+  width: 280px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-3);
+  z-index: var(--z-modal);
+  overflow: hidden;
+}
+.notif-dropdown.is-open { display: block; }
+
+.notif-header {
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-body-s);
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.notif-section-label {
+  padding: var(--sp-2) var(--sp-4) var(--sp-1);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--text-tertiary);
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: var(--fs-body-s);
+  transition: background var(--dur-fast), color var(--dur-fast);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--bg-surface-3); color: var(--text-primary); }
+.notif-item--urgent { color: var(--text-primary); }
+
+.notif-item-title { font-weight: 500; color: var(--text-primary); line-height: 1.35; }
+.notif-item-sub { font-size: var(--fs-micro); color: var(--text-tertiary); margin-top: 2px; }
+
+.notif-dot {
+  flex-shrink: 0;
+  margin-top: 4px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.notif-dot--live {
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, .6);
+  animation: pulseGreen 1.5s ease-in-out infinite;
+}
+.notif-dot--blue   { background: var(--blue, #3b82f6); }
+.notif-dot--yellow { background: var(--yellow, #ca8a04); }
+
+.notif-empty {
+  padding: var(--sp-5) var(--sp-4);
+  text-align: center;
+  font-size: var(--fs-body-s);
+  color: var(--text-tertiary);
+}
+
+@keyframes pulseGreen {
+  0%   { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+  70%  { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+  100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
 /* ────────── ISOLATION — reset de estilos globais da landing ────────── */
 
 /* components.css tem `nav { position: fixed; ... }` para a navbar da landing.

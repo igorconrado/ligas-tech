@@ -32,8 +32,8 @@ function renderEntregas(aulas) {
   if (!aulasComPrazo.length) {
     renderEmptyState(tbody, {
       icon: icons.inbox,
-      title: 'Nenhuma entrega disponível',
-      description: 'Quando as aulas forem cadastradas pela diretoria, elas aparecem aqui.',
+      title: 'Nenhuma tarefa disponível',
+      description: 'Quando as tarefas forem cadastradas pela diretoria, elas aparecem aqui.',
     });
     if (box) box.style.display = 'none';
     return;
@@ -48,7 +48,7 @@ function renderEntregas(aulas) {
       ? `<a href="${a.entrega.repo_url}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:11px;text-decoration:none">${a.entrega.repo_url.replace('https://github.com/', '')} ↗</a>`
       : '<span style="color:var(--muted);font-size:11px">—</span>';
     return `<tr>
-      <td style="font-weight:500">Aula ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
+      <td style="font-weight:500">Tarefa ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
       <td class="${getPrazoClass(a.prazo_entrega, a.statusEntrega)}">${fmtDate(a.prazo_entrega)}</td>
       <td>${repo}</td>
       <td><span class="pill ${pillClass}">${pillLabel}</span></td>
@@ -58,7 +58,7 @@ function renderEntregas(aulas) {
   const pendente = aulasComPrazo.find(a => a.statusEntrega !== 'entregue');
   if (box && pendente) {
     box.style.display = '';
-    $('entrega-title').textContent = `Enviar entrega — Aula ${String(pendente.numero).padStart(2, '0')}`;
+    $('entrega-title').textContent = `Enviar entrega — Tarefa ${String(pendente.numero).padStart(2, '0')}`;
     box.dataset.aulaId = pendente.id;
     $('repo-input').disabled = false;
     $('repo-input').value = '';
