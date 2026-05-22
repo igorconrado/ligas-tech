@@ -62,6 +62,8 @@ function renderEntregas(aulas) {
     box.dataset.aulaId = pendente.id;
     $('repo-input').disabled = false;
     $('repo-input').value = '';
+    const mensagemEl = $('mensagem-input');
+    if (mensagemEl) { mensagemEl.disabled = false; mensagemEl.value = ''; }
     const btn = box.querySelector('.entrega-submit');
     if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.textContent = 'Enviar →'; }
     $('entrega-feedback').style.display = 'none';
@@ -72,9 +74,10 @@ function renderEntregas(aulas) {
 
 async function submitEntrega() {
   const input = $('repo-input');
-  const fb = $('entrega-feedback');
+  const mensagemEl = $('mensagem-input');
   const box = $('entrega-box');
   const url = input?.value?.trim();
+  const mensagem = mensagemEl?.value?.trim() || null;
   const aulaId = box?.dataset.aulaId;
 
   if (!url || !url.includes('github.com')) {
@@ -86,9 +89,10 @@ async function submitEntrega() {
   try {
     btn.disabled = true;
     btn.textContent = 'Enviando...';
-    await submeterEntrega(aulaId, url);
+    await submeterEntrega(aulaId, url, mensagem);
     toast.success('Entrega registrada. A diretoria foi notificada.');
     input.disabled = true;
+    if (mensagemEl) mensagemEl.disabled = true;
     btn.style.opacity = '.4';
     const aulas = await getAulasComEntregas();
     renderEntregas(aulas);

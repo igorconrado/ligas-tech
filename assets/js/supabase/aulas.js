@@ -38,7 +38,7 @@ export async function getAulasComEntregas() {
   });
 }
 
-export async function submeterEntrega(aulaId, repoUrl) {
+export async function submeterEntrega(aulaId, repoUrl, mensagem = null) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
 
@@ -60,7 +60,7 @@ export async function submeterEntrega(aulaId, repoUrl) {
   const { error } = await supabase
     .from('entregas')
     .upsert(
-      { membro_id: membro.id, aula_id: aulaId, repo_url: repoUrl, status: 'entregue', entregue_em: new Date().toISOString() },
+      { membro_id: membro.id, aula_id: aulaId, repo_url: repoUrl, mensagem: mensagem || null, status: 'entregue', entregue_em: new Date().toISOString() },
       { onConflict: 'membro_id,aula_id' }
     );
 
