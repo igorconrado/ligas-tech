@@ -2,7 +2,7 @@
 import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
-import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro, corrigirPresenca } from '/assets/js/supabase/presenca.js';
+import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro, corrigirPresenca, excluirEncontro, getHistoricoEncontros } from '/assets/js/supabase/presenca.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -115,10 +115,80 @@ async function handleCriarEncontro() {
     await criarEncontro(ligaId, titulo, data);
     closeModal('modal-encontro');
     await carregarEncontros();
+    await carregarHistorico();
     toast.success('Encontro criado.');
   } catch (e) {
     console.error('Erro ao criar encontro:', e);
     toast.error(e.message || 'Erro ao criar encontro');
+  }
+}
+
+async function handleExcluirEncontro(id, titulo) {
+  const ok = await confirmDialog({
+    title: 'Excluir encontro?',
+    message: `"${titulo}" e todas as presenças registradas serão removidos permanentemente.`,
+    confirmLabel: 'Excluir',
+    danger: true,
+  });
+  if (!ok) return;
+  try {
+    await excluirEncontro(id);
+    if (encontroAtivoId === id) {
+      chamadaAberta = false;
+      encontroAtivoId = null;
+      renderPresenca();
+      $('chamada-badge').textContent = 'Fechada';
+      $('chamada-badge').className = 'chamada-badge closed';
+      const btn = $('btn-abrir-chamada');
+      if (btn) { btn.textContent = 'Gerar QR Code'; btn.onclick = handleAbrirChamada; btn.disabled = false; }
+    }
+    await carregarEncontros();
+    await carregarHistorico();
+    toast.success('Encontro excluído.');
+  } catch (e) {
+    console.error('Erro ao excluir encontro:', e);
+    toast.error(e.message || 'Erro ao excluir encontro');
+  }
+}
+
+async function carregarHistorico() {
+  const tbl = $('historico-tbl');
+  if (!tbl) return;
+  try {
+    const encontros = await getHistoricoEncontros(ligaId);
+    if (!encontros.length) {
+      tbl.innerHTML = `<tbody><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted);font-size:12px">Nenhum encontro registrado ainda.</td></tr></tbody>`;
+      return;
+    }
+    tbl.innerHTML = `
+      <thead><tr>
+        <th>Título</th><th>Data</th><th>Presença</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${encontros.map(e => {
+          const data = new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR');
+          const pct = e.total ? Math.round((e.presentes / e.total) * 100) : 0;
+          const statusCor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+          const badge = e.aberto
+            ? `<span style="background:var(--green);color:#000;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600">ABERTA</span>`
+            : '';
+          return `<tr>
+            <td style="font-weight:500">${e.titulo} ${badge}</td>
+            <td style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">${data}</td>
+            <td style="font-family:var(--font-mono);font-size:12px">
+              <span style="color:${statusCor};font-weight:600">${e.presentes}</span>
+              <span style="color:var(--muted)">/ ${e.total}</span>
+              ${e.total ? `<span style="color:var(--muted);margin-left:.25rem">(${pct}%)</span>` : ''}
+            </td>
+            <td style="text-align:right">
+              <button class="btn-sm ghost" style="color:var(--red);border-color:var(--red)"
+                onclick="handleExcluirEncontro('${e.id}', '${e.titulo.replace(/'/g, "\\'")}')">Excluir</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>`;
+  } catch (e) {
+    console.error('Erro ao carregar histórico:', e);
   }
 }
 
@@ -182,6 +252,7 @@ window.savePresenca = savePresenca;
 window.handleCriarEncontro = handleCriarEncontro;
 window.handleAbrirChamada = handleAbrirChamada;
 window.handleFecharChamada = handleFecharChamada;
+window.handleExcluirEncontro = handleExcluirEncontro;
 
 $('btn-export-todos')?.addEventListener('click', () => exportarTodosRegistros(ligaId));
 $('btn-export-membros')?.addEventListener('click', () => exportarResumoPorMembro(ligaId));
@@ -190,3 +261,4 @@ $('btn-export-frequencia')?.addEventListener('click', () => exportarRelatorioFre
 
 await carregarMembros();
 await carregarEncontros();
+await carregarHistorico();

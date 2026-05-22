@@ -134,6 +134,34 @@ export async function getEncontros(ligaId) {
   return data || [];
 }
 
+// Diretoria: histórico com contagem de presenças
+export async function getHistoricoEncontros(ligaId) {
+  const { data, error } = await supabase
+    .from('encontros')
+    .select('id, titulo, data, aberto, presencas(status)')
+    .eq('liga_id', ligaId)
+    .order('data', { ascending: false });
+
+  if (error) throw error;
+  return (data || []).map(e => ({
+    id: e.id,
+    titulo: e.titulo,
+    data: e.data,
+    aberto: e.aberto,
+    presentes: (e.presencas || []).filter(p => p.status === 'presente').length,
+    total: (e.presencas || []).length,
+  }));
+}
+
+// Diretoria: excluir encontro
+export async function excluirEncontro(encontroId) {
+  const { error } = await supabase
+    .from('encontros')
+    .delete()
+    .eq('id', encontroId);
+  if (error) throw error;
+}
+
 // Diretoria: ver presenças de um encontro
 export async function getPresencasEncontro(encontroId) {
   const { data, error } = await supabase
