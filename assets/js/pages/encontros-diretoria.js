@@ -2,7 +2,7 @@
 import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
-import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro, corrigirPresenca, excluirEncontro, getHistoricoEncontros } from '/assets/js/supabase/presenca.js';
+import { abrirChamada, fecharChamada, assinarPresencasEncontro, getEncontros, criarEncontro, corrigirPresenca, excluirEncontro, getHistoricoEncontros, getPresencasEncontro } from '/assets/js/supabase/presenca.js';
 import { exportarTodosRegistros, exportarResumoPorMembro, exportarPorEncontro, exportarRelatorioFrequencia } from '/assets/js/supabase/exportacao.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -201,8 +201,9 @@ async function carregarHistorico() {
                 <span style="color:var(--muted)">/ ${e.total}</span>
                 ${e.total ? `<span style="color:var(--muted);margin-left:.25rem">(${pct}%)</span>` : ''}
               </td>
-              <td>
+              <td style="display:flex;gap:.375rem;flex-wrap:wrap">
                 <button id="btn-expand-${e.id}" class="btn-sm ghost" onclick="toggleDetalhe('${e.id}')">▶ Ver detalhes</button>
+                <button class="btn-sm ghost" onclick="openEditPresencaModal('${e.id}', '${e.titulo.replace(/'/g, "\\'")}')">Editar presença</button>
               </td>
               <td style="text-align:right">
                 <button class="btn-sm ghost" style="color:var(--red);border-color:var(--red)"
@@ -221,6 +222,96 @@ async function carregarHistorico() {
   }
 }
 
+// ── Edição de presença por encontro ──
+let editEncontroId = null;
+let editPresentSet = new Set();
+
+async function openEditPresencaModal(encontroId, titulo) {
+  editEncontroId = encontroId;
+  editPresentSet = new Set();
+  const sub = $('editar-presenca-sub');
+  if (sub) sub.textContent = titulo;
+  const grid = $('editar-presenca-grid');
+  if (grid) grid.innerHTML = '<span style="color:var(--muted);font-size:12px">Carregando...</span>';
+  openModal('modal-editar-presenca');
+
+  // Carrega presenças existentes do encontro
+  const presencas = await getPresencasEncontro(encontroId);
+  const presencaMap = {};
+  presencas.forEach(p => { presencaMap[p.membro_id] = p.status; });
+
+  // Pré-marca quem estava presente
+  members.forEach(m => {
+    if (presencaMap[m.id] === 'presente') editPresentSet.add(m.id);
+  });
+
+  renderEditPresencaGrid();
+}
+
+function renderEditPresencaGrid() {
+  const grid = $('editar-presenca-grid');
+  if (!grid) return;
+  if (!members.length) {
+    grid.innerHTML = '<span style="color:var(--muted);font-size:12px">Nenhum membro encontrado.</span>';
+    return;
+  }
+  grid.innerHTML = members.map(m => {
+    const on = editPresentSet.has(m.id);
+    const cor = on ? 'var(--green)' : 'var(--muted)';
+    const borderCor = on ? 'var(--green)44' : 'var(--border2)';
+    const icon = on ? '✓' : '✗';
+    return `<div onclick="toggleEditPresenca('${m.id}')" style="cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;background:var(--bg3);border:1px solid ${borderCor};border-radius:4px;padding:5px 10px;font-size:11px;font-family:var(--font-body);user-select:none">
+      <span style="color:${cor};font-weight:700;font-size:13px">${icon}</span>${m.name}
+    </div>`;
+  }).join('');
+}
+
+function toggleEditPresenca(membroId) {
+  if (editPresentSet.has(membroId)) editPresentSet.delete(membroId);
+  else editPresentSet.add(membroId);
+  renderEditPresencaGrid();
+}
+
+function editPresencaMarcarTodos() {
+  members.forEach(m => editPresentSet.add(m.id));
+  renderEditPresencaGrid();
+}
+
+function editPresencaDesmarcarTodos() {
+  editPresentSet.clear();
+  renderEditPresencaGrid();
+}
+
+async function handleSalvarPresencaEdit() {
+  if (!editEncontroId) return;
+  const btn = document.querySelector('#modal-editar-presenca .btn-sm.b');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+  try {
+    await Promise.all(members.map(m =>
+      corrigirPresenca(m.id, editEncontroId, editPresentSet.has(m.id) ? 'presente' : 'ausente')
+    ));
+    closeModal('modal-editar-presenca');
+    await carregarHistorico();
+    toast.success('Presença atualizada.');
+  } catch (e) {
+    console.error('Erro ao salvar presença:', e);
+    toast.error(e.message || 'Erro ao salvar presença.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar →'; }
+  }
+}
+
+async function syncPresencasFromDB(encontroId) {
+  const presencas = await getPresencasEncontro(encontroId);
+  presentSet.clear();
+  presencas.forEach(p => {
+    if (p.status === 'presente') {
+      const idx = members.findIndex(m => m.id === p.membro_id);
+      if (idx !== -1) presentSet.add(idx);
+    }
+  });
+}
+
 async function handleAbrirChamada() {
   const encontroId = $('select-encontro')?.value;
   if (!encontroId) { toast.error('Selecione um encontro primeiro.'); return; }
@@ -234,10 +325,16 @@ async function handleAbrirChamada() {
     }
     openModal('qr-modal');
     chamadaAberta = true;
+    // Carrega presenças já existentes antes de renderizar
+    await syncPresencasFromDB(encontroId);
     renderPresenca();
     $('chamada-badge').textContent = 'Aberta';
     $('chamada-badge').className = 'chamada-badge open';
-    window._chamadaChannel = assinarPresencasEncontro(encontroId, () => renderPresenca());
+    // Realtime: sincroniza do banco a cada novo registro
+    window._chamadaChannel = assinarPresencasEncontro(encontroId, async () => {
+      await syncPresencasFromDB(encontroId);
+      renderPresenca();
+    });
     const btn = $('btn-abrir-chamada');
     if (btn) { btn.textContent = 'Fechar Chamada'; btn.onclick = () => handleFecharChamada(encontroId); }
   } catch (e) {
@@ -283,6 +380,11 @@ window.handleAbrirChamada = handleAbrirChamada;
 window.handleFecharChamada = handleFecharChamada;
 window.handleExcluirEncontro = handleExcluirEncontro;
 window.toggleDetalhe = toggleDetalhe;
+window.openEditPresencaModal = openEditPresencaModal;
+window.toggleEditPresenca = toggleEditPresenca;
+window.editPresencaMarcarTodos = editPresencaMarcarTodos;
+window.editPresencaDesmarcarTodos = editPresencaDesmarcarTodos;
+window.handleSalvarPresencaEdit = handleSalvarPresencaEdit;
 
 $('btn-export-todos')?.addEventListener('click', () => exportarTodosRegistros(ligaId));
 $('btn-export-membros')?.addEventListener('click', () => exportarResumoPorMembro(ligaId));
