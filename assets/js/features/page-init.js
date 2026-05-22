@@ -5,7 +5,7 @@
 //
 // requireRole:
 //   'any'       — apenas exige sessão válida
-//   'membro'    — redireciona diretoria pro dashboard-diretoria
+//   'membro'    — redireciona não-autenticados; diretoria pode acessar também
 //   'diretoria' — redireciona membro pro dashboard
 
 import { supabase } from '/assets/js/supabase/client.js';
@@ -25,10 +25,6 @@ export async function initPage({ requireRole = 'any' } = {}) {
 
   const isDiretoria = ROLES_DIRETORIA.includes(usuario?.role);
 
-  if (requireRole === 'membro' && isDiretoria) {
-    window.location.href = '/membros/dashboard-diretoria';
-    throw new Error('Redirecionando');
-  }
   if (requireRole === 'diretoria' && !isDiretoria) {
     window.location.href = '/membros/dashboard';
     throw new Error('Redirecionando');
