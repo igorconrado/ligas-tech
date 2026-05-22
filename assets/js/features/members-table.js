@@ -12,6 +12,12 @@ import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 
 const STATUS_LABEL = { ok: 'Regular', warn: 'Atenção', adv: 'Advertência' };
 const STATUS_PILL  = { ok: 'ok', warn: 'warn', adv: 'adv' };
+const CARGO_LABEL  = { trainee: 'Trainee', membro: 'Membro', diretor: 'Diretor(a)' };
+const CARGO_STYLE  = {
+  trainee: 'background:var(--amber)22;color:var(--amber);border:1px solid var(--amber)44',
+  membro:  'background:var(--blue)22;color:var(--blue);border:1px solid var(--blue)44',
+  diretor: 'background:var(--green)22;color:var(--green);border:1px solid var(--green)44',
+};
 
 function emptyStateConfig() {
   return {
@@ -54,24 +60,30 @@ export function renderOverviewTable(tbl, data) {
   </tr>`).join('')}</tbody>`;
 }
 
+function cargoPill(cargo) {
+  const label = CARGO_LABEL[cargo] || 'Membro';
+  const style = CARGO_STYLE[cargo] || CARGO_STYLE.membro;
+  return `<span style="font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600;font-family:var(--font-body);${style}">${label}</span>`;
+}
+
 export function renderMembrosTable(tbl, data) {
   if (!tbl) return;
   if (!data.length) {
-    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead><tbody></tbody>`;
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Cargo</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th></th></tr></thead><tbody></tbody>`;
     renderEmptyState(tbl.querySelector('tbody'), emptyStateConfig());
     return;
   }
-  tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th>Semestre</th><th></th></tr></thead>
+  tbl.innerHTML = `<thead><tr><th>Nome</th><th>Liga</th><th>Cargo</th><th>Presença</th><th>Entregas</th><th>Adv.</th><th></th></tr></thead>
   <tbody>${data.map(m => `<tr>
     <td style="font-weight:500">${m.name}</td>
     <td>${ligaPill(m.liga)}</td>
+    <td>${cargoPill(m.cargo)}</td>
     <td>${progressCell(m.presenca)}</td>
     <td style="color:var(--mid)">${m.entregas}</td>
     ${advCell(m.adv)}
-    <td style="color:var(--muted)">2026.1</td>
     <td style="display:flex;gap:.375rem">
       <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button>
-      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px">Editar</button>
+      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openEditModal('${m.id}', '${m.name.replace(/'/g, "\\'")}', '${m.liga}', '${m.cargo || 'membro'}')">Editar</button>
     </td>
   </tr>`).join('')}</tbody>`;
 }
