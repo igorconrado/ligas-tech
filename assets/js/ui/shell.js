@@ -127,15 +127,24 @@ function buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoriaUser,
   `;
 }
 
-function buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl }) {
+function buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl, showNotif }) {
   const avatarContent = avatarUrl
     ? `<img src="${escape(avatarUrl)}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
     : escape(initial);
+  const notifHtml = showNotif ? `
+    <div class="notif-wrap">
+      <button class="notif-btn" type="button" aria-label="Notificações" aria-haspopup="true" aria-expanded="false">
+        ${icons.bell}
+        <span class="notif-badge" style="display:none" aria-hidden="true"></span>
+      </button>
+      <div class="notif-dropdown" aria-hidden="true"></div>
+    </div>` : '';
   return `
     <header class="topbar">
       <button class="topbar__hamburger" type="button" aria-label="Abrir menu" aria-expanded="false">${icons.menu}</button>
       <h1 class="topbar__title">${escape(pageTitle)}</h1>
-      <div class="topbar__user">
+      <div class="topbar__user" style="display:flex;align-items:center;gap:var(--sp-2)">
+        ${notifHtml}
         <button class="topbar__avatar" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="topbar-dropdown">${avatarContent}</button>
         <div class="topbar__dropdown" id="topbar-dropdown" role="menu" aria-hidden="true">
           <div class="topbar__dropdown-header">
@@ -192,17 +201,25 @@ async function mount({ activeRoute, pageTitle } = {}) {
   shellWrap.className = 'shell'
     + (accentClass ? ' ' + accentClass : '')
     + (initialState === 'collapsed' ? ' shell--collapsed' : '');
+  const showNotif = !isDiretoriaRoute;
   shellWrap.innerHTML = `
     ${buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoria, isDiretoriaRoute, usuario?.membros?.cargo)}
     <div class="shell__backdrop"></div>
     <div class="shell__main">
-      ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl })}
+      ${buildTopbar({ pageTitle, initial, userName, userEmail, perfilHref, avatarUrl, showNotif })}
     </div>
   `;
   shellWrap.querySelector('.shell__main').appendChild(existingMain);
 
   if (skipLink) skipLink.after(shellWrap);
   else parent.prepend(shellWrap);
+
+  // Notificações (apenas área de membro)
+  if (showNotif && usuario?.membros?.liga_id) {
+    import('/assets/js/ui/notificacoes.js').then(({ initNotificacoes }) => {
+      initNotificacoes(shellWrap, usuario.membros.liga_id);
+    }).catch(e => console.error('[shell] Erro ao carregar notificações:', e));
+  }
 
   // Toggle collapse
   const toggle = shellWrap.querySelector('.sidebar__toggle');

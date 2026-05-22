@@ -17,6 +17,8 @@ export async function getAulasComEntregas() {
 
   if (!aulas) return [];
 
+  const tarefas = aulas.filter(a => a.tipo === 'tarefa');
+
   const { data: entregas } = await supabase
     .from('entregas')
     .select('*')
@@ -26,7 +28,7 @@ export async function getAulasComEntregas() {
   (entregas || []).forEach(e => { entregasMap[e.aula_id] = e; });
 
   const now = new Date();
-  return aulas.map(aula => {
+  return tarefas.map(aula => {
     const entrega = entregasMap[aula.id] || null;
     let statusEntrega = 'pendente';
     if (entrega) {
@@ -36,6 +38,48 @@ export async function getAulasComEntregas() {
     }
     return { ...aula, entrega, statusEntrega };
   });
+}
+
+export async function getAulasPublicadas() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { aulas: [], tarefas: [] };
+
+  const { data: membro } = await supabase
+    .from('membros').select('id, liga_id').eq('usuario_id', user.id).maybeSingle();
+  if (!membro?.liga_id) return { aulas: [], tarefas: [] };
+
+  const { data: itens } = await supabase
+    .from('aulas')
+    .select('*')
+    .eq('liga_id', membro.liga_id)
+    .eq('publicada', true)
+    .order('numero');
+
+  if (!itens) return { aulas: [], tarefas: [] };
+
+  const tarefasRaw = itens.filter(a => a.tipo === 'tarefa');
+
+  const { data: entregas } = await supabase
+    .from('entregas')
+    .select('*')
+    .eq('membro_id', membro.id);
+
+  const entregasMap = {};
+  (entregas || []).forEach(e => { entregasMap[e.aula_id] = e; });
+
+  const now = new Date();
+  const tarefas = tarefasRaw.map(a => {
+    const entrega = entregasMap[a.id] || null;
+    let statusEntrega = 'pendente';
+    if (entrega) statusEntrega = entrega.status;
+    else if (a.prazo_entrega && new Date(a.prazo_entrega) < now) statusEntrega = 'atrasada';
+    return { ...a, entrega, statusEntrega };
+  });
+
+  return {
+    aulas: itens.filter(a => a.tipo === 'aula'),
+    tarefas,
+  };
 }
 
 export async function submeterEntrega(aulaId, repoUrl, mensagem = null) {
@@ -67,7 +111,30 @@ export async function submeterEntrega(aulaId, repoUrl, mensagem = null) {
   if (error) throw error;
 }
 
-// Diretoria: criar aula
+// Diretoria: upload de arquivo de material
+export async function uploadMaterialAula(file, ligaId) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${ligaId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('aulas-materiais')
+    .upload(path, file, { upsert: false, contentType: file.type });
+
+  if (uploadError) {
+    if (uploadError.message?.includes('Bucket not found')) {
+      throw new Error('Bucket de storage não configurado. Aplique a migration 0014_aulas_arquivo.sql.');
+    }
+    throw uploadError;
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('aulas-materiais')
+    .getPublicUrl(path);
+
+  return publicUrl;
+}
+
+// Diretoria: criar aula ou tarefa
 export async function criarAula(dados) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Não autenticado');
@@ -78,9 +145,11 @@ export async function criarAula(dados) {
       liga_id: dados.liga_id,
       numero: dados.numero,
       titulo: dados.titulo,
+      tipo: dados.tipo || 'tarefa',
       prazo_entrega: dados.prazo_entrega || null,
       material_url: dados.material_url || null,
       slides_url: dados.slides_url || null,
+      arquivo_url: dados.arquivo_url || null,
       publicada: dados.publicada ?? false
     });
 

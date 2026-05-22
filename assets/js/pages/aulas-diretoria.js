@@ -1,6 +1,6 @@
 // ── Página: Aulas (diretoria) ──
 import { shell } from '/assets/js/ui/shell.js';
-import { getTodasAulas, criarAula, togglePublicarAula, deletarAula } from '/assets/js/supabase/aulas.js';
+import { getTodasAulas, criarAula, uploadMaterialAula, togglePublicarAula, deletarAula } from '/assets/js/supabase/aulas.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonCards } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -16,8 +16,8 @@ function renderizar(aulas) {
   if (!aulas.length) {
     renderEmptyState(grid, {
       icon: icons.book,
-      title: 'Nenhuma aula cadastrada',
-      description: 'Use o botão "+ Nova aula" pra criar a primeira aula da liga.',
+      title: 'Nenhum evento cadastrado',
+      description: 'Use o botão "+ Novo evento" pra criar a primeira aula ou tarefa da liga.',
     });
     return;
   }
@@ -33,14 +33,22 @@ function renderizar(aulas) {
       ? prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '')
       : '—';
     const toggleLabel = a.publicada ? 'Despublicar' : 'Publicar';
+    const tipoLabel = a.tipo === 'aula' ? 'Aula' : 'Tarefa';
+    const tipoPill = a.tipo === 'aula'
+      ? `<span class="pill" style="background:var(--blue-soft,rgba(59,130,246,.15));color:var(--blue)">${tipoLabel}</span>`
+      : `<span class="pill" style="background:var(--yellow-soft,rgba(234,179,8,.15));color:var(--yellow,#ca8a04)">${tipoLabel}</span>`;
+    const numLabel = a.tipo === 'aula' ? `Aula ${numero}` : `Tarefa ${numero}`;
     return `
       <div class="aula-dir-card">
-        <div class="aula-num">Aula ${numero}</div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.25rem">
+          <div class="aula-num">${numLabel}</div>
+          ${tipoPill}
+        </div>
         <div class="aula-title-sm">${a.titulo}</div>
         <div class="aula-meta">
           <span class="pill ${statusPill[status]}">${statusLabel[status]}</span>
           <div style="display:flex;align-items:center;gap:.5rem">
-            <span class="aula-stats">Prazo: ${prazoFmt}</span>
+            ${a.tipo === 'tarefa' ? `<span class="aula-stats">Prazo: ${prazoFmt}</span>` : ''}
             <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="handleTogglePublicarAula('${a.id}', ${a.publicada})">${toggleLabel}</button>
             <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px;color:var(--red)" onclick="handleDeletarAula('${a.id}', '${a.titulo.replace(/'/g, "\\'")}')">Excluir</button>
           </div>
@@ -61,10 +69,10 @@ async function carregar() {
 async function handleTogglePublicarAula(aulaId, publicadaAtual) {
   const novaFlag = !publicadaAtual;
   const ok = await confirmDialog({
-    title: publicadaAtual ? 'Despublicar aula?' : 'Publicar aula?',
+    title: publicadaAtual ? 'Despublicar?' : 'Publicar?',
     message: publicadaAtual
-      ? 'Membros não verão mais essa aula no dashboard enquanto estiver despublicada.'
-      : 'Os membros da liga vão ver essa aula no dashboard imediatamente.',
+      ? 'Membros não verão mais esse evento enquanto estiver despublicado.'
+      : 'Os membros da liga vão ver esse evento imediatamente.',
     confirmLabel: publicadaAtual ? 'Despublicar' : 'Publicar',
     danger: publicadaAtual,
   });
@@ -72,19 +80,22 @@ async function handleTogglePublicarAula(aulaId, publicadaAtual) {
   try {
     await togglePublicarAula(aulaId, novaFlag);
     await carregar();
-    toast.success(novaFlag ? 'Aula publicada' : 'Aula despublicada');
+    toast.success(novaFlag ? 'Publicado' : 'Despublicado');
   } catch (e) {
     console.error('Erro:', e);
-    toast.error(e.message || 'Erro ao atualizar aula');
+    toast.error(e.message || 'Erro ao atualizar');
   }
 }
 
 async function handleCriarAula() {
+  const tipo = document.getElementById('aula-tipo')?.value || 'aula';
   const numero = parseInt(document.getElementById('aula-numero')?.value);
   const titulo = document.getElementById('aula-titulo')?.value?.trim();
-  const prazo = document.getElementById('aula-prazo')?.value || null;
-  const slides = document.getElementById('aula-slides')?.value?.trim() || null;
-  const material = document.getElementById('aula-material')?.value?.trim() || null;
+  const prazo = tipo === 'tarefa' ? (document.getElementById('aula-prazo')?.value || null) : null;
+  const slides = tipo === 'aula' ? (document.getElementById('aula-slides')?.value?.trim() || null) : null;
+  const material = tipo === 'aula'
+    ? (document.getElementById('aula-material')?.value?.trim() || null)
+    : (document.getElementById('tarefa-material')?.value?.trim() || null);
 
   if (!numero || !titulo) {
     toast.error('Número e título são obrigatórios.');
@@ -95,26 +106,47 @@ async function handleCriarAula() {
     return;
   }
 
+  const confirmBtn = document.getElementById('modal-aula-confirm');
+  const arquivoInput = document.getElementById('aula-arquivo');
+  const arquivoFile = arquivoInput?.files?.[0] || null;
+
   try {
-    await criarAula({ liga_id: ligaId, numero, titulo, prazo_entrega: prazo, slides_url: slides, material_url: material, publicada: false });
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = arquivoFile ? 'Enviando arquivo…' : 'Criando…';
+
+    let arquivo_url = null;
+    if (arquivoFile) {
+      arquivo_url = await uploadMaterialAula(arquivoFile, ligaId);
+    }
+
+    confirmBtn.textContent = 'Criando…';
+    await criarAula({ liga_id: ligaId, numero, titulo, tipo, prazo_entrega: prazo, slides_url: slides, material_url: material, arquivo_url, publicada: false });
     closeModal('modal-aula');
     document.getElementById('aula-numero').value = '';
     document.getElementById('aula-titulo').value = '';
     document.getElementById('aula-prazo').value = '';
     document.getElementById('aula-slides').value = '';
     document.getElementById('aula-material').value = '';
+    document.getElementById('tarefa-material').value = '';
+    if (arquivoInput) arquivoInput.value = '';
+    const hint = document.getElementById('aula-arquivo-hint');
+    if (hint) hint.textContent = '';
+    selecionarTipo('aula');
     await carregar();
-    toast.success('Aula criada.');
+    toast.success(tipo === 'aula' ? 'Aula criada.' : 'Tarefa criada.');
   } catch (e) {
-    console.error('Erro ao criar aula:', e);
-    toast.error(e.message || 'Erro ao criar aula');
+    console.error('Erro ao criar:', e);
+    toast.error(e.message || 'Erro ao criar');
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = tipo === 'aula' ? 'Criar aula →' : 'Criar tarefa →';
   }
 }
 
 async function handleDeletarAula(aulaId, titulo) {
   const ok = await confirmDialog({
-    title: 'Excluir aula?',
-    message: `"${titulo}" será removida permanentemente. Entregas associadas também serão excluídas.`,
+    title: 'Excluir evento?',
+    message: `"${titulo}" será removido permanentemente. Entregas associadas também serão excluídas.`,
     confirmLabel: 'Excluir',
     danger: true,
   });
@@ -122,18 +154,54 @@ async function handleDeletarAula(aulaId, titulo) {
   try {
     await deletarAula(aulaId);
     await carregar();
-    toast.success('Aula excluída.');
+    toast.success('Excluído.');
   } catch (e) {
-    console.error('Erro ao excluir aula:', e);
-    toast.error(e.message || 'Erro ao excluir aula');
+    console.error('Erro ao excluir:', e);
+    toast.error(e.message || 'Erro ao excluir');
   }
 }
+
+function selecionarTipo(tipo) {
+  document.getElementById('aula-tipo').value = tipo;
+  const btnAula = document.getElementById('tipo-aula-btn');
+  const btnTarefa = document.getElementById('tipo-tarefa-btn');
+  const camposAula = document.getElementById('campos-aula');
+  const camposTarefa = document.getElementById('campos-tarefa');
+  const confirmBtn = document.getElementById('modal-aula-confirm');
+
+  if (tipo === 'aula') {
+    btnAula.className = 'btn-sm b';
+    btnTarefa.className = 'btn-sm ghost';
+    camposAula.style.display = '';
+    camposTarefa.style.display = 'none';
+    if (confirmBtn) confirmBtn.textContent = 'Criar aula →';
+  } else {
+    btnAula.className = 'btn-sm ghost';
+    btnTarefa.className = 'btn-sm b';
+    camposAula.style.display = 'none';
+    camposTarefa.style.display = '';
+    if (confirmBtn) confirmBtn.textContent = 'Criar tarefa →';
+  }
+}
+
+document.getElementById('aula-arquivo')?.addEventListener('change', (e) => {
+  const hint = document.getElementById('aula-arquivo-hint');
+  if (!hint) return;
+  const file = e.target.files?.[0];
+  if (file) {
+    const kb = (file.size / 1024).toFixed(0);
+    hint.textContent = `${file.name} · ${kb > 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB'}`;
+  } else {
+    hint.textContent = '';
+  }
+});
 
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.handleTogglePublicarAula = handleTogglePublicarAula;
 window.handleDeletarAula = handleDeletarAula;
 window.handleCriarAula = handleCriarAula;
+window.selecionarTipo = selecionarTipo;
 
 initModalEscape();
 await carregar();
