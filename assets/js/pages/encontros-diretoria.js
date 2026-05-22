@@ -151,40 +151,69 @@ async function handleExcluirEncontro(id, titulo) {
   }
 }
 
+function toggleDetalhe(id) {
+  const row = document.getElementById(`detalhe-${id}`);
+  const btn = document.getElementById(`btn-expand-${id}`);
+  if (!row || !btn) return;
+  const aberto = row.style.display !== 'none';
+  row.style.display = aberto ? 'none' : 'table-row';
+  btn.textContent = aberto ? '▶ Ver detalhes' : '▼ Ocultar';
+}
+
 async function carregarHistorico() {
   const tbl = $('historico-tbl');
   if (!tbl) return;
   try {
     const encontros = await getHistoricoEncontros(ligaId);
     if (!encontros.length) {
-      tbl.innerHTML = `<tbody><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted);font-size:12px">Nenhum encontro registrado ainda.</td></tr></tbody>`;
+      tbl.innerHTML = `<tbody><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted);font-size:12px">Nenhum encontro registrado ainda.</td></tr></tbody>`;
       return;
     }
     tbl.innerHTML = `
       <thead><tr>
-        <th>Título</th><th>Data</th><th>Presença</th><th></th>
+        <th>Título</th><th>Data</th><th>Presença</th><th></th><th></th>
       </tr></thead>
       <tbody>
         ${encontros.map(e => {
-          const data = new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR');
+          const dataFmt = new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR');
           const pct = e.total ? Math.round((e.presentes / e.total) * 100) : 0;
           const statusCor = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
           const badge = e.aberto
-            ? `<span style="background:var(--green);color:#000;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600">ABERTA</span>`
+            ? `<span style="background:var(--green);color:#000;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600;margin-left:.5rem">ABERTA</span>`
             : '';
-          return `<tr>
-            <td style="font-weight:500">${e.titulo} ${badge}</td>
-            <td style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">${data}</td>
-            <td style="font-family:var(--font-mono);font-size:12px">
-              <span style="color:${statusCor};font-weight:600">${e.presentes}</span>
-              <span style="color:var(--muted)">/ ${e.total}</span>
-              ${e.total ? `<span style="color:var(--muted);margin-left:.25rem">(${pct}%)</span>` : ''}
-            </td>
-            <td style="text-align:right">
-              <button class="btn-sm ghost" style="color:var(--red);border-color:var(--red)"
-                onclick="handleExcluirEncontro('${e.id}', '${e.titulo.replace(/'/g, "\\'")}')">Excluir</button>
-            </td>
-          </tr>`;
+          const chips = e.membros.length
+            ? e.membros.map(m => {
+                const presente = m.status === 'presente';
+                const cor = presente ? 'var(--green)' : 'var(--red)';
+                const icon = presente ? '✓' : '✗';
+                return `<span style="display:inline-flex;align-items:center;gap:.3rem;background:var(--bg3);border:1px solid ${cor}33;border-radius:4px;padding:3px 8px;font-size:11px;font-family:var(--font-body)">
+                  <span style="color:${cor};font-weight:700">${icon}</span>${m.nome}
+                </span>`;
+              }).join('')
+            : `<span style="color:var(--muted);font-size:12px">Nenhuma presença registrada.</span>`;
+
+          return `
+            <tr>
+              <td style="font-weight:500">${e.titulo}${badge}</td>
+              <td style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">${dataFmt}</td>
+              <td style="font-family:var(--font-mono);font-size:12px">
+                <span style="color:${statusCor};font-weight:600">${e.presentes}</span>
+                <span style="color:var(--muted)">/ ${e.total}</span>
+                ${e.total ? `<span style="color:var(--muted);margin-left:.25rem">(${pct}%)</span>` : ''}
+              </td>
+              <td>
+                <button id="btn-expand-${e.id}" class="btn-sm ghost" onclick="toggleDetalhe('${e.id}')">▶ Ver detalhes</button>
+              </td>
+              <td style="text-align:right">
+                <button class="btn-sm ghost" style="color:var(--red);border-color:var(--red)"
+                  onclick="handleExcluirEncontro('${e.id}', '${e.titulo.replace(/'/g, "\\'")}')">Excluir</button>
+              </td>
+            </tr>
+            <tr id="detalhe-${e.id}" style="display:none">
+              <td colspan="5" style="background:var(--bg2);padding:1rem 1.25rem;border-top:none">
+                <div style="display:flex;flex-wrap:wrap;gap:.4rem">${chips}</div>
+              </td>
+            </tr>`;
         }).join('')}
       </tbody>`;
   } catch (e) {
@@ -253,6 +282,7 @@ window.handleCriarEncontro = handleCriarEncontro;
 window.handleAbrirChamada = handleAbrirChamada;
 window.handleFecharChamada = handleFecharChamada;
 window.handleExcluirEncontro = handleExcluirEncontro;
+window.toggleDetalhe = toggleDetalhe;
 
 $('btn-export-todos')?.addEventListener('click', () => exportarTodosRegistros(ligaId));
 $('btn-export-membros')?.addEventListener('click', () => exportarResumoPorMembro(ligaId));

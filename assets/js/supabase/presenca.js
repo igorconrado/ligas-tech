@@ -134,23 +134,30 @@ export async function getEncontros(ligaId) {
   return data || [];
 }
 
-// Diretoria: histórico com contagem de presenças
+// Diretoria: histórico com contagem e detalhes de presenças
 export async function getHistoricoEncontros(ligaId) {
   const { data, error } = await supabase
     .from('encontros')
-    .select('id, titulo, data, aberto, presencas(status)')
+    .select('id, titulo, data, aberto, presencas(status, membros(nome))')
     .eq('liga_id', ligaId)
     .order('data', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map(e => ({
-    id: e.id,
-    titulo: e.titulo,
-    data: e.data,
-    aberto: e.aberto,
-    presentes: (e.presencas || []).filter(p => p.status === 'presente').length,
-    total: (e.presencas || []).length,
-  }));
+  return (data || []).map(e => {
+    const presencas = e.presencas || [];
+    const membros = presencas
+      .map(p => ({ nome: p.membros?.nome || '?', status: p.status }))
+      .sort((a, b) => a.nome.localeCompare(b.nome));
+    return {
+      id: e.id,
+      titulo: e.titulo,
+      data: e.data,
+      aberto: e.aberto,
+      presentes: presencas.filter(p => p.status === 'presente').length,
+      total: presencas.length,
+      membros,
+    };
+  });
 }
 
 // Diretoria: excluir encontro
