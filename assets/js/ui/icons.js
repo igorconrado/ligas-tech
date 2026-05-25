@@ -21,6 +21,8 @@ export const icons = {
   bell:         `<svg ${A}><path d="M10 2a6 6 0 0 0-6 6v3l-2 3h16l-2-3V8a6 6 0 0 0-6-6z"/><path d="M10 18a2 2 0 0 0 2-2H8a2 2 0 0 0 2 2z"/></svg>`,
   inbox:        `<svg ${A}><path d="M3 9l2-5h10l2 5"/><path d="M3 9v8h14V9"/><path d="M3 9h5l1 2h2l1-2h5"/></svg>`,
 
+  changelog:    `<svg ${A}><path d="M5 3h10a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M7 7h6M7 10h6M7 13h4"/></svg>`,
+
   // Chrome (toggle, drawer, logout)
   chevronLeft:  `<svg ${A}><path d="M12 5l-5 5 5 5"/></svg>`,
   chevronRight: `<svg ${A}><path d="M8 5l5 5-5 5"/></svg>`,

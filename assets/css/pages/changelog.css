@@ -1,0 +1,93 @@
+/* ================================================================
+   CHANGELOG.CSS
+   Estilos da página membros/changelog.html
+================================================================ */
+
+.changelog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.changelog__release {
+  border-left: 2px solid var(--border-subtle);
+  padding-left: var(--sp-5);
+  position: relative;
+}
+
+.changelog__release::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.changelog__release:first-child::before {
+  background: var(--shell-accent, var(--text-primary));
+}
+
+.changelog__header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.changelog__version {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  color: var(--text-primary);
+  letter-spacing: var(--tr-tight);
+}
+
+.changelog__date {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--tr-caps);
+}
+
+.changelog__badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-pill);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--tr-caps);
+}
+
+.changelog__badge--latest {
+  background: color-mix(in srgb, var(--shell-accent, var(--accent-bot)) 12%, transparent);
+  color: var(--shell-accent, var(--accent-bot));
+  border: 1px solid color-mix(in srgb, var(--shell-accent, var(--accent-bot)) 30%, transparent);
+}
+
+.changelog__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.changelog__items li {
+  font-size: var(--fs-body-s);
+  color: var(--text-secondary);
+  padding-left: var(--sp-4);
+  position: relative;
+}
+
+.changelog__items li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}

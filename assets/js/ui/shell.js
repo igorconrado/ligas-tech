@@ -18,6 +18,7 @@ import { fazerLogout } from '/assets/js/supabase/auth.js';
 import { icons } from '/assets/js/ui/icons.js';
 
 const SIDEBAR_STATE_KEY = 'sidebar-state';
+const APP_VERSION = 'v1.4.0';
 
 const NAV_MEMBRO = [
   { group: 'PRINCIPAL', items: [
@@ -118,6 +119,10 @@ function buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoriaUser,
       </div>
       <nav class="sidebar__nav">${groupsHtml}${extraLink}</nav>
       <div class="sidebar__footer">
+        <a href="/membros/changelog" class="sidebar__version" title="Ver changelog">
+          <span class="sidebar__icon">${icons.changelog}</span>
+          <span class="sidebar__label sidebar__version-text">${APP_VERSION}</span>
+        </a>
         <button class="sidebar__logout" type="button">
           <span class="sidebar__icon">${icons.logout}</span>
           <span class="sidebar__label">Sair</span>
