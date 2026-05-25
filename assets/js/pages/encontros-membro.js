@@ -11,7 +11,7 @@ const $ = (id) => document.getElementById(id);
 
 function fmtDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+  return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
 }
 
 function renderPresencas(presencas) {

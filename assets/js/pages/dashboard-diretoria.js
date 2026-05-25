@@ -94,7 +94,7 @@ async function renderizarUltimasPresencas() {
     }
     const presencasPorEnc = await Promise.all(ultimos.map(e => getPresencasEncontro(e.id)));
     tbody.innerHTML = ultimos.map((e, i) => {
-      const data = new Date(e.data).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }).replace('.', '');
+      const data = new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }).replace('.', '');
       const presentes = presencasPorEnc[i].filter(p => p.status === 'presente').length;
       const taxa = totalMembros > 0 ? Math.round((presentes / totalMembros) * 100) : 0;
       const pill = ligaNome === 'IbBot' ? 'r' : 'b';

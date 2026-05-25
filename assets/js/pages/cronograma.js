@@ -29,7 +29,7 @@ try {
   }
   const encontros = await getEncontros(perfil.liga_id);
   const itens = [...encontros]
-    .sort((a, b) => new Date(a.data) - new Date(b.data))
+    .sort((a, b) => new Date(a.data + 'T12:00:00') - new Date(b.data + 'T12:00:00'))
     .map(e => ({
       data: e.data,
       titulo: e.titulo,
@@ -45,7 +45,7 @@ try {
   } else {
     const hoje = new Date().toDateString();
     container.innerHTML = itens.map(item => {
-      const dataItem = new Date(item.data);
+      const dataItem = new Date(item.data + 'T12:00:00');
       const isHoje = dataItem.toDateString() === hoje;
       const isConcluida = dataItem < new Date() && !isHoje;
       const status = isHoje ? 'hoje' : isConcluida ? 'concluida' : 'planejada';

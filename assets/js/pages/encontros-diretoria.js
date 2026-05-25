@@ -40,7 +40,7 @@ async function carregarEncontros() {
       return;
     }
     select.innerHTML = encontros.map(e => `
-      <option value="${e.id}">${e.titulo} — ${new Date(e.data).toLocaleDateString('pt-BR')}</option>
+      <option value="${e.id}">${e.titulo} — ${new Date(e.data + 'T12:00:00').toLocaleDateString('pt-BR')}</option>
     `).join('');
   } catch (e) {
     console.error('Erro ao carregar encontros:', e);
