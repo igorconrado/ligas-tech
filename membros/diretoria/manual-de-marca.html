@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Marca — Diretoria · Ligas Tech</title>
+<link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/global.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/dashboard-diretoria.css">
+<link rel="stylesheet" href="/assets/css/pages/ux-improvements.css">
+<link rel="stylesheet" href="/assets/css/ui/empty-state.css">
+<link rel="stylesheet" href="/assets/css/ui/skeleton.css">
+<link rel="stylesheet" href="/assets/css/ui/a11y.css">
+<link rel="stylesheet" href="/assets/css/shell.css">
+<style>
+  /* ── Seletor de liga ── */
+  .mm-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-6);
+  }
+  .mm-sel-btn {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: var(--sp-5) var(--sp-6);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .15s, background .15s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    position: relative;
+    overflow: hidden;
+  }
+  .mm-sel-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border2);
+    transition: background .15s;
+  }
+  .mm-sel-btn.ibtech::before { background: #00A6FF; }
+  .mm-sel-btn.ibbot::before  { background: #FF1F1F; }
+  .mm-sel-btn:not(.active) { opacity: .55; }
+  .mm-sel-btn:not(.active):hover { opacity: .85; border-color: var(--border2); }
+  .mm-sel-btn.active { border-color: var(--border2); opacity: 1; }
+  .mm-sel-btn.active.ibtech { background: #00A6FF08; }
+  .mm-sel-btn.active.ibbot  { background: #FF1F1F08; }
+  .mm-sel-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1;
+  }
+  .mm-sel-btn.ibtech .mm-sel-name { color: #00A6FF; }
+  .mm-sel-btn.ibbot  .mm-sel-name { color: #FF1F1F; }
+  .mm-sel-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .mm-sel-meta {
+    display: flex;
+    gap: var(--sp-2);
+    margin-top: var(--sp-1);
+    flex-wrap: wrap;
+  }
+  .mm-sel-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .mm-sel-btn.ibtech .mm-sel-tag { border-color: #00A6FF40; color: #00A6FF; background: #00A6FF0D; }
+  .mm-sel-btn.ibbot  .mm-sel-tag { border-color: #FF1F1F40; color: #FF4530;  background: #FF1F1F0D; }
+  .mm-sel-arrow {
+    position: absolute;
+    right: var(--sp-5);
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .mm-sel-btn.active .mm-sel-arrow { opacity: 1; }
+  .mm-sel-btn.ibtech .mm-sel-arrow { color: #00A6FF; }
+  .mm-sel-btn.ibbot  .mm-sel-arrow { color: #FF1F1F; }
+
+  /* ── Painéis ── */
+  .mm-panel { display: none; }
+  .mm-panel.active { display: flex; flex-direction: column; gap: var(--sp-8); }
+
+  /* ── Layout compartilhado ── */
+  .mm-section { display: flex; flex-direction: column; gap: var(--sp-4); }
+  .mm-section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .mm-section-label span { color: var(--text); margin-right: var(--sp-2); }
+
+  /* ── Manifesto ── */
+  .mm-manifesto { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--sp-4); }
+  .mm-mcard {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: var(--sp-5);
+  }
+  .mm-mcard-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: var(--sp-2);
+    display: block;
+  }
+  .mm-mcard-value { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.5; }
+  .mm-personality { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-top: var(--sp-2); }
+  .mm-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .mm-pill-azure { border-color: #00A6FF40; color: #00A6FF; background: #00A6FF0D; }
+  .mm-pill-aqua  { border-color: #00E5FF40; color: #00E5FF; background: #00E5FF0D; }
+  .mm-pill-teal  { border-color: #4FB8B840; color: #4FB8B8; background: #4FB8B80D; }
+  .mm-pill-red   { border-color: #FF1F1F40; color: #FF4530; background: #FF1F1F0D; }
+  .mm-pill-muted { border-color: var(--border2); color: var(--muted); }
+
+  /* ── Logo ── */
+  .mm-logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .mm-logo-preview {
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    padding: var(--sp-6);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-4);
+  }
+  .mm-logo-preview.dark-navy { background: #00154F; }
+  .mm-logo-preview.dark-ink  { background: #080808; border-color: #222; }
+  .mm-logo-preview.light     { background: #F3F4F2; }
+  .mm-logo-lock { display: flex; align-items: center; gap: 10px; }
+  .mm-logo-mark {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .mm-logo-name  { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -.01em; line-height: 1; }
+  .mm-logo-sub   { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; margin-top: 3px; }
+  .mm-logo-badge { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 2px; }
+  .mm-logo-badge.pref-blue  { background: #00A6FF20; color: #00A6FF; border: 1px solid #00A6FF40; }
+  .mm-logo-badge.alt-paper  { background: #0B122020; color: #0B1220;  border: 1px solid #0B122040; }
+  .mm-logo-badge.pref-dark  { background: #FF1F1F20; color: #FF4530;  border: 1px solid #FF1F1F40; }
+  .mm-logo-badge.alt-light  { background: #08080820; color: #888;     border: 1px solid #33333340; }
+
+  .mm-clearspace {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: var(--sp-5);
+  }
+  .mm-clearspace-rule { display: flex; align-items: flex-start; gap: var(--sp-4); padding: var(--sp-3) 0; border-bottom: 1px solid var(--border); }
+  .mm-clearspace-rule:last-child { border-bottom: none; }
+  .mm-cs-key { font-family: 'Space Mono', monospace; font-size: 10px; width: 120px; flex-shrink: 0; }
+  .mm-cs-key.blue { color: #00A6FF; }
+  .mm-cs-key.red  { color: #FF4530; }
+  .mm-cs-val { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .mm-cs-sub { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Cores ── */
+  .mm-color-group { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .mm-color-group-title { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .mm-swatches { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+  .mm-swatch {
+    display: flex; flex-direction: column; gap: var(--sp-2);
+    min-width: 90px;
+    cursor: pointer;
+    position: relative;
+  }
+  .mm-swatch::after {
+    content: 'Copiar';
+    position: absolute; top: 6px; right: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; letter-spacing: .05em; text-transform: uppercase;
+    background: rgba(0,0,0,.75); color: #fff;
+    padding: 2px 6px; border-radius: 2px;
+    opacity: 0; transition: opacity .15s; pointer-events: none;
+  }
+  .mm-swatch:hover::after { opacity: 1; }
+  .mm-swatch:hover .mm-swatch-block { outline: 2px solid rgba(255,255,255,.3); outline-offset: -2px; }
+  .mm-swatch.copied::after { content: 'Copiado!'; background: #00A6FF; color: #0B1220; opacity: 1; }
+  .mm-swatch-block { height: 60px; border-radius: 4px; border: 1px solid rgba(255,255,255,.06); }
+  .mm-swatch-name  { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); display: block; }
+  .mm-swatch-hex   { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); display: block; }
+  .mm-swatch-token { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--border2); display: block; margin-top: 1px; }
+  .mm-swatch-role  { font-size: 10px; color: var(--muted); display: block; margin-top: 1px; }
+
+  /* Proporção */
+  .mm-prop-bar { display: flex; height: 36px; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .mm-prop-label { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; }
+  .mm-prop-legend { display: flex; gap: var(--sp-5); margin-top: var(--sp-3); flex-wrap: wrap; }
+  .mm-prop-legend-item { display: flex; align-items: center; gap: var(--sp-2); font-size: 12px; color: var(--muted); }
+  .mm-prop-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Semânticos */
+  .mm-semantic-row { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+  .mm-sem { display: flex; align-items: center; gap: var(--sp-3); background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-3) var(--sp-4); flex: 1; min-width: 140px; }
+  .mm-sem-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .mm-sem-name  { font-size: 12px; font-weight: 600; color: var(--text); display: block; }
+  .mm-sem-hex   { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); display: block; }
+  .mm-sem-token { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--border2); display: block; }
+
+  /* ── Tipografia ── */
+  .mm-type-table { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .mm-type-row { display: flex; align-items: center; gap: var(--sp-5); padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border); }
+  .mm-type-row:last-child { border-bottom: none; }
+  .mm-type-meta { width: 200px; flex-shrink: 0; }
+  .mm-type-role { font-size: 11px; font-weight: 600; color: var(--text); display: block; }
+  .mm-type-spec { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); display: block; margin-top: 3px; }
+
+  /* ── Espaçamento ── */
+  .mm-space-grid { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: flex-end; }
+  .mm-space-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+  .mm-space-block { background: #00A6FF1A; border: 1px solid #00A6FF40; border-radius: 2px; width: 100%; min-width: 24px; }
+  .mm-space-block.red { background: #FF1F1F1A; border-color: #FF1F1F40; }
+  .mm-space-token { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); white-space: nowrap; }
+
+  /* Radius */
+  .mm-radius-row { display: flex; gap: var(--sp-4); flex-wrap: wrap; align-items: center; }
+  .mm-radius-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+  .mm-radius-block { width: 52px; height: 52px; background: var(--surface-1); border: 2px solid; }
+  .mm-radius-block.blue { border-color: #00A6FF; }
+  .mm-radius-block.red  { border-color: #FF1F1F; }
+  .mm-radius-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); text-align: center; }
+
+  /* Grid stats */
+  .mm-grid-info { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
+  .mm-grid-stat { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-4) var(--sp-5); display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 120px; }
+  .mm-grid-num  { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
+  .mm-grid-num.blue { color: #00A6FF; }
+  .mm-grid-num.red  { color: #FF4530; }
+  .mm-grid-desc { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* ── Tom de voz ── */
+  .mm-voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .mm-voice-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-5); }
+  .mm-voice-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: var(--sp-3); display: flex; align-items: center; gap: var(--sp-2); }
+  .mm-voice-title.do   { color: #3FCF8E; }
+  .mm-voice-title.dont { color: #FF5A5F; }
+  .mm-voice-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .mm-voice-list li { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--text); line-height: 1.4; padding: var(--sp-2) var(--sp-3); background: var(--surface-2); border-radius: 3px; border-left: 2px solid transparent; }
+  .mm-voice-card.do   .mm-voice-list li { border-left-color: #3FCF8E; }
+  .mm-voice-card.dont .mm-voice-list li { border-left-color: #FF5A5F; color: var(--muted); }
+  .mm-attr-grid { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+  .mm-attr { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-4) var(--sp-5); flex: 1; min-width: 120px; }
+  .mm-attr-word { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); display: block; margin-bottom: 4px; }
+  .mm-attr-num  { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .1em; }
+  .mm-attr-num.blue { color: #00A6FF; }
+  .mm-attr-num.red  { color: #FF4530; }
+
+  /* ── Do & Don't logo ── */
+  .mm-dod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .mm-dod-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-5); }
+  .mm-dod-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; margin-bottom: var(--sp-3); display: flex; align-items: center; gap: var(--sp-2); }
+  .mm-dod-title.do   { color: #3FCF8E; }
+  .mm-dod-title.dont { color: #FF5A5F; }
+  .mm-dod-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+  .mm-dod-list li { font-size: 12px; color: var(--muted); line-height: 1.5; padding-left: var(--sp-3); position: relative; }
+  .mm-dod-list li::before { content: '—'; position: absolute; left: 0; color: var(--border2); }
+
+  /* ── Principles ── */
+  .mm-principles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .mm-principle { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-5); }
+  .mm-principle-num   { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .1em; margin-bottom: var(--sp-2); display: block; }
+  .mm-principle-num.blue { color: #00A6FF; }
+  .mm-principle-num.red  { color: #FF4530; }
+  .mm-principle-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: var(--sp-2); }
+  .mm-principle-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── Callout ── */
+  .mm-callout { background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid; border-radius: 4px; padding: var(--sp-4) var(--sp-5); font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .mm-callout strong { color: var(--text); }
+  .mm-callout code   { font-family: 'Space Mono', monospace; font-size: 11px; background: var(--surface-2); padding: 1px 5px; border-radius: 2px; }
+  .mm-callout.blue   { border-left-color: #00A6FF; }
+  .mm-callout.blue code { color: #00A6FF; }
+  .mm-callout.red    { border-left-color: #FF1F1F; }
+  .mm-callout.red code  { color: #FF4530; }
+
+  /* ── Tokens ── */
+  .mm-token-table { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .mm-token-row { display: grid; grid-template-columns: 80px 120px 1fr 180px; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); align-items: center; }
+  .mm-token-row:last-child { border-bottom: none; }
+  .mm-token-row.head { background: var(--surface-2); padding: var(--sp-2) var(--sp-4); }
+  .mm-token-row.head span { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .mm-tk-prefix { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; }
+  .mm-tk-prefix.blue { color: #00A6FF; }
+  .mm-tk-prefix.red  { color: #FF4530; }
+  .mm-tk-syntax   { font-family: 'Space Mono', monospace; font-size: 11px; color: #00E5FF; }
+  .mm-tk-type     { font-size: 12px; color: var(--muted); }
+  .mm-tk-examples { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--border2); }
+
+  /* ── Componentes ── */
+  .mm-comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .mm-comp-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .mm-comp-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border); background: var(--surface-2); }
+  .mm-comp-body  { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); }
+
+  /* DS components */
+  .ds-btn { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; padding: 8px 18px; border-radius: 4px; border: none; cursor: default; letter-spacing: -.01em; }
+  .ds-btn.primary   { background: #00A6FF; color: #0B1220; }
+  .ds-btn.secondary { background: #0033A8; color: #F3F4F2; }
+  .ds-btn.ghost     { background: transparent; color: #00A6FF; border: 1px solid #00A6FF40; }
+  .ds-btn.danger    { background: #FF5A5F20; color: #FF5A5F; border: 1px solid #FF5A5F40; }
+  .ds-btn.disabled  { background: var(--surface-2); color: var(--muted); cursor: not-allowed; }
+  .ds-btn.bot-primary   { background: #FF1F1F; color: #fff; }
+  .ds-btn.bot-secondary { background: #6E0808; color: #FFC4BD; }
+  .ds-btn.bot-ghost     { background: transparent; color: #FF4530; border: 1px solid #FF1F1F40; }
+
+  .ds-badge { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 2px; }
+  .ds-badge.default { background: var(--surface-2); color: var(--text); border: 1px solid var(--border2); }
+  .ds-badge.accent  { background: #00A6FF20; color: #00A6FF; border: 1px solid #00A6FF40; }
+  .ds-badge.live    { background: #3FCF8E20; color: #3FCF8E; border: 1px solid #3FCF8E40; }
+  .ds-badge.beta    { background: #FFB02020; color: #FFB020; border: 1px solid #FFB02040; }
+  .ds-badge.offline { background: #FF5A5F20; color: #FF5A5F; border: 1px solid #FF5A5F40; }
+  .ds-badge.bot-accent { background: #FF1F1F20; color: #FF4530; border: 1px solid #FF1F1F40; }
+
+  .ds-alert { border-left: 3px solid; border-radius: 3px; padding: var(--sp-3) var(--sp-4); font-size: 13px; display: flex; align-items: flex-start; gap: var(--sp-3); }
+  .ds-alert.info    { border-color: #00A6FF; background: #00A6FF0D; color: var(--text); }
+  .ds-alert.success { border-color: #3FCF8E; background: #3FCF8E0D; color: var(--text); }
+  .ds-alert.warning { border-color: #FFB020;  background: #FFB0200D; color: var(--text); }
+  .ds-alert.danger  { border-color: #FF5A5F; background: #FF5A5F0D; color: var(--text); }
+  .ds-alert-icon { font-family: 'Space Mono', monospace; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .ds-alert.info    .ds-alert-icon { color: #00A6FF; }
+  .ds-alert.success .ds-alert-icon { color: #3FCF8E; }
+  .ds-alert.warning .ds-alert-icon { color: #FFB020; }
+  .ds-alert.danger  .ds-alert-icon { color: #FF5A5F; }
+
+  .ds-field { display: flex; flex-direction: column; gap: 4px; }
+  .ds-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .ds-input { background: var(--surface-2); border: 1px solid var(--border2); border-radius: 4px; padding: 8px 12px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+  .ds-input-hint { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); font-style: italic; }
+
+  .ds-avatar { width: 36px; height: 36px; border-radius: 50%; background: #0033A8; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; color: #F3F4F2; flex-shrink: 0; }
+  .ds-avatar-row { display: flex; gap: var(--sp-2); align-items: center; }
+
+  .ds-pre { background: #081028; border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-4); font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.7; overflow-x: auto; margin: 0; }
+  .ds-pre .kw  { color: #00A6FF; }
+  .ds-pre .str { color: #00E5FF; }
+  .ds-pre .fn  { color: #4FB8B8; }
+  .ds-pre .com { color: #2A3550; }
+  .ds-pre .ty  { color: #FFB020; }
+  .ds-pre.bot .kw  { color: #FF4530; }
+  .ds-pre.bot .str { color: #FFC4BD; }
+  .ds-pre.bot .fn  { color: #D81515; }
+  .ds-pre.bot .ty  { color: #FFB020; }
+
+  /* Recursos */
+  .mm-resource-row { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
+  .mm-resource { background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; padding: var(--sp-4) var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-1); flex: 1; min-width: 180px; }
+  .mm-resource-key { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .mm-resource-val.blue { font-family: 'Space Mono', monospace; font-size: 12px; color: #00A6FF; }
+  .mm-resource-val.red  { font-family: 'Space Mono', monospace; font-size: 12px; color: #FF4530; }
+
+  /* responsive */
+  @media (max-width: 860px) {
+    .mm-manifesto, .mm-logo-grid, .mm-voice-grid, .mm-dod-grid, .mm-principles, .mm-comp-grid { grid-template-columns: 1fr; }
+    .mm-token-row { grid-template-columns: 80px 110px 1fr; }
+    .mm-token-row .mm-tk-examples { display: none; }
+  }
+  @media (max-width: 580px) {
+    .mm-manifesto { grid-template-columns: 1fr; }
+    .mm-selector  { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
+<main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
+
+  <!-- Cabeçalho -->
+  <div style="margin-bottom:var(--sp-6)">
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin:0 0 var(--sp-2);line-height:1">Manual de Marca</h1>
+    <p style="font-size:13px;color:var(--muted);max-width:560px;line-height:1.6;margin:0">
+      Selecione uma liga para visualizar o guia de identidade visual, cores, tipografia, tom de voz e aplicações.
+    </p>
+  </div>
+
+  <!-- Seletor -->
+  <div class="mm-selector">
+    <button class="mm-sel-btn ibtech active" id="btn-ibtech" onclick="selectLiga('ibtech')">
+      <span class="mm-sel-name">IBtech</span>
+      <span class="mm-sel-sub">Liga de Software · Ibmec BH</span>
+      <div class="mm-sel-meta">
+        <span class="mm-sel-tag">Software</span>
+        <span class="mm-sel-tag">Produto</span>
+        <span class="mm-sel-tag">Engenharia</span>
+      </div>
+      <span class="mm-sel-arrow">→</span>
+    </button>
+    <button class="mm-sel-btn ibbot" id="btn-ibbot" onclick="selectLiga('ibbot')">
+      <span class="mm-sel-name">IbBot</span>
+      <span class="mm-sel-sub">Liga de Robótica · Ibmec BH</span>
+      <div class="mm-sel-meta">
+        <span class="mm-sel-tag">Robótica</span>
+        <span class="mm-sel-tag">Automação</span>
+        <span class="mm-sel-tag">IoT</span>
+      </div>
+      <span class="mm-sel-arrow">→</span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PAINEL IBTECH
+       ═══════════════════════════════════════════════ -->
+  <div class="mm-panel active" id="panel-ibtech">
+
+    <!-- 01 · A Marca -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>01</span>A Marca</div>
+      <div class="mm-manifesto">
+        <div class="mm-mcard">
+          <span class="mm-mcard-label">Propósito</span>
+          <span class="mm-mcard-value">Construir a próxima geração de devs do Ibmec.</span>
+        </div>
+        <div class="mm-mcard">
+          <span class="mm-mcard-label">Atuação</span>
+          <span class="mm-mcard-value">Software · Engenharia · Produto</span>
+        </div>
+        <div class="mm-mcard">
+          <span class="mm-mcard-label">Personalidade</span>
+          <div class="mm-personality">
+            <span class="mm-pill mm-pill-azure">Técnica</span>
+            <span class="mm-pill mm-pill-azure">Direta</span>
+            <span class="mm-pill mm-pill-aqua">Curiosa</span>
+            <span class="mm-pill mm-pill-teal">Brincalhona</span>
+          </div>
+        </div>
+      </div>
+      <div class="mm-callout blue">
+        <strong>Manifesto:</strong> Desenvolvemos projetos de tecnologia e software que integram engenharia e programação — transformando teoria em prática por meio de desenvolvimento, testes e implementação. Promovemos aprendizado ativo e evolução contínua.
+      </div>
+    </div>
+
+    <!-- 02 · Logo -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>02</span>Logo & Mascote</div>
+      <div class="mm-logo-grid">
+        <div class="mm-logo-preview dark-navy">
+          <div class="mm-logo-lock">
+            <div class="mm-logo-mark" style="background:#0033A8">🐱</div>
+            <div>
+              <div class="mm-logo-name" style="color:#F3F4F2">IBtech</div>
+              <div class="mm-logo-sub" style="color:#00A6FF">Liga de Software</div>
+            </div>
+          </div>
+          <span class="mm-logo-badge pref-blue">Preferencial · Fundo Escuro</span>
+        </div>
+        <div class="mm-logo-preview light">
+          <div class="mm-logo-lock">
+            <div class="mm-logo-mark" style="background:#0033A8">🐱</div>
+            <div>
+              <div class="mm-logo-name" style="color:#0B1220">IBtech</div>
+              <div class="mm-logo-sub" style="color:#0033A8">Liga de Software</div>
+            </div>
+          </div>
+          <span class="mm-logo-badge alt-paper">Alternativa · Fundo Claro</span>
+        </div>
+      </div>
+      <div class="mm-clearspace">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:var(--sp-4)">Área de Respiro & Tamanhos Mínimos</div>
+        <div class="mm-clearspace-rule">
+          <span class="mm-cs-key blue">Clear Space</span>
+          <div class="mm-cs-val">1X em todos os lados — onde X = altura da orelha do mascote
+            <span class="mm-cs-sub">Mantenha sempre 1X livre de textos, imagens ou bordas</span>
+          </div>
+        </div>
+        <div class="mm-clearspace-rule">
+          <span class="mm-cs-key blue">Digital</span>
+          <div class="mm-cs-val">24px mínimo de altura<span class="mm-cs-sub">Abaixo de 24px, use versão simplificada do mascote</span></div>
+        </div>
+        <div class="mm-clearspace-rule">
+          <span class="mm-cs-key blue">Web</span>
+          <div class="mm-cs-val">48px mínimo de altura</div>
+        </div>
+        <div class="mm-clearspace-rule">
+          <span class="mm-cs-key blue">Impresso</span>
+          <div class="mm-cs-val">10mm mínimo de altura</div>
+        </div>
+      </div>
+      <div class="mm-dod-grid">
+        <div class="mm-dod-card">
+          <div class="mm-dod-title do"><svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l5 5 7-7"/></svg>SEMPRE</div>
+          <ul class="mm-dod-list">
+            <li>Usar a logo fornecida nos arquivos oficiais</li>
+            <li>Manter proporções originais e área de respiro</li>
+            <li>Preferir fundos escuros (Ink Navy) para mais impacto</li>
+            <li>Centralizar o mascote dentro da área de respiro</li>
+          </ul>
+        </div>
+        <div class="mm-dod-card">
+          <div class="mm-dod-title dont"><svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l10 10M15 5L5 15"/></svg>NUNCA</div>
+          <ul class="mm-dod-list">
+            <li>Adicionar sombras, bordas ou efeitos extras</li>
+            <li>Recolorir o mascote fora das versões aprovadas</li>
+            <li>Rotacionar ou distorcer proporções</li>
+            <li>Usar em fundos de baixo contraste ou com ruído</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 · Cores -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>03</span>Paleta de Cores</div>
+
+      <div class="mm-color-group">
+        <span class="mm-color-group-title">01.1 · Primárias</span>
+        <div class="mm-swatches">
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#0B1220"></div>
+            <span class="mm-swatch-name">Ink</span>
+            <span class="mm-swatch-hex">#0B1220</span>
+            <span class="mm-swatch-token">--c-ink</span>
+          </div>
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#00154F"></div>
+            <span class="mm-swatch-name">Ink Navy</span>
+            <span class="mm-swatch-hex">#00154F</span>
+            <span class="mm-swatch-token">--c-midnight</span>
+            <span class="mm-swatch-role">Fundo e base · 60%</span>
+          </div>
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#00A6FF"></div>
+            <span class="mm-swatch-name">Azure</span>
+            <span class="mm-swatch-hex">#00A6FF</span>
+            <span class="mm-swatch-token">--c-azure</span>
+            <span class="mm-swatch-role">Destaques · 30%</span>
+          </div>
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#F3F4F2;border-color:rgba(0,0,0,.1)"></div>
+            <span class="mm-swatch-name">Paper</span>
+            <span class="mm-swatch-hex">#F3F4F2</span>
+            <span class="mm-swatch-token">--c-paper</span>
+          </div>
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#FFFFFF;border-color:rgba(0,0,0,.1)"></div>
+            <span class="mm-swatch-name">White</span>
+            <span class="mm-swatch-hex">#FFFFFF</span>
+            <span class="mm-swatch-token">--c-white</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mm-color-group">
+        <span class="mm-color-group-title">01.2 · Secundárias & Acento</span>
+        <div class="mm-swatches">
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#00154F"></div><span class="mm-swatch-name">Midnight</span><span class="mm-swatch-hex">#00154F</span><span class="mm-swatch-token">--c-midnight</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#0033A8"></div><span class="mm-swatch-name">Cobalt</span><span class="mm-swatch-hex">#0033A8</span><span class="mm-swatch-token">--c-cobalt</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#00E5FF"></div><span class="mm-swatch-name">Aqua</span><span class="mm-swatch-hex">#00E5FF</span><span class="mm-swatch-token">--c-aqua</span><span class="mm-swatch-role">Acento · 10%</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#4FB8B8"></div><span class="mm-swatch-name">Teal</span><span class="mm-swatch-hex">#4FB8B8</span><span class="mm-swatch-token">--c-teal</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#2A6B6B"></div><span class="mm-swatch-name">Teal Deep</span><span class="mm-swatch-hex">#2A6B6B</span><span class="mm-swatch-token">--c-teal-deep</span></div>
+        </div>
+      </div>
+
+      <div class="mm-color-group">
+        <span class="mm-color-group-title">01.3 · Neutros</span>
+        <div class="mm-swatches">
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#081028"></div><span class="mm-swatch-name">Ink Deep</span><span class="mm-swatch-hex">#081028</span><span class="mm-swatch-token">--c-ink-deep</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#1A2238"></div><span class="mm-swatch-name">Ink 80</span><span class="mm-swatch-hex">#1A2238</span><span class="mm-swatch-token">--c-ink-80</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#2A3550"></div><span class="mm-swatch-name">Ink 60</span><span class="mm-swatch-hex">#2A3550</span><span class="mm-swatch-token">--c-ink-60</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#E8EAE6;border-color:rgba(0,0,0,.08)"></div><span class="mm-swatch-name">Paper 2</span><span class="mm-swatch-hex">#E8EAE6</span><span class="mm-swatch-token">--c-paper-2</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#D9DCD7;border-color:rgba(0,0,0,.08)"></div><span class="mm-swatch-name">Paper 3</span><span class="mm-swatch-hex">#D9DCD7</span><span class="mm-swatch-token">--c-paper-3</span></div>
+        </div>
+      </div>
+
+      <div class="mm-color-group">
+        <span class="mm-color-group-title">01.4 · Semânticos</span>
+        <div class="mm-semantic-row">
+          <div class="mm-sem"><div class="mm-sem-dot" style="background:#3FCF8E"></div><div><span class="mm-sem-name">Success</span><span class="mm-sem-hex">#3FCF8E</span><span class="mm-sem-token">--c-success</span></div></div>
+          <div class="mm-sem"><div class="mm-sem-dot" style="background:#FFB020"></div><div><span class="mm-sem-name">Warning</span><span class="mm-sem-hex">#FFB020</span><span class="mm-sem-token">--c-warning</span></div></div>
+          <div class="mm-sem"><div class="mm-sem-dot" style="background:#FF5A5F"></div><div><span class="mm-sem-name">Danger</span><span class="mm-sem-hex">#FF5A5F</span><span class="mm-sem-token">--c-danger</span></div></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:var(--sp-3)">Proporção de Uso — 60 / 30 / 10</div>
+        <div class="mm-prop-bar">
+          <div style="flex:60;background:#00154F;display:flex;align-items:center;padding-left:12px"><span class="mm-prop-label" style="color:rgba(255,255,255,.8)">60% INK NAVY</span></div>
+          <div style="flex:30;background:#00A6FF;display:flex;align-items:center;justify-content:center"><span class="mm-prop-label" style="color:#0B1220">30%</span></div>
+          <div style="flex:10;background:#00E5FF;display:flex;align-items:center;justify-content:center"><span class="mm-prop-label" style="color:#0B1220;font-size:9px">10%</span></div>
+        </div>
+        <div class="mm-prop-legend">
+          <div class="mm-prop-legend-item"><div class="mm-prop-dot" style="background:#00154F"></div>60% · Ink Navy — fundo e base</div>
+          <div class="mm-prop-legend-item"><div class="mm-prop-dot" style="background:#00A6FF"></div>30% · Azure — destaques</div>
+          <div class="mm-prop-legend-item"><div class="mm-prop-dot" style="background:#00E5FF"></div>10% · Aqua — acento pontual</div>
+        </div>
+      </div>
+      <div class="mm-callout blue"><strong>Regra:</strong> <code>Ink + Azure</code> é a combinação-chave. <code>Paper + Ink</code> para leitura extensa. Evite azul saturado como fundo dominante — Azure é acento e foco, não base.</div>
+    </div>
+
+    <!-- 04 · Tipografia -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>04</span>Tipografia</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4)">
+        <div class="mm-mcard">
+          <span class="mm-mcard-label">Display & Títulos · <code style="font-family:'Space Mono',monospace;font-size:10px;color:#00A6FF">--ff-display</code></span>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--text);line-height:1.1;margin:var(--sp-3) 0">Aa</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text)">Space Grotesk · 300 / 400 / 500 / 600 / 700</div>
+        </div>
+        <div class="mm-mcard">
+          <span class="mm-mcard-label">Código & Captions · <code style="font-family:'Space Mono',monospace;font-size:10px;color:#00A6FF">--ff-mono</code></span>
+          <div style="font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:var(--text);line-height:1.1;margin:var(--sp-3) 0">Aa</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text)">Space Mono · 400 / 700 / italic</div>
+        </div>
+      </div>
+      <div class="mm-type-table">
+        <div class="mm-type-row" style="background:var(--surface-2);padding-top:var(--sp-2);padding-bottom:var(--sp-2)">
+          <div class="mm-type-meta"><span style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Estilo / Especificação</span></div>
+          <span style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Preview</span>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">Display</span><span class="mm-type-spec">Grotesk 700 · 160px / 144 lh</span></div>
+          <div style="font-family:'Space Grotesk';font-size:40px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.02em">IBtech</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">H1 — Título</span><span class="mm-type-spec">Grotesk 600 · 96px / 92 lh</span></div>
+          <div style="font-family:'Space Grotesk';font-size:28px;font-weight:600;color:var(--text);line-height:1">Construindo devs.</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">H2 — Subtítulo</span><span class="mm-type-spec">Grotesk 500 · 56px / 56 lh</span></div>
+          <div style="font-family:'Space Grotesk';font-size:20px;font-weight:500;color:var(--text)">Liga de Software · Ibmec BH</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">Body</span><span class="mm-type-spec">Grotesk 400 · 28px / 40 lh · <code style="font-family:'Space Mono',monospace;font-size:9px;color:#00A6FF">--t-16</code></span></div>
+          <div style="font-family:'Space Grotesk';font-size:14px;color:var(--muted);max-width:420px;line-height:1.6">Texto corrido em Space Grotesk 400, usado para parágrafos em peças extensas.</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">Caption / Code</span><span class="mm-type-spec">Mono 400 · 22px / 32 lh · <code style="font-family:'Space Mono',monospace;font-size:9px;color:#00A6FF">--t-12</code></span></div>
+          <div style="font-family:'Space Mono';font-size:12px;color:var(--muted)">print("IBtech.liga de Software")</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 · Espaçamento -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>05</span>Espaçamento & Grid</div>
+      <div class="mm-callout blue">Toda margem, padding e gap deve ser múltiplo de 4. Isso mantém ritmo visual previsível em qualquer tela.</div>
+      <div class="mm-space-grid">
+        <div class="mm-space-item"><div class="mm-space-block" style="height:4px"></div><span class="mm-space-token">--s-1 · 4</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:8px"></div><span class="mm-space-token">--s-2 · 8</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:12px"></div><span class="mm-space-token">--s-3 · 12</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:16px"></div><span class="mm-space-token">--s-4 · 16</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:24px"></div><span class="mm-space-token">--s-6 · 24</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:32px"></div><span class="mm-space-token">--s-8 · 32</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:40px"></div><span class="mm-space-token">--s-10 · 40</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:48px"></div><span class="mm-space-token">--s-12 · 48</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:64px"></div><span class="mm-space-token">--s-16 · 64</span></div>
+        <div class="mm-space-item"><div class="mm-space-block" style="height:80px"></div><span class="mm-space-token">--s-20 · 80</span></div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text)">Grid & Radius</div>
+      <div class="mm-grid-info">
+        <div class="mm-grid-stat"><div class="mm-grid-num blue">12</div><div class="mm-grid-desc">Colunas · Desktop</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num blue">24</div><div class="mm-grid-desc">Gutter (px)</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num blue">1280</div><div class="mm-grid-desc">Container máx (px)</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num blue">4</div><div class="mm-grid-desc">Colunas · Mobile</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num blue">16</div><div class="mm-grid-desc">Gutter Mobile (px)</div></div>
+      </div>
+      <div class="mm-radius-row">
+        <div class="mm-radius-item"><div class="mm-radius-block blue" style="border-radius:0"></div><span class="mm-radius-label">--r-0<br>0px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block blue" style="border-radius:2px"></div><span class="mm-radius-label">--r-1<br>2px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block blue" style="border-radius:4px"></div><span class="mm-radius-label">--r-2<br>4px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block blue" style="border-radius:8px"></div><span class="mm-radius-label">--r-3<br>8px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block blue" style="border-radius:9999px;width:52px"></div><span class="mm-radius-label">--r-full</span></div>
+      </div>
+    </div>
+
+    <!-- 06 · Componentes -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>06</span>Componentes</div>
+      <div class="mm-comp-grid">
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Buttons · primary / secondary / ghost / danger</div>
+          <div class="mm-comp-body">
+            <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
+              <button class="ds-btn primary">Primary</button>
+              <button class="ds-btn secondary">Secondary</button>
+              <button class="ds-btn ghost">Ghost</button>
+              <button class="ds-btn danger">Danger</button>
+              <button class="ds-btn disabled">Disabled</button>
+            </div>
+          </div>
+        </div>
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Badges & Tags · monospace uppercase</div>
+          <div class="mm-comp-body">
+            <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
+              <span class="ds-badge default">DEFAULT</span>
+              <span class="ds-badge accent">ACCENT</span>
+              <span class="ds-badge live">● LIVE</span>
+              <span class="ds-badge beta">● BETA</span>
+              <span class="ds-badge offline">● OFFLINE</span>
+            </div>
+          </div>
+        </div>
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Alerts / Callouts · borda-esquerda por tipo</div>
+          <div class="mm-comp-body">
+            <div class="ds-alert info"><span class="ds-alert-icon">i</span>Novo edital aberto. Inscrições até 30/04.</div>
+            <div class="ds-alert success"><span class="ds-alert-icon">✓</span>Deploy concluído — PR mergeada.</div>
+            <div class="ds-alert warning"><span class="ds-alert-icon">!</span>Sua chave expira em 7 dias.</div>
+            <div class="ds-alert danger"><span class="ds-alert-icon">✗</span>3 testes falharam no pipeline.</div>
+          </div>
+        </div>
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Code Block · Space Mono · syntax highlighting</div>
+          <div class="mm-comp-body">
+            <pre class="ds-pre"><span class="kw">type</span> <span class="ty">Membro</span> = {
+  nome: <span class="ty">string</span>;
+  papel: <span class="str">'dev'</span> | <span class="str">'design'</span>;
+};
+<span class="kw">const</span> eu: <span class="ty">Membro</span> = {
+  nome: <span class="str">'Dir. Marketing'</span>,
+};</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 · Princípios -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>07</span>Princípios de Design</div>
+      <div class="mm-principles">
+        <div class="mm-principle"><span class="mm-principle-num blue">PRINCÍPIO 01</span><div class="mm-principle-title">Clareza antes de estilo.</div><p class="mm-principle-desc">O conteúdo dita a forma. Tipografia forte, contraste alto e hierarquia óbvia. Efeitos só quando servem à leitura.</p></div>
+        <div class="mm-principle"><span class="mm-principle-num blue">PRINCÍPIO 02</span><div class="mm-principle-title">Densidade confortável.</div><p class="mm-principle-desc">Espaço gera respiração, não desperdício. Use a escala de 4px e mantenha ritmos consistentes entre seções.</p></div>
+        <div class="mm-principle"><span class="mm-principle-num blue">PRINCÍPIO 03</span><div class="mm-principle-title">Monospace é personalidade.</div><p class="mm-principle-desc">Space Mono carrega o tom tech. Use em metadados, labels, código e caption — não em corpo de texto longo.</p></div>
+        <div class="mm-principle"><span class="mm-principle-num blue">PRINCÍPIO 04</span><div class="mm-principle-title">Azul é energia, não fundo.</div><p class="mm-principle-desc">Azure é acento e foco. A base é Ink Navy. Evite paredes de azul saturado — perde força.</p></div>
+      </div>
+    </div>
+
+    <!-- 08 · Tom de voz -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>08</span>Tom de Voz</div>
+      <div class="mm-attr-grid">
+        <div class="mm-attr"><span class="mm-attr-word">Técnica</span><span class="mm-attr-num blue">ATRIBUTO 01</span></div>
+        <div class="mm-attr"><span class="mm-attr-word">Direta</span><span class="mm-attr-num blue">ATRIBUTO 02</span></div>
+        <div class="mm-attr"><span class="mm-attr-word">Curiosa</span><span class="mm-attr-num blue">ATRIBUTO 03</span></div>
+        <div class="mm-attr"><span class="mm-attr-word">Brincalhona</span><span class="mm-attr-num blue">ATRIBUTO 04</span></div>
+      </div>
+      <div class="mm-voice-grid">
+        <div class="mm-voice-card do">
+          <div class="mm-voice-title do"><svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l5 5 7-7"/></svg>DO · SOA COMO</div>
+          <ul class="mm-voice-list">
+            <li>"Conheça IBtech."</li>
+            <li><code style="font-family:'Space Mono',monospace;font-size:11px;color:#00E5FF">print("Arrasta pro lado")</code></li>
+            <li>"Segue a gente."</li>
+            <li>"Somos a Liga Tech do Ibmec BH."</li>
+          </ul>
+        </div>
+        <div class="mm-voice-card dont">
+          <div class="mm-voice-title dont"><svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l10 10M15 5L5 15"/></svg>DON'T · EVITE</div>
+          <ul class="mm-voice-list">
+            <li>"Liga acadêmica inovadora e disruptiva."</li>
+            <li>"Sinergia em soluções 360°."</li>
+            <li>"Família tech ❤ 🚀"</li>
+            <li>Emoji em excesso ou gírias forçadas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 09 · Tokens -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>09</span>Tokens CSS</div>
+      <div class="mm-token-table">
+        <div class="mm-token-row head"><span>Prefixo</span><span>Sintaxe</span><span>Tipo</span><span>Exemplos</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--c-*</span><span class="mm-tk-syntax">color</span><span class="mm-tk-type">Cores primitivas</span><span class="mm-tk-examples">--c-ink, --c-azure, --c-aqua</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--t-*</span><span class="mm-tk-syntax">type size</span><span class="mm-tk-type">Tamanhos de texto (px)</span><span class="mm-tk-examples">--t-12, --t-16, --t-32, --t-56</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--s-*</span><span class="mm-tk-syntax">spacing</span><span class="mm-tk-type">Espaçamento 4-pt</span><span class="mm-tk-examples">--s-1 (4px) → --s-20 (80px)</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--r-*</span><span class="mm-tk-syntax">radius</span><span class="mm-tk-type">Border radius</span><span class="mm-tk-examples">--r-0, --r-1, --r-2, --r-3, --r-full</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--ff-*</span><span class="mm-tk-syntax">font-family</span><span class="mm-tk-type">Famílias tipográficas</span><span class="mm-tk-examples">--ff-display, --ff-mono</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--sh-*</span><span class="mm-tk-syntax">shadow</span><span class="mm-tk-type">Sombras / elevação</span><span class="mm-tk-examples">--sh-0 → --sh-3</span></div>
+        <div class="mm-token-row"><span class="mm-tk-prefix blue">--dur-*</span><span class="mm-tk-syntax">duration</span><span class="mm-tk-type">Durações de animação</span><span class="mm-tk-examples">--dur-fast, --dur-base, --dur-slow</span></div>
+      </div>
+      <pre class="ds-pre"><span class="com">/* Exemplo de consumo */</span>
+.<span class="fn">meu-botao</span> {
+  background:    <span class="fn">var</span>(<span class="kw">--c-azure</span>);
+  color:         <span class="fn">var</span>(<span class="kw">--c-ink</span>);
+  padding:       <span class="fn">var</span>(<span class="kw">--s-3</span>) <span class="fn">var</span>(<span class="kw">--s-5</span>);
+  border-radius: <span class="fn">var</span>(<span class="kw">--r-2</span>);
+  font-family:   <span class="fn">var</span>(<span class="kw">--ff-display</span>);
+  font-size:     <span class="fn">var</span>(<span class="kw">--t-16</span>);
+}</pre>
+    </div>
+
+    <!-- 10 · Recursos -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>10</span>Recursos</div>
+      <div class="mm-resource-row">
+        <div class="mm-resource"><span class="mm-resource-key">Versão</span><span class="mm-resource-val blue">v1.0 · 04/2026</span></div>
+        <div class="mm-resource"><span class="mm-resource-key">Arquivos oficiais</span><span class="mm-resource-val blue">drive.ibtech/brand</span></div>
+        <div class="mm-resource"><span class="mm-resource-key">Dúvidas / aprovações</span><span class="mm-resource-val blue">marketing@ibtech</span></div>
+        <div class="mm-resource"><span class="mm-resource-key">Instagram</span><span class="mm-resource-val blue">@ibtechbh</span></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-ibtech -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       PAINEL IBBOT
+       ═══════════════════════════════════════════════ -->
+  <div class="mm-panel" id="panel-ibbot">
+
+    <!-- 01 · A Marca -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>01</span>A Marca</div>
+      <div class="mm-manifesto">
+        <div class="mm-mcard" style="border-top:3px solid #FF1F1F">
+          <span class="mm-mcard-label">Propósito</span>
+          <span class="mm-mcard-value">Construir soluções autônomas e formar engenheiros do Ibmec.</span>
+        </div>
+        <div class="mm-mcard" style="border-top:3px solid #FF1F1F">
+          <span class="mm-mcard-label">Atuação</span>
+          <span class="mm-mcard-value">Robótica · Automação · Sistemas Embarcados · IoT</span>
+        </div>
+        <div class="mm-mcard" style="border-top:3px solid #FF1F1F">
+          <span class="mm-mcard-label">Personalidade</span>
+          <div class="mm-personality">
+            <span class="mm-pill mm-pill-red">Prática</span>
+            <span class="mm-pill mm-pill-red">Ousada</span>
+            <span class="mm-pill mm-pill-red">Maker</span>
+            <span class="mm-pill mm-pill-muted">Competitiva</span>
+          </div>
+        </div>
+      </div>
+      <div class="mm-callout red">
+        <strong>Manifesto:</strong> Construímos robôs, sistemas embarcados e soluções de automação que saem do papel e funcionam no mundo real. Hardware, eletrônica e código trabalhando juntos — aprendizado pela mão na massa.
+      </div>
+    </div>
+
+    <!-- 02 · Logo -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>02</span>Logo & Identidade</div>
+      <div class="mm-logo-grid">
+        <div class="mm-logo-preview dark-ink">
+          <div class="mm-logo-lock">
+            <div class="mm-logo-mark" style="background:#6E0808">🤖</div>
+            <div>
+              <div class="mm-logo-name" style="color:#EDEDED">IbBot</div>
+              <div class="mm-logo-sub" style="color:#FF4530">Liga de Robótica</div>
+            </div>
+          </div>
+          <span class="mm-logo-badge pref-dark">Preferencial · Fundo Escuro</span>
+        </div>
+        <div class="mm-logo-preview light">
+          <div class="mm-logo-lock">
+            <div class="mm-logo-mark" style="background:#6E0808">🤖</div>
+            <div>
+              <div class="mm-logo-name" style="color:#080808">IbBot</div>
+              <div class="mm-logo-sub" style="color:#A50E0E">Liga de Robótica</div>
+            </div>
+          </div>
+          <span class="mm-logo-badge alt-light">Alternativa · Fundo Claro</span>
+        </div>
+      </div>
+      <div class="mm-dod-grid">
+        <div class="mm-dod-card">
+          <div class="mm-dod-title do"><svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l5 5 7-7"/></svg>SEMPRE</div>
+          <ul class="mm-dod-list">
+            <li>Usar a logo fornecida nos arquivos oficiais da liga</li>
+            <li>Manter proporções e área de respiro originais</li>
+            <li>Preferir fundos escuros (#080808) para mais impacto</li>
+            <li>Usar o vermelho #FF1F1F apenas nas versões aprovadas</li>
+          </ul>
+        </div>
+        <div class="mm-dod-card">
+          <div class="mm-dod-title dont"><svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l10 10M15 5L5 15"/></svg>NUNCA</div>
+          <ul class="mm-dod-list">
+            <li>Usar a cor IbBot (#FF1F1F) em materiais da IBtech</li>
+            <li>Adicionar gradientes ou efeitos sobre a logo</li>
+            <li>Alterar matiz, saturação ou brilho do vermelho de marca</li>
+            <li>Usar em fundos coloridos de baixo contraste</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 · Cores -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>03</span>Paleta de Cores</div>
+
+      <div class="mm-color-group">
+        <span class="mm-color-group-title">Primárias</span>
+        <div class="mm-swatches">
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#FF1F1F;outline:2px solid rgba(255,255,255,.3);outline-offset:-2px"></div>
+            <span class="mm-swatch-name">IbBot Red</span>
+            <span class="mm-swatch-hex">#FF1F1F</span>
+            <span class="mm-swatch-token">--bot-500</span>
+            <span class="mm-swatch-role">COR-MARCA — não alterar</span>
+          </div>
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#080808"></div>
+            <span class="mm-swatch-name">Background</span>
+            <span class="mm-swatch-hex">#080808</span>
+            <span class="mm-swatch-token">--bg-base</span>
+            <span class="mm-swatch-role">Fundo principal — intocado</span>
+          </div>
+          <div class="mm-swatch" style="min-width:120px">
+            <div class="mm-swatch-block" style="background:#EDEDED;border-color:rgba(0,0,0,.15)"></div>
+            <span class="mm-swatch-name">Text</span>
+            <span class="mm-swatch-hex">#EDEDED</span>
+            <span class="mm-swatch-token">--text</span>
+            <span class="mm-swatch-role">Texto principal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mm-color-group">
+        <span class="mm-color-group-title">Escala Tonal — --bot-50 → --bot-900</span>
+        <div class="mm-swatches">
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#FFE8E5;border-color:rgba(0,0,0,.1)"></div><span class="mm-swatch-name" style="font-size:11px">bot-50</span><span class="mm-swatch-hex">#FFE8E5</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#FFC4BD;border-color:rgba(0,0,0,.1)"></div><span class="mm-swatch-name" style="font-size:11px">bot-100</span><span class="mm-swatch-hex">#FFC4BD</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#FF9A8E"></div><span class="mm-swatch-name" style="font-size:11px">bot-200</span><span class="mm-swatch-hex">#FF9A8E</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#FF6E5C"></div><span class="mm-swatch-name" style="font-size:11px">bot-300</span><span class="mm-swatch-hex">#FF6E5C</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#FF4530"></div><span class="mm-swatch-name" style="font-size:11px">bot-400</span><span class="mm-swatch-hex">#FF4530</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#FF1F1F;outline:2px solid rgba(255,255,255,.4);outline-offset:-2px"></div><span class="mm-swatch-name" style="font-size:11px;color:#FF4530">bot-500 ★</span><span class="mm-swatch-hex" style="color:#FF4530">#FF1F1F</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#D81515"></div><span class="mm-swatch-name" style="font-size:11px">bot-600</span><span class="mm-swatch-hex">#D81515</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#A50E0E"></div><span class="mm-swatch-name" style="font-size:11px">bot-700</span><span class="mm-swatch-hex">#A50E0E</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#6E0808"></div><span class="mm-swatch-name" style="font-size:11px">bot-800</span><span class="mm-swatch-hex">#6E0808</span></div>
+          <div class="mm-swatch"><div class="mm-swatch-block" style="background:#380404"></div><span class="mm-swatch-name" style="font-size:11px">bot-900</span><span class="mm-swatch-hex">#380404</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:var(--sp-3)">Proporção de Uso</div>
+        <div class="mm-prop-bar">
+          <div style="flex:70;background:#080808;display:flex;align-items:center;padding-left:12px;border-right:1px solid #222"><span class="mm-prop-label" style="color:rgba(255,255,255,.6)">70% BACKGROUND</span></div>
+          <div style="flex:20;background:#FF1F1F;display:flex;align-items:center;justify-content:center"><span class="mm-prop-label" style="color:#fff">20%</span></div>
+          <div style="flex:10;background:#D81515;display:flex;align-items:center;justify-content:center"><span class="mm-prop-label" style="color:rgba(255,255,255,.7);font-size:9px">10%</span></div>
+        </div>
+        <div class="mm-prop-legend">
+          <div class="mm-prop-legend-item"><div class="mm-prop-dot" style="background:#080808;border:1px solid #333"></div>70% · Background #080808 — fundo e base</div>
+          <div class="mm-prop-legend-item"><div class="mm-prop-dot" style="background:#FF1F1F"></div>20% · IbBot Red — destaques e elementos de marca</div>
+          <div class="mm-prop-legend-item"><div class="mm-prop-dot" style="background:#D81515"></div>10% · bot-600 — estados secundários e bordas</div>
+        </div>
+      </div>
+      <div class="mm-callout red"><strong>Regra:</strong> <code>#FF1F1F</code> é a cor-marca e nunca deve ser alterada. Use tons mais escuros da escala (<code>bot-600/700</code>) para hover e bordas. Tons claros (<code>bot-50/100</code>) apenas para backgrounds sutis. O fundo <code>#080808</code> é intocável.</div>
+    </div>
+
+    <!-- 04 · Tipografia -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>04</span>Tipografia</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-4)">
+        <div class="mm-mcard" style="border-top:3px solid #FF1F1F">
+          <span class="mm-mcard-label">Display · <code style="font-family:'Space Mono',monospace;font-size:9px;color:#FF4530">--font-display</code></span>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);line-height:1;margin:var(--sp-3) 0">Aa</div>
+          <div style="font-size:12px;color:var(--muted)">Bebas Neue · Regular<br>Títulos e números grandes</div>
+        </div>
+        <div class="mm-mcard" style="border-top:3px solid #FF1F1F">
+          <span class="mm-mcard-label">Body · <code style="font-family:'Space Mono',monospace;font-size:9px;color:#FF4530">--font-body</code></span>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:600;color:var(--text);line-height:1;margin:var(--sp-3) 0">Aa</div>
+          <div style="font-size:12px;color:var(--muted)">Space Grotesk · 300–700<br>Interface e corpo de texto</div>
+        </div>
+        <div class="mm-mcard" style="border-top:3px solid #FF1F1F">
+          <span class="mm-mcard-label">Mono · <code style="font-family:'Space Mono',monospace;font-size:9px;color:#FF4530">--font-mono</code></span>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:400;color:var(--text);line-height:1;margin:var(--sp-3) 0">Aa</div>
+          <div style="font-size:12px;color:var(--muted)">JetBrains Mono · 400–500<br>Código, dados e versões</div>
+        </div>
+      </div>
+      <div class="mm-type-table">
+        <div class="mm-type-row" style="background:var(--surface-2);padding-top:var(--sp-2);padding-bottom:var(--sp-2)">
+          <div class="mm-type-meta"><span style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Estilo</span></div>
+          <span style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Preview</span>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">Display</span><span class="mm-type-spec">Bebas Neue · grande e impactante</span></div>
+          <div style="font-family:'Bebas Neue';font-size:44px;color:var(--text);line-height:1;letter-spacing:.03em">IBBOT</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">H1 — Título</span><span class="mm-type-spec">Space Grotesk 700</span></div>
+          <div style="font-family:'Space Grotesk';font-size:28px;font-weight:700;color:var(--text);line-height:1">Liga de Robótica</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">Body</span><span class="mm-type-spec">Space Grotesk 400 · 14–16px</span></div>
+          <div style="font-family:'Space Grotesk';font-size:14px;color:var(--muted);max-width:400px;line-height:1.6">Hardware, eletrônica e código trabalhando juntos.</div>
+        </div>
+        <div class="mm-type-row">
+          <div class="mm-type-meta"><span class="mm-type-role">Mono / Dados</span><span class="mm-type-spec">JetBrains Mono 400</span></div>
+          <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">v1.0 · #FF1F1F · IbBot.liga()</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 · Espaçamento -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>05</span>Espaçamento & Grid</div>
+      <div class="mm-callout red">Sistema 4-pt compartilhado entre as ligas. Toda margem, padding e gap é múltiplo de 4.</div>
+      <div class="mm-space-grid">
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:4px"></div><span class="mm-space-token">4px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:8px"></div><span class="mm-space-token">8px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:12px"></div><span class="mm-space-token">12px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:16px"></div><span class="mm-space-token">16px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:24px"></div><span class="mm-space-token">24px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:32px"></div><span class="mm-space-token">32px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:48px"></div><span class="mm-space-token">48px</span></div>
+        <div class="mm-space-item"><div class="mm-space-block red" style="height:64px"></div><span class="mm-space-token">64px</span></div>
+      </div>
+      <div class="mm-grid-info">
+        <div class="mm-grid-stat"><div class="mm-grid-num red">12</div><div class="mm-grid-desc">Colunas · Desktop</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num red">24</div><div class="mm-grid-desc">Gutter (px)</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num red">1280</div><div class="mm-grid-desc">Container máx (px)</div></div>
+        <div class="mm-grid-stat"><div class="mm-grid-num red">4</div><div class="mm-grid-desc">Colunas · Mobile</div></div>
+      </div>
+      <div class="mm-radius-row">
+        <div class="mm-radius-item"><div class="mm-radius-block red" style="border-radius:0"></div><span class="mm-radius-label">0px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block red" style="border-radius:2px"></div><span class="mm-radius-label">2px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block red" style="border-radius:4px"></div><span class="mm-radius-label">4px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block red" style="border-radius:8px"></div><span class="mm-radius-label">8px</span></div>
+        <div class="mm-radius-item"><div class="mm-radius-block red" style="border-radius:9999px;width:52px"></div><span class="mm-radius-label">full</span></div>
+      </div>
+    </div>
+
+    <!-- 06 · Componentes -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>06</span>Componentes</div>
+      <div class="mm-comp-grid">
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Buttons · variantes IbBot</div>
+          <div class="mm-comp-body">
+            <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
+              <button class="ds-btn bot-primary">Primary</button>
+              <button class="ds-btn bot-secondary">Secondary</button>
+              <button class="ds-btn bot-ghost">Ghost</button>
+              <button class="ds-btn danger">Danger</button>
+              <button class="ds-btn disabled">Disabled</button>
+            </div>
+          </div>
+        </div>
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Badges & Status · IbBot</div>
+          <div class="mm-comp-body">
+            <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center">
+              <span class="ds-badge default">DEFAULT</span>
+              <span class="ds-badge bot-accent">IBBOT</span>
+              <span class="ds-badge live">● LIVE</span>
+              <span class="ds-badge beta">● BETA</span>
+              <span class="ds-badge offline">● OFFLINE</span>
+            </div>
+          </div>
+        </div>
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Alerts · estados de sistema</div>
+          <div class="mm-comp-body">
+            <div class="ds-alert" style="border-color:#FF1F1F;background:#FF1F1F0D;color:var(--text)"><span class="ds-alert-icon" style="color:#FF4530">!</span>Sistema de chamada ativo.</div>
+            <div class="ds-alert success"><span class="ds-alert-icon">✓</span>Robô calibrado com sucesso.</div>
+            <div class="ds-alert warning"><span class="ds-alert-icon">!</span>Bateria em 15% — recarregue.</div>
+            <div class="ds-alert danger"><span class="ds-alert-icon">✗</span>Falha no sensor de distância.</div>
+          </div>
+        </div>
+        <div class="mm-comp-card">
+          <div class="mm-comp-label">Code Block · IbBot flavor</div>
+          <div class="mm-comp-body">
+            <pre class="ds-pre bot"><span class="com">// Controle de motor</span>
+<span class="kw">def</span> <span class="fn">mover</span>(direcao, velocidade):
+  pwm = <span class="ty">PWM</span>(pin=<span class="str">18</span>)
+  pwm.freq(<span class="str">1000</span>)
+  pwm.duty(<span class="str">int</span>(velocidade * <span class="str">1023</span>))
+  <span class="kw">return</span> <span class="str">"ok"</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 · Tom de voz -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>07</span>Tom de Voz</div>
+      <div class="mm-attr-grid">
+        <div class="mm-attr"><span class="mm-attr-word">Prática</span><span class="mm-attr-num red">ATRIBUTO 01</span></div>
+        <div class="mm-attr"><span class="mm-attr-word">Ousada</span><span class="mm-attr-num red">ATRIBUTO 02</span></div>
+        <div class="mm-attr"><span class="mm-attr-word">Maker</span><span class="mm-attr-num red">ATRIBUTO 03</span></div>
+        <div class="mm-attr"><span class="mm-attr-word">Competitiva</span><span class="mm-attr-num red">ATRIBUTO 04</span></div>
+      </div>
+      <div class="mm-voice-grid">
+        <div class="mm-voice-card do">
+          <div class="mm-voice-title do"><svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l5 5 7-7"/></svg>DO · SOA COMO</div>
+          <ul class="mm-voice-list">
+            <li>"A gente constrói. De verdade."</li>
+            <li>"Robô na pista. Resultado na mão."</li>
+            <li>"Hardware não mente."</li>
+            <li>"Ibmec BH · Liga de Robótica · IbBot."</li>
+          </ul>
+        </div>
+        <div class="mm-voice-card dont">
+          <div class="mm-voice-title dont"><svg width="11" height="11" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l10 10M15 5L5 15"/></svg>DON'T · EVITE</div>
+          <ul class="mm-voice-list">
+            <li>"Liga inovadora de soluções disruptivas."</li>
+            <li>"Família robótica ❤🤖🚀"</li>
+            <li>"Sinergia interdisciplinar maker."</li>
+            <li>Tom genérico de liga acadêmica</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 · Recursos -->
+    <div class="mm-section">
+      <div class="mm-section-label"><span>08</span>Recursos</div>
+      <div class="mm-resource-row">
+        <div class="mm-resource"><span class="mm-resource-key">Cor de marca</span><span class="mm-resource-val red">#FF1F1F — intocável</span></div>
+        <div class="mm-resource"><span class="mm-resource-key">Background</span><span class="mm-resource-val red">#080808 — intocável</span></div>
+        <div class="mm-resource"><span class="mm-resource-key">Arquivos oficiais</span><span class="mm-resource-val red">drive.ibtech/brand/ibbot</span></div>
+        <div class="mm-resource"><span class="mm-resource-key">Instagram</span><span class="mm-resource-val red">@ibbotbh</span></div>
+      </div>
+    </div>
+
+  </div><!-- /panel-ibbot -->
+
+</main>
+
+<script type="module" src="/assets/js/pages/manual-de-marca-diretoria.js"></script>
+<script>
+  function selectLiga(liga) {
+    document.getElementById('btn-ibtech').classList.toggle('active', liga === 'ibtech');
+    document.getElementById('btn-ibbot').classList.toggle('active',  liga === 'ibbot');
+    document.getElementById('panel-ibtech').classList.toggle('active', liga === 'ibtech');
+    document.getElementById('panel-ibbot').classList.toggle('active',  liga === 'ibbot');
+  }
+
+  // Copy hex on swatch click
+  document.addEventListener('click', e => {
+    const swatch = e.target.closest('.mm-swatch');
+    if (!swatch) return;
+    const hexEl = swatch.querySelector('.mm-swatch-hex');
+    if (!hexEl) return;
+    const hex = hexEl.textContent.trim();
+    navigator.clipboard.writeText(hex).then(() => {
+      swatch.classList.add('copied');
+      setTimeout(() => swatch.classList.remove('copied'), 1600);
+      showCopyToast(hex);
+    });
+  });
+
+  function showCopyToast(text) {
+    const prev = document.getElementById('mm-copy-toast');
+    if (prev) prev.remove();
+    const t = document.createElement('div');
+    t.id = 'mm-copy-toast';
+    t.textContent = text + ' copiado';
+    Object.assign(t.style, {
+      position:      'fixed',
+      bottom:        '28px',
+      left:          '50%',
+      transform:     'translateX(-50%)',
+      background:    '#00A6FF',
+      color:         '#0B1220',
+      fontFamily:    "'Space Mono', monospace",
+      fontSize:      '11px',
+      fontWeight:    '700',
+      letterSpacing: '.06em',
+      padding:       '8px 18px',
+      borderRadius:  '4px',
+      zIndex:        '99999',
+      pointerEvents: 'none',
+      whiteSpace:    'nowrap',
+      boxShadow:     '0 4px 16px rgba(0,0,0,.4)',
+      transition:    'opacity .3s',
+    });
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; }, 1300);
+    setTimeout(() => t.remove(), 1600);
+  }
+</script>
+</body>
+</html>
