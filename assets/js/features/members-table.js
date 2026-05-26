@@ -56,7 +56,10 @@ export function renderOverviewTable(tbl, data) {
     <td style="color:var(--mid)">${m.entregas}</td>
     <td><span class="pill ${STATUS_PILL[m.status] || 'ok'}">${STATUS_LABEL[m.status] || 'Regular'}</span></td>
     ${advCell(m.adv)}
-    <td><button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button></td>
+    <td style="display:flex;gap:.375rem">
+      <a href="/membros/diretoria/perfil-membro?id=${m.id}" class="btn-sm ghost" style="font-size:10px;padding:3px 8px;text-decoration:none">Ver</a>
+      <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button>
+    </td>
   </tr>`).join('')}</tbody>`;
 }
 
@@ -82,6 +85,7 @@ export function renderMembrosTable(tbl, data) {
     <td style="color:var(--mid)">${m.entregas}</td>
     ${advCell(m.adv)}
     <td style="display:flex;gap:.375rem">
+      <a href="/membros/diretoria/perfil-membro?id=${m.id}" class="btn-sm ghost" style="font-size:10px;padding:3px 8px;text-decoration:none">Ver</a>
       <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openAdvModal('${m.id}', '${m.name}')">Anotar</button>
       <button class="btn-sm ghost" style="font-size:10px;padding:3px 8px" onclick="openEditModal('${m.id}', '${m.name.replace(/'/g, "\\'")}', '${m.liga}', '${m.cargo || 'membro'}')">Editar</button>
     </td>

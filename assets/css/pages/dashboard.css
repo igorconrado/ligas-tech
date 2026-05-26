@@ -213,6 +213,15 @@ body { font-size: var(--fs-label); min-height: 100vh; }
 .form-save { font-family: var(--font-body); font-size: var(--fs-micro); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: var(--sp-3) var(--sp-5); border-radius: var(--r-sm); border: none; cursor: pointer; background: var(--text); color: var(--bg); margin-top: var(--sp-3); transition: opacity var(--dur-base); }
 .form-save:hover { opacity: .88; }
 
+.perfil-back { display: inline-block; font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--muted); text-decoration: none; margin-bottom: var(--sp-4); transition: color var(--dur-fast); }
+.perfil-back:hover { color: var(--text); }
+.perfil-info-section { margin-bottom: var(--sp-4); }
+.perfil-info-section:last-child { margin-bottom: 0; }
+.perfil-info-label { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: var(--sp-1); }
+.perfil-info-text { font-size: var(--fs-body-s); color: var(--text-secondary); margin: 0; line-height: 1.6; }
+.perfil-info-link { color: var(--text-secondary); text-decoration: none; transition: color var(--dur-fast); }
+.perfil-info-link:hover { color: var(--text-primary); text-decoration: underline; }
+
 /* Timeline cronograma */
 .timeline {
   position: relative;
