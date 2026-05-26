@@ -54,6 +54,9 @@ const NAV_DIRETORIA = [
     { label: 'Membros',      href: '/membros/diretoria/membros',      icon: 'members' },
     { label: 'Advertências', href: '/membros/diretoria/advertencias', icon: 'warnings' },
   ]},
+  { group: 'IDENTIDADE', items: [
+    { label: 'Manual de Marca', href: '/membros/diretoria/manual-de-marca', icon: 'changelog' },
+  ]},
   { group: 'MINHA ÁREA', items: [
     { label: 'Área de Membros', href: '/membros/dashboard', icon: 'members' },
   ]},
