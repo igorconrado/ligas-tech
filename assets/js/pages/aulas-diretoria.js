@@ -7,8 +7,19 @@ import { toast } from '/assets/js/ui/toast.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 
+// Expõe funções antes do auth para que o botão funcione imediatamente após o DOM carregar
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.selecionarTipo = selecionarTipo;
+window.handleCriarAula = handleCriarAula;
+window.handleTogglePublicarAula = handleTogglePublicarAula;
+window.handleDeletarAula = handleDeletarAula;
+initModalEscape();
+
+let ligaId = null;
+
 const { usuario } = await shell.mount({ activeRoute: '/membros/diretoria/aulas', pageTitle: 'Aulas' });
-const ligaId = usuario?.liga_id || null;
+ligaId = usuario?.liga_id || null;
 
 const grid = document.getElementById('aulas-dir-grid');
 
@@ -196,12 +207,4 @@ document.getElementById('aula-arquivo')?.addEventListener('change', (e) => {
   }
 });
 
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.handleTogglePublicarAula = handleTogglePublicarAula;
-window.handleDeletarAula = handleDeletarAula;
-window.handleCriarAula = handleCriarAula;
-window.selecionarTipo = selecionarTipo;
-
-initModalEscape();
 await carregar();
