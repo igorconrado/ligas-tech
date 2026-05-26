@@ -40,6 +40,39 @@ export async function getAulasComEntregas() {
   });
 }
 
+export async function getAulasComEntregasMembro(membroId, ligaId) {
+  const { data: aulas } = await supabase
+    .from('aulas')
+    .select('*')
+    .eq('liga_id', ligaId)
+    .eq('publicada', true)
+    .order('numero');
+
+  if (!aulas) return [];
+
+  const tarefas = aulas.filter(a => a.tipo === 'tarefa');
+
+  const { data: entregas } = await supabase
+    .from('entregas')
+    .select('*')
+    .eq('membro_id', membroId);
+
+  const entregasMap = {};
+  (entregas || []).forEach(e => { entregasMap[e.aula_id] = e; });
+
+  const now = new Date();
+  return tarefas.map(aula => {
+    const entrega = entregasMap[aula.id] || null;
+    let statusEntrega = 'pendente';
+    if (entrega) {
+      statusEntrega = entrega.status;
+    } else if (aula.prazo_entrega && new Date(aula.prazo_entrega) < now) {
+      statusEntrega = 'atrasada';
+    }
+    return { ...aula, entrega, statusEntrega };
+  });
+}
+
 export async function getAulasPublicadas() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { aulas: [], tarefas: [] };

@@ -58,6 +58,41 @@ export async function getMinhasPresencas() {
   return data || [];
 }
 
+export async function getPresencasMembro(membroId) {
+  const { data, error } = await supabase
+    .from('presencas')
+    .select('*, encontros(titulo, data)')
+    .eq('membro_id', membroId)
+    .order('criado_em', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getProximoEncontro() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: membro } = await supabase
+    .from('membros').select('liga_id').eq('usuario_id', user.id).maybeSingle();
+  if (!membro?.liga_id) return null;
+
+  // Usa data local (YYYY-MM-DD) para evitar shift de timezone
+  const hoje = new Date();
+  const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+
+  const { data, error } = await supabase
+    .from('encontros')
+    .select('id, titulo, data')
+    .eq('liga_id', membro.liga_id)
+    .gte('data', hojeStr)
+    .order('data', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data || null;
+}
+
 export function calcularAlertaFrequencia(presencas, totalEncontros) {
   if (totalEncontros === 0) return { status: 'ok', percentual: 0 };
   const ausencias = presencas.filter(p => p.status === 'ausente').length;

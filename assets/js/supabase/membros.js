@@ -21,6 +21,16 @@ export async function atualizarMembroDiretoria(membroId, updates) {
   if (error) throw error;
 }
 
+export async function getPerfilMembro(membroId) {
+  const { data, error } = await supabase
+    .from('membros')
+    .select('*, ligas(nome, cor)')
+    .eq('id', membroId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getMembrosLiga(ligaId = null) {
   let query = supabase
     .from('membros')

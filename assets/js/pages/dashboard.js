@@ -6,7 +6,7 @@
 import { shell } from '/assets/js/ui/shell.js';
 import { getMeuPerfil, completarOnboarding } from '/assets/js/supabase/membros.js';
 import { getAulasComEntregas } from '/assets/js/supabase/aulas.js';
-import { getMinhasPresencas, calcularAlertaFrequencia } from '/assets/js/supabase/presenca.js';
+import { getMinhasPresencas, calcularAlertaFrequencia, getProximoEncontro } from '/assets/js/supabase/presenca.js';
 import { skeletonTableRows, skeletonText } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 
@@ -16,7 +16,10 @@ const $ = (id) => document.getElementById(id);
 
 function fmtDate(d) {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+  // Parseia YYYY-MM-DD como data local para evitar shift de timezone
+  const parts = String(d).split('T')[0].split('-').map(Number);
+  const date = parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : new Date(d);
+  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
 }
 
 function ligaCor(perfil) {
@@ -26,7 +29,7 @@ function ligaCor(perfil) {
   return 'w';
 }
 
-function renderizarDashboard(perfil, presencas, aulas) {
+function renderizarDashboard(perfil, presencas, aulas, proximoEncontro) {
   const presentes = presencas.filter(p => p.status === 'presente').length;
   const totalEncontros = presencas.length;
   const pctPresenca = totalEncontros > 0 ? Math.round((presentes / totalEncontros) * 100) : 0;
@@ -40,7 +43,6 @@ function renderizarDashboard(perfil, presencas, aulas) {
   const now = new Date();
   const aulasPassadas = aulas.filter(a => new Date(a.prazo_entrega) < now);
   const pctAulas = aulas.length > 0 ? Math.round((aulasPassadas.length / aulas.length) * 100) : 0;
-  const proxima = aulas.find(a => new Date(a.prazo_entrega) >= now);
 
   // Métricas
   $('metric-presenca-val').textContent = `${pctPresenca}%`;
@@ -51,13 +53,16 @@ function renderizarDashboard(perfil, presencas, aulas) {
   $('metric-entregas-val').className = `metric-val ${pendentes === 0 ? 'g' : 'b'}`;
   $('metric-entregas-sub').textContent = pendentes > 0 ? `${pendentes} pendente${pendentes > 1 ? 's' : ''}` : 'Tudo em dia';
 
-  if (proxima) {
-    const dia = new Date(proxima.prazo_entrega).toLocaleDateString('pt-BR', { weekday: 'long' });
+  if (proximoEncontro) {
+    // Parseia como data local para evitar shift de timezone
+    const [y, m, d] = proximoEncontro.data.split('-').map(Number);
+    const dataLocal = new Date(y, m - 1, d);
+    const dia = dataLocal.toLocaleDateString('pt-BR', { weekday: 'long' });
     $('metric-proximo-val').textContent = dia.charAt(0).toUpperCase() + dia.slice(1);
-    $('metric-proximo-sub').textContent = `${fmtDate(proxima.prazo_entrega)} · Aula ${String(proxima.numero).padStart(2, '0')}`;
+    $('metric-proximo-sub').textContent = `${fmtDate(proximoEncontro.data)} · ${proximoEncontro.titulo}`;
   } else {
     $('metric-proximo-val').textContent = '—';
-    $('metric-proximo-sub').textContent = 'Nenhuma agendada';
+    $('metric-proximo-sub').textContent = 'Nenhum agendado';
   }
 
   const month = now.getMonth() + 1;
@@ -200,11 +205,12 @@ async function inicializar() {
       return;
     }
     renderSkeletons();
-    const [presencas, aulas] = await Promise.all([
+    const [presencas, aulas, proximoEncontro] = await Promise.all([
       getMinhasPresencas(),
       getAulasComEntregas(),
+      getProximoEncontro(),
     ]);
-    renderizarDashboard(perfil, presencas, aulas);
+    renderizarDashboard(perfil, presencas, aulas, proximoEncontro);
   } catch (e) {
     console.error('Erro ao carregar dashboard:', e);
   }
