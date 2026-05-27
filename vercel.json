@@ -1,8 +1,5 @@
 {
   "cleanUrls": true,
-  "redirects": [
-    { "source": "/diretoria", "destination": "/#diretoria", "permanent": false }
-  ],
   "rewrites": [
     { "source": "/membros/:path*", "destination": "/membros/:path*" }
   ],
