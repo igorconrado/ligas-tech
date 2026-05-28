@@ -417,3 +417,11 @@
   margin-top: .75rem;
   font-family: var(--font-mono);
 }
+
+@media (max-width: 768px) {
+  .etapas { grid-template-columns: 1fr; }
+  .perfil-grid { grid-template-columns: 1fr; }
+  .depo-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+}

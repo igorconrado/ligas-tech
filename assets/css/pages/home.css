@@ -576,8 +576,15 @@
   .tick-item:nth-child(4),
   .tick-item:nth-child(5) { display: none; }
   .split-grid { grid-template-columns: 1fr; margin: 0 -1.25rem; }
+  .roadmap { grid-template-columns: repeat(2, 1fr); }
   .dir-wrap { grid-template-columns: repeat(2, 1fr); }
-  .dir-card:nth-child(n) { grid-column: span 1; }
+  .dir-card { grid-column: span 1 !important; }
   .cta-section { grid-template-columns: 1fr; gap: 2rem; }
   .cta-pair { align-items: flex-start; }
+}
+
+@media (max-width: 480px) {
+  .roadmap { grid-template-columns: 1fr; }
+  .ticker { grid-template-columns: repeat(2, 1fr); }
+  .tick-item:nth-child(3) { display: none; }
 }
