@@ -395,9 +395,10 @@ footer {
 
 .section-title {
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: clamp(36px, 5vw, 60px);
   line-height: .92;
-  letter-spacing: .01em;
+  letter-spacing: -0.03em;
   margin-bottom: 1.25rem;
 }
 
@@ -495,7 +496,7 @@ footer {
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: .625rem; margin-bottom: 1.25rem; }
 .metric { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: .875rem 1.125rem; }
 .metric-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .375rem; }
-.metric-val { font-family: var(--font-display); font-size: 28px; line-height: 1; }
+.metric-val { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1; letter-spacing: -0.02em; }
 .metric-val.r { color: var(--red); }
 .metric-val.b { color: var(--blue); }
 .metric-val.g { color: var(--green); }

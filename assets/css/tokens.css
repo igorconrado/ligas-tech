@@ -125,9 +125,9 @@
      Bebas Neue: condensada caps-only, brilha em display grande.
      Space Grotesk: corpo, variável, geometric grotesk.
      JetBrains Mono: labels, código, badges. */
-  --font-display: "Bebas Neue", "Druk Wide", "Neue Haas Grotesk Display", sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
   --font-body:    "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", "Berkeley Mono", ui-monospace, monospace;
+  --font-mono:    "Space Mono", ui-monospace, monospace;
 
   /* ---------- TIPOGRAFIA — ESCALA (clamp) ---------- */
   --fs-display-xl: clamp(4.5rem, 12vw, 12rem);   /* hero, raro */
@@ -141,6 +141,15 @@
   --fs-body-s:     0.875rem;
   --fs-label:      0.75rem;
   --fs-micro:      0.6875rem;
+
+  /* ---------- TIPOGRAFIA — PESOS DISPLAY ----------
+     DS especifica Space Grotesk 700 / tracking -4.5% para display grandes.
+     Uso: font-family: var(--font-display); font-weight: var(--fw-display); letter-spacing: var(--tr-display) */
+  --fw-display: 700;
+  --fw-body:    400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+  --fw-bold:    700;
 
   /* ---------- TIPOGRAFIA — LINE HEIGHT ---------- */
   --lh-display: 0.88;
