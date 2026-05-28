@@ -1,7 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/certificados/(.+)", "destination": "/certificado.html" },
+    { "source": "/rewrite-probe-xyz", "destination": "/certificado.html" },
+    { "source": "/certificados/:slug+", "destination": "/certificado.html" },
     { "source": "/membros/:path*", "destination": "/membros/:path*" }
   ],
   "headers": [
