@@ -9,12 +9,12 @@
 <meta property="og:type" content="profile">
 <link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/global.css">
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/certificado.css">
 </head>
-<body data-liga="ibtech">
+<body data-liga="ibtech" data-theme="angelic">
 
 <!-- NAV minimal -->
 <nav class="cert-nav">
@@ -36,15 +36,51 @@
   <!-- ESTADO 2: encontrado -->
   <section class="cert-state" data-state="found" hidden>
     <article class="cert-card">
-      <div class="cert-card__rail" aria-hidden="true"></div>
+
+      <!-- Aura angelical: halo radial atrás do título + raios sutis -->
+      <div class="cert-aura" aria-hidden="true">
+        <svg class="cert-aura__halo" viewBox="0 0 600 600" fill="none">
+          <defs>
+            <radialGradient id="haloGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#F4D77A" stop-opacity="0.55"/>
+              <stop offset="35%" stop-color="#E6CC72" stop-opacity="0.20"/>
+              <stop offset="70%" stop-color="#C9A227" stop-opacity="0.04"/>
+              <stop offset="100%" stop-color="#C9A227" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#C9A227" stop-opacity="0"/>
+              <stop offset="48%" stop-color="#C9A227" stop-opacity="0"/>
+              <stop offset="50%" stop-color="#C9A227" stop-opacity="0.45"/>
+              <stop offset="52%" stop-color="#C9A227" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#C9A227" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="300" cy="300" r="290" fill="url(#haloGrad)"/>
+          <circle cx="300" cy="300" r="200" fill="url(#ringGrad)"/>
+        </svg>
+      </div>
+
+      <!-- Sparkles decorativos -->
+      <svg class="cert-sparkle cert-sparkle--1" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
+      </svg>
+      <svg class="cert-sparkle cert-sparkle--2" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
+      </svg>
+      <svg class="cert-sparkle cert-sparkle--3" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
+      </svg>
 
       <header class="cert-card__head">
         <p class="cert-kicker">
-          <span class="kicker-dot"></span>
+          <span class="kicker-rule"></span>
           Liga Acadêmica IbTech · Ibmec BH
+          <span class="kicker-rule"></span>
         </p>
         <p class="cert-titulo" data-bind="titulo">IbTech Star</p>
       </header>
+
+      <p class="cert-presentation">Confere a presente honraria a</p>
 
       <h1 class="cert-aluno" data-bind="aluno_nome"></h1>
 
@@ -120,6 +156,13 @@
       </section>
 
       <footer class="cert-card__foot">
+        <div class="cert-seal" aria-hidden="true">
+          <svg viewBox="0 0 60 60" fill="none">
+            <circle cx="30" cy="30" r="28" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+            <circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="0.5" opacity="0.6"/>
+            <path d="M30 14 L31.5 23 L40.5 26 L31.5 29 L30 38 L28.5 29 L19.5 26 L28.5 23 Z" fill="currentColor"/>
+          </svg>
+        </div>
         <p class="cert-verify">
           Esta credencial é verificável publicamente em
           <a href="" id="cert-self-link">esta URL</a>. A Liga Acadêmica IbTech
