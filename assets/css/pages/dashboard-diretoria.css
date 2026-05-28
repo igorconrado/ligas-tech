@@ -72,3 +72,16 @@ body { font-size: var(--fs-label); min-height: 100vh; }
 .aviso-title-text { font-size: var(--fs-label); font-weight: 600; }
 .aviso-date { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--muted); }
 .aviso-body { font-size: var(--fs-label); color: var(--mid); line-height: 1.6; }
+
+@media (max-width: 768px) {
+  .member-grid { grid-template-columns: repeat(2, 1fr); }
+  .cadastro-form { grid-template-columns: 1fr; }
+  .cadastro-form .full { grid-column: 1; }
+  .aulas-dir-grid { grid-template-columns: 1fr; }
+  .chamada-header { flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+  .aviso-head { flex-direction: column; align-items: flex-start; gap: var(--sp-1); }
+}
+
+@media (max-width: 480px) {
+  .member-grid { grid-template-columns: 1fr; }
+}
