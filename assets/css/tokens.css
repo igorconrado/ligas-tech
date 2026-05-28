@@ -76,21 +76,21 @@
      Stack dark com 3 níveis de elevação. Cards = surface-1.
      Hover de card ou modal de baixo nível = surface-2.
      Modais e popovers (peak elevation) = surface-3. */
-  --bg-base:       #080808;            /* fundo da página — INTOCADO */
-  --bg-surface-1:  #111110;            /* cards, inputs */
-  --bg-surface-2:  #1A1817;            /* cards elevados, hover */
-  --bg-surface-3:  #232120;            /* modais, popovers */
+  --bg-base:       #060606;            /* IBBOT DS: --ib-black */
+  --bg-surface-1:  #0E0E10;            /* IBBOT DS: --ib-ink — cards, inputs */
+  --bg-surface-2:  #141416;            /* IBBOT DS: --ib-surface — hover, elevados */
+  --bg-surface-3:  #1B1B1E;            /* IBBOT DS: --ib-surface-2 — modais, popovers */
   --bg-inverse:    var(--warm-50);
 
   /* ---------- SEMÂNTICOS — TEXTO ----------
      --text-primary é #EDEDED (cor-marca de texto, intocada).
      Secundários derivados pra hierarquia clara (4.5:1 mínimo no
      bg-base; tertiary é só pra labels não-essenciais). */
-  --text-primary:   #EDEDED;            /* cor-marca de texto — INTOCADO */
-  --text-secondary: #A8A39B;
-  --text-tertiary:  #6E6A64;
-  --text-disabled:  #3D3A36;
-  --text-inverse:   #080808;
+  --text-primary:   #EDEDEF;            /* IBBOT DS: --ib-bone (corpo principal) */
+  --text-secondary: #C9C9CF;            /* IBBOT DS: --ib-fog (corpo secundário) */
+  --text-tertiary:  #8A8A92;            /* IBBOT DS: --ib-mute (meta, captions) */
+  --text-disabled:  #3D3A3E;
+  --text-inverse:   #060606;
 
   /* ---------- SEMÂNTICOS — BORDAS ---------- */
   --border-subtle:  rgba(237, 237, 237, 0.06);

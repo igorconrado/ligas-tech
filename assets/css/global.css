@@ -20,15 +20,16 @@
   --blue: #00A6FF;      /* IBtech DS: --c-azure (primary accent) */
   --green: #3FCF8E;     /* IBtech DS: --c-success */
   --amber: #FFB020;     /* IBtech DS: --c-warning */
-  --bg: #080808;
-  --bg2: #0F0F0F;
-  --bg3: #141414;
-  --bg4: #1A1A1A;
+  --bg: #060606;        /* IBBOT DS: --ib-black */
+  --bg2: #0E0E10;       /* IBBOT DS: --ib-ink (inputs, plates) */
+  --bg3: #141416;       /* IBBOT DS: --ib-surface (cards) */
+  --bg4: #1B1B1E;       /* IBBOT DS: --ib-surface-2 (hover state) */
+  --line: #2A2A2E;      /* IBBOT DS: --ib-line (divisor sólido) */
   --border: rgba(255,255,255,0.06);
   --border2: rgba(255,255,255,0.11);
-  --text: #EDEDED;
-  --muted: #666;
-  --mid: #999;
+  --text: #EDEDEF;      /* IBBOT DS: --ib-bone (corpo principal) */
+  --muted: #8A8A92;     /* IBBOT DS: --ib-mute (meta, captions) */
+  --mid: #C9C9CF;       /* IBBOT DS: --ib-fog (corpo secundário) */
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'Space Mono', ui-monospace, monospace;

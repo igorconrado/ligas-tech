@@ -3,7 +3,15 @@
    Estilos exclusivos do ibtech.html
    ================================================================ */
 
-:root { --nav-accent: var(--blue); }
+:root {
+  --nav-accent: var(--blue);
+  /* IBtech DS: Ink Navy #0B1220 como base dark (--c-ink),
+     Ink 80 #1A2238, Ink 60 #2A3550 como surfaces com tom navy */
+  --bg:  #0B1220;
+  --bg2: #111929;
+  --bg3: #1A2238;
+  --bg4: #2A3550;
+}
 
 /* Nav active state */
 .nav-links a.active { color: var(--blue); }
