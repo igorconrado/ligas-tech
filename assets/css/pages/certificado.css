@@ -1,0 +1,421 @@
+/* ================================================================
+   CERTIFICADO.CSS
+   Página pública de credencial — /certificados/<slug>
+   ================================================================ */
+
+/* ── Nav minimal ─────────────────────────────────────────────── */
+
+.cert-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cert-nav .nav-logo-img {
+  height: 28px;
+  width: auto;
+}
+
+.cert-nav .nav-btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.65rem 1.1rem;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.cert-nav .nav-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* ── Main + estados ──────────────────────────────────────────── */
+
+.cert-main {
+  min-height: calc(100vh - 200px);
+  display: grid;
+  place-items: center;
+  padding: clamp(2rem, 6vw, 5rem) 1.5rem;
+}
+
+.cert-state {
+  width: 100%;
+  max-width: 760px;
+}
+
+.cert-loading {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+  text-align: center;
+}
+
+/* ── Cartão da credencial ────────────────────────────────────── */
+
+.cert-card {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  overflow: hidden;
+  animation: certFadeUp 600ms ease forwards;
+}
+
+.cert-card__rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 0%, var(--blue) 20%, var(--blue) 80%, transparent 100%);
+}
+
+.cert-card__head {
+  margin-bottom: 1.75rem;
+}
+
+.cert-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 1.25rem;
+}
+
+.cert-kicker .kicker-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 12px var(--blue);
+}
+
+.cert-titulo {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.cert-aluno {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  margin: 1rem 0 1.25rem;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.cert-honraria {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--mid);
+  max-width: 55ch;
+}
+
+.cert-honraria span[data-bind] {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.cert-descricao {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg3);
+  border-left: 2px solid var(--blue);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.9375rem;
+  color: var(--mid);
+  line-height: 1.7;
+}
+
+/* ── Metadados ───────────────────────────────────────────────── */
+
+.cert-meta {
+  margin: 2.5rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.cert-meta dt {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.cert-meta dd {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.cert-meta dd.cert-id {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  word-break: break-all;
+  color: var(--mid);
+  font-weight: 400;
+}
+
+/* ── Seções título ───────────────────────────────────────────── */
+
+.cert-section-title {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+/* ── Links do projeto ────────────────────────────────────────── */
+
+.cert-links {
+  margin: 2rem 0;
+}
+
+.cert-links__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.cert-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.cert-link:hover {
+  border-color: var(--blue);
+  background: var(--bg4);
+  transform: translateY(-2px);
+}
+
+.cert-link__lbl {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cert-link__val {
+  font-size: 0.9375rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ── Share — LinkedIn + copiar URL ───────────────────────────── */
+
+.cert-share {
+  margin-top: 2.5rem;
+  padding: 1.75rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.cert-share__lead {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--mid);
+  margin-bottom: 1.25rem;
+}
+
+.cert-share__lead em {
+  color: var(--text);
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.cert-share__url-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.cert-share__url {
+  flex: 1 1 320px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  word-break: break-all;
+  user-select: all;
+}
+
+.cert-share__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cert-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.85rem 1.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.cert-btn--primary {
+  background: var(--blue);
+  color: #FFFFFF;
+}
+.cert-btn--primary:hover {
+  background: #2D85FF;
+  transform: translateY(-1px);
+}
+
+.cert-btn--ghost {
+  background: transparent;
+  border-color: var(--border2);
+  color: var(--text);
+}
+.cert-btn--ghost:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* ── Footer do cartão ────────────────────────────────────────── */
+
+.cert-card__foot {
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.cert-verify {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.cert-verify a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-decoration-color: var(--border2);
+  text-underline-offset: 3px;
+}
+
+/* ── Estados de alerta (revogada / não encontrada) ──────────── */
+
+.cert-card--alert .cert-aluno {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.cert-kicker--alert {
+  color: var(--amber);
+}
+.cert-kicker--alert .kicker-dot {
+  background: var(--amber);
+  box-shadow: 0 0 12px var(--amber);
+}
+
+.cert-card--alert .cert-card__rail {
+  background: linear-gradient(to bottom, transparent 0%, var(--amber) 20%, var(--amber) 80%, transparent 100%);
+}
+
+/* ── Footer geral ────────────────────────────────────────────── */
+
+.cert-foot {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cert-foot a {
+  color: var(--mid);
+  text-decoration: none;
+}
+.cert-foot a:hover {
+  color: var(--blue);
+}
+
+/* ── Animação ────────────────────────────────────────────────── */
+
+@keyframes certFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cert-card {
+    animation: none;
+  }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .cert-nav {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .cert-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .cert-share {
+    padding: 1.25rem;
+  }
+}
