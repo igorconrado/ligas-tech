@@ -35,13 +35,19 @@
       <div class="cert-glow" id="glow">
         <article class="cert" id="cert">
 
-          <!-- Sparkles dourados no canto -->
-          <svg class="cert-sparkle cert-sparkle--1" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
-          </svg>
-          <svg class="cert-sparkle cert-sparkle--2" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
-          </svg>
+          <!-- Sparkles dourados — chuva de brilhinhos -->
+          <svg class="cert-sparkle cert-sparkle--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--6" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--7" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--8" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--9" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--10" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--11" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <svg class="cert-sparkle cert-sparkle--12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
 
           <header class="cert-head">
             <div class="cert-brand">
@@ -239,19 +245,50 @@ function canonicalize(v) {
 function initTilt() {
   if (RM || matchMedia('(pointer: coarse)').matches) return;
   const stage = $('stage'), frame = $('frame');
+
+  // estado-alvo (atualizado pelo mouse) + estado renderizado (interpolado)
+  let tRY = 0, tRX = 0, tSC = 1;
+  let RY = 0, RX = 0, SC = 1;
+  let active = false;
+
+  // permite o eixo de orientação do dispositivo influenciar
+  // (smartphones em modo paisagem ganham um tilt sutil pelo giroscópio)
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', (e) => {
+      if (active) return;
+      if (e.gamma == null || e.beta == null) return;
+      tRY = Math.max(-12, Math.min(12, e.gamma * .35));
+      tRX = Math.max(-10, Math.min(10, (e.beta - 30) * -.18));
+    });
+  }
+
+  stage.addEventListener('pointerenter', () => { active = true; tSC = 1.05; });
   stage.addEventListener('pointermove', (e) => {
     const r = stage.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - .5;
     const py = (e.clientY - r.top) / r.height - .5;
-    frame.style.setProperty('--ry', (px * 18).toFixed(2) + 'deg');
-    frame.style.setProperty('--rx', (-py * 14).toFixed(2) + 'deg');
-    frame.style.setProperty('--sc', '1.03');
+    // amplitudes maiores e curva de easing exponencial pra dar peso nas pontas
+    const ease = (v) => Math.sign(v) * Math.pow(Math.abs(v), .85);
+    tRY = ease(px) * 32;
+    tRX = ease(py) * -24;
   });
   stage.addEventListener('pointerleave', () => {
-    frame.style.setProperty('--ry', '0deg');
-    frame.style.setProperty('--rx', '0deg');
-    frame.style.setProperty('--sc', '1');
+    active = false;
+    tRY = 0; tRX = 0; tSC = 1;
   });
+
+  // loop de interpolação — segue o mouse com inércia (parece físico, não engessado)
+  const lerp = 0.16;
+  function tick() {
+    RY += (tRY - RY) * lerp;
+    RX += (tRX - RX) * lerp;
+    SC += (tSC - SC) * lerp;
+    frame.style.setProperty('--ry', RY.toFixed(2) + 'deg');
+    frame.style.setProperty('--rx', RX.toFixed(2) + 'deg');
+    frame.style.setProperty('--sc', SC.toFixed(3));
+    requestAnimationFrame(tick);
+  }
+  tick();
 }
 
 function setCheck(id, state) {
