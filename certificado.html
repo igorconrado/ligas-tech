@@ -35,19 +35,7 @@
       <div class="cert-glow" id="glow">
         <article class="cert" id="cert">
 
-          <!-- Sparkles dourados — chuva de brilhinhos -->
-          <svg class="cert-sparkle cert-sparkle--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--4" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--6" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--7" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--8" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--9" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--10" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--11" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
-          <svg class="cert-sparkle cert-sparkle--12" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/></svg>
+          <div class="sparkle-field" id="sparkleField" aria-hidden="true"></div>
 
           <header class="cert-head">
             <div class="cert-brand">
@@ -63,7 +51,12 @@
             <p class="cert-kicker" id="kicker">— Honraria do Ciclo</p>
             <p class="cert-to">Em reconhecimento a</p>
             <h1 class="cert-name" id="certName">—</h1>
-            <p class="cert-text" id="certText"></p>
+            <p class="cert-text">
+              Pelos alunos que se destacaram a mais e cumpriram com excelência os
+              desafios propostos ao longo do Ciclo 2026.1 da Trilha Frontend —
+              somando dedicação, qualidade técnica nas entregas e presença ao
+              longo do semestre.
+            </p>
           </div>
 
           <footer class="cert-foot">
@@ -243,52 +236,87 @@ function canonicalize(v) {
 }
 
 function initTilt() {
-  if (RM || matchMedia('(pointer: coarse)').matches) return;
+  if (RM) return;
   const stage = $('stage'), frame = $('frame');
 
-  // estado-alvo (atualizado pelo mouse) + estado renderizado (interpolado)
-  let tRY = 0, tRX = 0, tSC = 1;
+  let mouseRY = 0, mouseRX = 0;
   let RY = 0, RX = 0, SC = 1;
   let active = false;
-
-  // permite o eixo de orientação do dispositivo influenciar
-  // (smartphones em modo paisagem ganham um tilt sutil pelo giroscópio)
-  if (window.DeviceOrientationEvent) {
-    window.addEventListener('deviceorientation', (e) => {
-      if (active) return;
-      if (e.gamma == null || e.beta == null) return;
-      tRY = Math.max(-12, Math.min(12, e.gamma * .35));
-      tRX = Math.max(-10, Math.min(10, (e.beta - 30) * -.18));
-    });
-  }
+  let tSC = 1;
 
   stage.addEventListener('pointerenter', () => { active = true; tSC = 1.05; });
   stage.addEventListener('pointermove', (e) => {
     const r = stage.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - .5;
     const py = (e.clientY - r.top) / r.height - .5;
-    // amplitudes maiores e curva de easing exponencial pra dar peso nas pontas
     const ease = (v) => Math.sign(v) * Math.pow(Math.abs(v), .85);
-    tRY = ease(px) * 32;
-    tRX = ease(py) * -24;
+    mouseRY = ease(px) * 32;
+    mouseRX = ease(py) * -24;
   });
-  stage.addEventListener('pointerleave', () => {
-    active = false;
-    tRY = 0; tRX = 0; tSC = 1;
-  });
+  stage.addEventListener('pointerleave', () => { active = false; tSC = 1; });
 
-  // loop de interpolação — segue o mouse com inércia (parece físico, não engessado)
-  const lerp = 0.16;
-  function tick() {
+  function tick(t) {
+    const s = (t || 0) / 1000;
+    // tilt automatico — duas curvas sinoidais sobrepostas em frequencias
+    // primas pra nao ciclar nem repetir; cert oscila sozinho como uma chama
+    const autoRY = Math.sin(s * 0.42) * 18 + Math.sin(s * 0.17) * 6;
+    const autoRX = Math.cos(s * 0.31) * 12 + Math.sin(s * 0.11) * 4;
+
+    const tRY = active ? mouseRY : autoRY;
+    const tRX = active ? mouseRX : autoRX;
+
+    const lerp = active ? 0.18 : 0.06;
     RY += (tRY - RY) * lerp;
     RX += (tRX - RX) * lerp;
-    SC += (tSC - SC) * lerp;
+    SC += (tSC - SC) * 0.12;
+
     frame.style.setProperty('--ry', RY.toFixed(2) + 'deg');
     frame.style.setProperty('--rx', RX.toFixed(2) + 'deg');
     frame.style.setProperty('--sc', SC.toFixed(3));
     requestAnimationFrame(tick);
   }
-  tick();
+  requestAnimationFrame(tick);
+}
+
+/* ── Chuva de estrelinhas (~90) geradas dinamicamente ───────────── */
+function spawnSparkles(parent, count = 90) {
+  if (RM) count = Math.min(count, 20); // reduced motion: menos brilho
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const PATH_D = 'M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z';
+  const anims = ['sparkleA', 'sparkleB', 'sparkleC'];
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < count; i++) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('cert-sparkle');
+    const p = document.createElementNS(SVG_NS, 'path');
+    p.setAttribute('d', PATH_D);
+    p.setAttribute('fill', 'currentColor');
+    svg.appendChild(p);
+
+    // tamanhos variados: 60% pequenas (10-18px), 30% medias (18-28px),
+    // 10% gigantes (28-42px) — distribuicao com cauda longa.
+    const r = Math.random();
+    let size;
+    if (r < .6)      size = 10 + Math.random() * 8;
+    else if (r < .9) size = 18 + Math.random() * 10;
+    else             size = 28 + Math.random() * 14;
+
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    const delay = (Math.random() * 7).toFixed(2);
+    const duration = (2.6 + Math.random() * 3.4).toFixed(2);
+    const anim = anims[i % 3];
+
+    svg.style.cssText =
+      `width:${size.toFixed(1)}px;height:${size.toFixed(1)}px;` +
+      `top:${y.toFixed(1)}%;left:${x.toFixed(1)}%;` +
+      `animation:${anim} ${duration}s ease-in-out infinite;` +
+      `animation-delay:${delay}s;`;
+    frag.appendChild(svg);
+  }
+  parent.appendChild(frag);
 }
 
 function setCheck(id, state) {
@@ -338,7 +366,6 @@ async function renderCert(cert) {
   $('league').textContent = cert.titulo || 'IbTech Star';
   $('period').textContent = `Ciclo ${cert.ciclo} · Trilha ${cert.trilha}`;
   $('kicker').textContent = `— ${cert.titulo || 'Honraria do Ciclo'}`;
-  $('certText').innerHTML = (cert.descricao || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   $('reg').textContent = regCode(cert.id);
   $('issueDate').textContent = formatDate(cert.emitido_em);
 
@@ -418,6 +445,7 @@ if (!cert) {
   $('errorState').hidden = false;
   document.title = 'Credencial não encontrada · Liga IbTech';
 } else {
+  spawnSparkles($('sparkleField'), 95);
   await renderCert(cert);
   initTilt();
   runVerification(cert);
