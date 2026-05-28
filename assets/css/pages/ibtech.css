@@ -28,7 +28,7 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 70% at 85% 50%, rgba(15,111,255,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 70% at 85% 50%, rgba(0,166,255,0.13) 0%, transparent 70%),
     radial-gradient(ellipse 40% 40% at 50% 80%, rgba(0,58,140,0.06) 0%, transparent 70%);
 }
 
@@ -73,13 +73,14 @@
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(80px, 11vw, 150px);
-  line-height: .84;
-  letter-spacing: -.01em;
+  font-weight: 700;
+  font-size: clamp(64px, 9vw, 130px);
+  line-height: .88;
+  letter-spacing: -0.045em;
   margin-bottom: 1.75rem;
 }
 
-.hero-title .blue { color: var(--blue); text-shadow: 0 0 40px rgba(15,111,255,0.35); }
+.hero-title .blue { color: var(--blue); text-shadow: 0 0 40px rgba(0,166,255,0.35); }
 
 .hero-sub {
   font-size: 15px;
@@ -210,7 +211,7 @@
 .stat-prefix {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: rgba(15,111,255,.5);
+  color: rgba(0,166,255,.5);
   letter-spacing: .04em;
   margin-bottom: .25rem;
 }
@@ -262,7 +263,7 @@
 .sobre-card-num {
   font-family: var(--font-display);
   font-size: 52px;
-  color: rgba(15,111,255,.1);
+  color: rgba(0,166,255,.1);
   line-height: 1;
   margin-bottom: .75rem;
 }
@@ -320,8 +321,8 @@
 .projeto-card:hover {
   background: var(--bg3);
   transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(15,111,255,0.12);
-  border-color: rgba(15,111,255,0.25);
+  box-shadow: 0 20px 60px rgba(0,166,255,0.12);
+  border-color: rgba(0,166,255,0.25);
 }
 .projeto-card:hover .projeto-img::before {
   opacity: 2;
@@ -343,15 +344,15 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(rgba(15,111,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15,111,255,0.04) 1px, transparent 1px);
+    linear-gradient(rgba(0,166,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,166,255,0.04) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 .projeto-img::after {
   content: attr(data-label);
   font-family: var(--font-mono);
   font-size: 10px;
-  color: rgba(15,111,255,0.4);
+  color: rgba(0,166,255,0.4);
   letter-spacing: .12em;
   text-transform: uppercase;
   position: relative;
@@ -379,9 +380,9 @@
   font-size: 9px;
   padding: 2px 7px;
   border-radius: 2px;
-  border: 1px solid rgba(15,111,255,.2);
+  border: 1px solid rgba(0,166,255,.2);
   color: rgba(100,160,255,.7);
-  background: rgba(15,111,255,.05);
+  background: rgba(0,166,255,.05);
   letter-spacing: .03em;
 }
 
@@ -404,7 +405,7 @@
   bottom: -0.1em;
   font-family: var(--font-display);
   font-size: clamp(120px, 18vw, 220px);
-  color: rgba(15,111,255,.04);
+  color: rgba(0,166,255,.04);
   line-height: 1;
   pointer-events: none;
   user-select: none;

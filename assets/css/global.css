@@ -14,10 +14,12 @@
 
 /* Variáveis */
 :root {
-  --red: #FF1F1F;
-  --blue: #0F6FFF;
-  --green: #22C55E;
-  --amber: #F59E0B;
+  --red: #E10600;       /* IBBOT DS: --ib-red (primary) */
+  --red-hover: #FF3B33; /* IBBOT DS: --ib-red-300 (hover/link) */
+  --red-press: #B30500; /* IBBOT DS: --ib-red-700 (pressed/borda) */
+  --blue: #00A6FF;      /* IBtech DS: --c-azure (primary accent) */
+  --green: #3FCF8E;     /* IBtech DS: --c-success */
+  --amber: #FFB020;     /* IBtech DS: --c-warning */
   --bg: #080808;
   --bg2: #0F0F0F;
   --bg3: #141414;

@@ -21,31 +21,30 @@
 
 :root {
   /* ---------- PALETA — RED (IbBot) ----------
-     Derivada de #FF1F1F (HSL 0°, 100%, 56%).
-     Steps: lightness varia, saturação preservada nos médios. */
-  --bot-50:  #FFE8E5;
-  --bot-100: #FFC4BD;
-  --bot-200: #FF9A8E;
-  --bot-300: #FF6E5C;
-  --bot-400: #FF4530;
-  --bot-500: #FF1F1F;   /* COR-MARCA — não alterar */
-  --bot-600: #D81515;
-  --bot-700: #A50E0E;
-  --bot-800: #6E0808;
-  --bot-900: #380404;
+     IBBOT Design System v0.1: primária #E10600, hover #FF3B33, pressed #B30500 */
+  --bot-50:  #FFE5E3;
+  --bot-100: #FFBAB5;
+  --bot-200: #FF8A80;
+  --bot-300: #FF3B33;   /* hover / link — DS --ib-red-300 */
+  --bot-400: #F01A08;
+  --bot-500: #E10600;   /* COR-MARCA — IBBOT DS --ib-red */
+  --bot-600: #B30500;   /* pressed / borda — DS --ib-red-700 */
+  --bot-700: #8A0400;
+  --bot-800: #5C0200;
+  --bot-900: #2E0100;
 
-  /* ---------- PALETA — BLUE (IbTech) ----------
-     Derivada de #0F6FFF (HSL 215°, 100%, 53%). */
-  --tech-50:  #E5EFFF;
-  --tech-100: #BDD4FF;
-  --tech-200: #8FB5FF;
-  --tech-300: #5C95FF;
-  --tech-400: #3082FF;
-  --tech-500: #0F6FFF;  /* COR-MARCA — não alterar */
-  --tech-600: #0856D8;
-  --tech-700: #053FA5;
-  --tech-800: #03296E;
-  --tech-900: #011538;
+  /* ---------- PALETA — BLUE (IBtech) ----------
+     IBtech Design System v1.0: Azure #00A6FF como cor primária */
+  --tech-50:  #E0F4FF;
+  --tech-100: #B3E5FF;
+  --tech-200: #80D4FF;
+  --tech-300: #4DC2FF;
+  --tech-400: #26B4FF;
+  --tech-500: #00A6FF;  /* COR-MARCA — IBtech DS --c-azure */
+  --tech-600: #0083CC;
+  --tech-700: #006299;
+  --tech-800: #004266;
+  --tech-900: #002133;
 
   /* ---------- NEUTROS QUENTES (superfícies) ----------
      Ancorado em --bg-base #080808 (intocado).
@@ -104,22 +103,23 @@
   --accent-bot-hover:  var(--bot-400);
   --accent-tech-hover: var(--tech-400);
 
-  /* ---------- SEMÂNTICOS — STATUS ---------- */
-  --success: #2EBE7A;
-  --warning: #F5B544;
-  --danger:  #E84545;
-  --info:    var(--tech-400);
+  /* ---------- SEMÂNTICOS — STATUS ----------
+     IBtech DS: --c-success #3FCF8E, --c-warning #FFB020, --c-danger #FF5A5F */
+  --success: #3FCF8E;
+  --warning: #FFB020;
+  --danger:  #FF5A5F;
+  --info:    var(--tech-500);
 
   /* tints translúcidos pra badges/backgrounds de status */
-  --success-bg: rgba(46, 190, 122, 0.12);
-  --warning-bg: rgba(245, 181, 68, 0.12);
-  --danger-bg:  rgba(232, 69, 69, 0.12);
-  --info-bg:    rgba(48, 130, 255, 0.12);
+  --success-bg: rgba(63, 207, 142, 0.12);
+  --warning-bg: rgba(255, 176, 32, 0.12);
+  --danger-bg:  rgba(255, 90, 95, 0.12);
+  --info-bg:    rgba(0, 166, 255, 0.12);
 
-  --success-border: rgba(46, 190, 122, 0.24);
-  --warning-border: rgba(245, 181, 68, 0.24);
-  --danger-border:  rgba(232, 69, 69, 0.24);
-  --info-border:    rgba(48, 130, 255, 0.24);
+  --success-border: rgba(63, 207, 142, 0.24);
+  --warning-border: rgba(255, 176, 32, 0.24);
+  --danger-border:  rgba(255, 90, 95, 0.24);
+  --info-border:    rgba(0, 166, 255, 0.24);
 
   /* ---------- TIPOGRAFIA — FAMILIES ----------
      Bebas Neue: condensada caps-only, brilha em display grande.
