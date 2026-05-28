@@ -2,351 +2,390 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Credencial — Liga Acadêmica IbTech</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Henrique Bomfim — IbTech Star · Liga IbTech</title>
+<script>window.CERT_DATA_PRELOAD = {"id": "20d753e8-0b0d-47ea-ad05-bb4692aa734d", "slug": "henrique-bomfim", "aluno_nome": "Henrique Bomfim", "aluno_email": null, "aluno_github": null, "aluno_linkedin": null, "projeto_titulo": "Projeto 01 — Cartão de Visita", "projeto_repo": "https://github.com/Henrique-Bomfim/Portifolio-Pessoal", "projeto_site_url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/joshazze/ibtech-frontend-2026-1/aluno/henrique-bomfim/sites/henrique-bomfim/index.html", "projeto_revisao_url": "https://github.com/joshazze/ibtech-frontend-2026-1/blob/aluno/henrique-bomfim/projeto01-cartao-visita/henrique-bomfim.md", "ciclo": "2026.1", "trilha": "Frontend", "edicao": 1, "titulo": "IbTech Star", "descricao": "Por entregar uma das estruturas HTML mais semânticas da Trilha — aside, main, section e nav corretos com layout de currículo limpo — e pela presença e dedicação ao longo do semestre.", "conteudo_hash": null, "ipfs_cid": null, "polygon_tx_hash": null, "polygon_block": null, "pdf_path": null, "metadata_path": null, "emitido_em": "2026-05-28T20:15:56.138496+00:00", "revogado_em": null};</script>
 <meta name="description" content="Credencial verificável emitida pela Liga Acadêmica IbTech do Ibmec BH.">
-<meta property="og:title" content="Credencial — Liga Acadêmica IbTech">
 <meta property="og:type" content="profile">
 <link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/global.css">
-<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://wsshwwjiwfrgkssyxbtc.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/pages/certificado.css">
 </head>
-<body data-liga="ibtech" data-theme="angelic">
+<body>
 
-<!-- NAV minimal -->
-<nav class="cert-nav">
-  <a class="nav-logo" href="/">
-    <img src="/assets/icons/Documento-removebg-preview.png" alt="IbBot &amp; IbTech" class="nav-logo-img">
-  </a>
-  <div class="nav-right">
-    <a class="nav-btn" href="/ibtech">Sobre a IbTech →</a>
-  </div>
-</nav>
+<div class="aura" id="aura" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
 
-<main class="cert-main" id="cert-main" aria-busy="true">
+<div class="shell">
 
-  <!-- ESTADO 1: carregando -->
-  <section class="cert-state" data-state="loading" hidden>
-    <p class="cert-loading">Carregando credencial…</p>
-  </section>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="/assets/icons/IbTech.svg" alt="" class="brand-mark" aria-hidden="true">
+      <b>Liga IbTech</b>
+    </div>
+    <div class="pill scan" id="pill"><span class="dot"></span><span id="pillText">Verificando</span></div>
+  </header>
 
-  <!-- ESTADO 2: encontrado -->
-  <section class="cert-state" data-state="found" hidden>
-    <article class="cert-card">
+  <!-- PALCO DO CERTIFICADO -->
+  <section class="stage" id="stage" aria-label="Certificado">
+    <div class="cert-frame" id="frame">
+      <div class="cert-glow" id="glow">
+        <article class="cert" id="cert">
 
-      <!-- Aura angelical: halo radial atrás do título + raios sutis -->
-      <div class="cert-aura" aria-hidden="true">
-        <svg class="cert-aura__halo" viewBox="0 0 600 600" fill="none">
-          <defs>
-            <radialGradient id="haloGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#F4D77A" stop-opacity="0.55"/>
-              <stop offset="35%" stop-color="#E6CC72" stop-opacity="0.20"/>
-              <stop offset="70%" stop-color="#C9A227" stop-opacity="0.04"/>
-              <stop offset="100%" stop-color="#C9A227" stop-opacity="0"/>
-            </radialGradient>
-            <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#C9A227" stop-opacity="0"/>
-              <stop offset="48%" stop-color="#C9A227" stop-opacity="0"/>
-              <stop offset="50%" stop-color="#C9A227" stop-opacity="0.45"/>
-              <stop offset="52%" stop-color="#C9A227" stop-opacity="0"/>
-              <stop offset="100%" stop-color="#C9A227" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <circle cx="300" cy="300" r="290" fill="url(#haloGrad)"/>
-          <circle cx="300" cy="300" r="200" fill="url(#ringGrad)"/>
-        </svg>
-      </div>
-
-      <!-- Sparkles decorativos -->
-      <svg class="cert-sparkle cert-sparkle--1" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
-      </svg>
-      <svg class="cert-sparkle cert-sparkle--2" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
-      </svg>
-      <svg class="cert-sparkle cert-sparkle--3" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
-      </svg>
-
-      <header class="cert-card__head">
-        <p class="cert-kicker">
-          <span class="kicker-rule"></span>
-          Liga Acadêmica IbTech · Ibmec BH
-          <span class="kicker-rule"></span>
-        </p>
-        <p class="cert-titulo" data-bind="titulo">IbTech Star</p>
-      </header>
-
-      <p class="cert-presentation">Confere a presente honraria a</p>
-
-      <h1 class="cert-aluno" data-bind="aluno_nome"></h1>
-
-      <p class="cert-honraria" data-bind="honraria">
-        Honraria pelo desempenho e esforço no Ciclo
-        <span data-bind="ciclo"></span> da Trilha
-        <span data-bind="trilha"></span>.
-      </p>
-
-      <p class="cert-descricao" data-bind="descricao" hidden></p>
-
-      <dl class="cert-meta">
-        <div>
-          <dt>Emitido em</dt>
-          <dd data-bind="emitido_em"></dd>
-        </div>
-        <div>
-          <dt>Credential ID</dt>
-          <dd class="cert-id" data-bind="id"></dd>
-        </div>
-        <div>
-          <dt>Issuing organization</dt>
-          <dd>Liga Acadêmica IbTech</dd>
-        </div>
-      </dl>
-
-      <section class="cert-links" data-bind="projeto" hidden>
-        <h2 class="cert-section-title">Projeto premiado</h2>
-        <div class="cert-links__grid">
-          <a class="cert-link" data-bind="projeto_site_url" target="_blank" rel="noopener noreferrer" hidden>
-            <span class="cert-link__lbl">Site entregue</span>
-            <span class="cert-link__val">Abrir entrega →</span>
-          </a>
-          <a class="cert-link" data-bind="projeto_repo" target="_blank" rel="noopener noreferrer" hidden>
-            <span class="cert-link__lbl">Repositório</span>
-            <span class="cert-link__val">Ver código →</span>
-          </a>
-          <a class="cert-link" data-bind="projeto_revisao_url" target="_blank" rel="noopener noreferrer" hidden>
-            <span class="cert-link__lbl">Revisão didática</span>
-            <span class="cert-link__val">Ler revisão →</span>
-          </a>
-        </div>
-      </section>
-
-      <section class="cert-share">
-        <h2 class="cert-section-title">Usar esta credencial</h2>
-        <p class="cert-share__lead">
-          Cole a Credential URL abaixo no campo correspondente do
-          LinkedIn em <em>"Add license &amp; certification"</em>, ou use
-          o botão pra abrir o formulário já preenchido.
-        </p>
-
-        <div class="cert-share__url-row">
-          <code class="cert-share__url" id="cert-share-url"></code>
-          <button
-            type="button"
-            class="cert-btn cert-btn--ghost"
-            id="cert-copy-btn"
-            aria-live="polite">
-            Copiar URL
-          </button>
-        </div>
-
-        <div class="cert-share__actions">
-          <a
-            id="cert-linkedin-btn"
-            class="cert-btn cert-btn--primary"
-            target="_blank"
-            rel="noopener noreferrer">
-            Adicionar ao LinkedIn →
-          </a>
-        </div>
-      </section>
-
-      <footer class="cert-card__foot">
-        <div class="cert-seal" aria-hidden="true">
-          <svg viewBox="0 0 60 60" fill="none">
-            <circle cx="30" cy="30" r="28" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
-            <circle cx="30" cy="30" r="22" stroke="currentColor" stroke-width="0.5" opacity="0.6"/>
-            <path d="M30 14 L31.5 23 L40.5 26 L31.5 29 L30 38 L28.5 29 L19.5 26 L28.5 23 Z" fill="currentColor"/>
+          <!-- Sparkles dourados no canto -->
+          <svg class="cert-sparkle cert-sparkle--1" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
           </svg>
+          <svg class="cert-sparkle cert-sparkle--2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 0 L13.5 9 L24 12 L13.5 15 L12 24 L10.5 15 L0 12 L10.5 9 Z" fill="currentColor"/>
+          </svg>
+
+          <header class="cert-head">
+            <div class="cert-brand">
+              <img src="/assets/icons/IbTech.svg" alt="IbTech" class="cert-brand-mark">
+              <span class="cert-wordmark">IbTech</span>
+              <span class="cert-divider"></span>
+              <span class="cert-league" id="league">IbTech Stars</span>
+            </div>
+            <div class="cert-period" id="period">Ciclo 2026.1</div>
+          </header>
+
+          <div class="cert-body">
+            <p class="cert-kicker" id="kicker">— Honraria do Ciclo</p>
+            <p class="cert-to">Em reconhecimento a</p>
+            <h1 class="cert-name" id="certName">—</h1>
+            <p class="cert-text" id="certText"></p>
+          </div>
+
+          <footer class="cert-foot">
+            <div class="sig">
+              <div class="sig-line"></div>
+              <div class="sig-role">Presidente</div>
+              <div class="sig-name">Igor Conrado</div>
+            </div>
+            <div class="sig">
+              <div class="sig-line"></div>
+              <div class="sig-role">Vice-Presidente</div>
+              <div class="sig-name">Joshua Azze</div>
+            </div>
+            <div class="cert-reg">
+              <div>REG <b id="reg">—</b></div>
+              <div id="issueDate">—</div>
+            </div>
+          </footer>
+
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 VERIFICAÇÃO -->
+  <section class="verify">
+    <div class="seclabel">01 <b>Verificação da credencial</b></div>
+    <div class="card checks">
+      <div class="check is-scanning" id="c1">
+        <div class="ic">·</div>
+        <div class="ctext">Registro encontrado no banco da Liga<div class="ctag">Identidade da credencial</div></div>
+      </div>
+      <div class="check is-scanning" id="c2">
+        <div class="ic">·</div>
+        <div class="ctext">Dados de emissão íntegros<div class="ctag">Aluno · Ciclo · Honraria</div></div>
+      </div>
+      <div class="check is-scanning" id="c3">
+        <div class="ic">·</div>
+        <div class="ctext">Credencial não revogada<div class="ctag">Status: válida</div></div>
+      </div>
+    </div>
+    <div class="verdict" id="verdict">
+      <div class="vmark" id="vmark">·</div>
+      <div>
+        <div class="vtitle" id="vtitle">Verificando credencial…</div>
+        <div class="vsub" id="vsub">Conferindo registro junto à Liga.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 ON-CHAIN -->
+  <section class="ledger">
+    <div class="seclabel">02 <b>Ancoragem on-chain</b></div>
+    <div class="grid">
+      <div class="cell wide">
+        <div class="k">Status</div>
+        <div class="v" id="lStatus">Programado para a próxima fase — attestation na Polygon mainnet</div>
+      </div>
+      <div class="cell"><div class="k">Rede</div><div class="v" id="lNet">Polygon</div></div>
+      <div class="cell"><div class="k">Bloco</div><div class="v" id="lBlock">—</div></div>
+      <div class="cell wide">
+        <div class="k">Transação <button class="copy" data-c="tx" hidden>copiar</button></div>
+        <div class="hash" id="lTx">—</div>
+      </div>
+      <div class="cell wide">
+        <div class="k">Impressão digital (SHA-256) <button class="copy" data-c="hash">copiar</button></div>
+        <div class="hash" id="lHash">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 CREDENCIAL -->
+  <section class="meta">
+    <div class="seclabel">03 <b>Credencial</b></div>
+    <div class="grid">
+      <div class="cell wide">
+        <div class="k">Emitido por</div>
+        <div class="issuer">
+          <img src="/assets/icons/IbTech.svg" alt="" aria-hidden="true">
+          <div>
+            <div class="iname">Liga Acadêmica IbTech</div>
+            <a href="https://www.ligastechibmec.com.br" target="_blank" rel="noopener noreferrer">www.ligastechibmec.com.br</a>
+          </div>
         </div>
-        <p class="cert-verify">
-          Esta credencial é verificável publicamente em
-          <a href="" id="cert-self-link">esta URL</a>. A Liga Acadêmica IbTech
-          mantém o registro oficial em seu banco de dados.
-        </p>
-      </footer>
-    </article>
+      </div>
+      <div class="cell"><div class="k">Emissão</div><div class="v" id="mDate">—</div></div>
+      <div class="cell"><div class="k">Validade</div><div class="v">Permanente</div></div>
+      <div class="cell wide">
+        <div class="k">Credential ID <button class="copy" data-c="id">copiar</button></div>
+        <div class="hash" id="mId">—</div>
+      </div>
+      <div class="cell wide">
+        <div class="k">Critérios atendidos</div>
+        <div class="crit" id="mCrit">—</div>
+      </div>
+    </div>
   </section>
 
-  <!-- ESTADO 3: revogada -->
-  <section class="cert-state" data-state="revoked" hidden>
-    <article class="cert-card cert-card--alert">
-      <p class="cert-kicker cert-kicker--alert">Credencial revogada</p>
-      <h1 class="cert-aluno">Esta credencial não está mais válida.</h1>
-      <p class="cert-honraria">
-        A Liga Acadêmica IbTech revogou esta credencial em
-        <span data-bind="revogado_em"></span>. Em caso de dúvida, entre em
-        contato pela <a href="/contato">página de contato</a>.
-      </p>
-    </article>
+  <!-- 04 COMPARTILHAR -->
+  <section class="actions">
+    <div class="seclabel">04 <b>Compartilhar</b></div>
+    <div class="card actions-card">
+      <div class="actions-row">
+        <div class="qr" id="qr" aria-hidden="true"></div>
+        <div class="qr-hint">Aponte a câmera para abrir esta verificação.</div>
+        <div class="btns">
+          <a class="btn primary" id="liButton" target="_blank" rel="noopener noreferrer">Adicionar ao LinkedIn</a>
+          <button class="btn ghost" id="copyButton">Copiar Credential URL</button>
+          <button class="btn ghost" onclick="window.print()">Baixar PDF</button>
+        </div>
+      </div>
+      <div class="url-row">
+        <code class="url-pre" id="urlPre"></code>
+      </div>
+    </div>
   </section>
 
-  <!-- ESTADO 4: não encontrada -->
-  <section class="cert-state" data-state="not-found" hidden>
-    <article class="cert-card cert-card--alert">
-      <p class="cert-kicker cert-kicker--alert">Credencial não encontrada</p>
-      <h1 class="cert-aluno">Nenhuma credencial corresponde a este link.</h1>
-      <p class="cert-honraria">
-        Verifique o endereço ou volte à
-        <a href="/ibtech">página da IbTech</a>. Se você acredita que
-        deveria ter uma credencial aqui, escreva pela
-        <a href="/contato">página de contato</a>.
-      </p>
+  <footer class="sitefoot">
+    Credencial emitida pela Liga Acadêmica IbTech · Ibmec BH<br>
+    Registro permanente no banco da Liga · Ancoragem blockchain prevista para a próxima fase
+  </footer>
+
+</div>
+
+<div id="errorState" hidden>
+  <div class="shell">
+    <article class="cert" style="aspect-ratio:auto;padding:3rem;text-align:center">
+      <p class="cert-kicker">Credencial não encontrada</p>
+      <h1 class="cert-name" style="font-size:2rem">Nenhuma credencial corresponde a este link.</h1>
+      <p class="cert-text">Verifique o endereço ou volte à <a href="/ibtech">página da IbTech</a>.</p>
     </article>
-  </section>
+  </div>
+</div>
 
-</main>
-
-<footer class="cert-foot">
-  <p>
-    © Liga Acadêmica IbTech · Ibmec BH ·
-    <a href="/">liga-ibtech.com.br</a>
-  </p>
-</footer>
-
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script type="module">
-  import { supabase } from '/assets/js/supabase/client.js';
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sleep = (ms) => new Promise((r) => setTimeout(r, RM ? 0 : ms));
+const $ = (id) => document.getElementById(id);
 
-  /* ── 1. Descobrir o slug (path /certificados/<slug> ou ?id=<slug>) ── */
-  const path = window.location.pathname.replace(/\/+$/, '');
-  const parts = path.split('/').filter(Boolean);
-  const slugFromPath = parts[0] === 'certificados' && parts[1] ? parts[1] : null;
-  const slug = slugFromPath || new URLSearchParams(window.location.search).get('id');
+async function loadCert() {
+  if (window.CERT_DATA_PRELOAD) return window.CERT_DATA_PRELOAD;
+  const slug = slugFromLocation();
+  if (!slug) return null;
+  const { supabase } = await import('/assets/js/supabase/client.js');
+  const { data, error } = await supabase
+    .from('certificados').select('*').eq('slug', slug).maybeSingle();
+  return error ? null : data;
+}
 
-  const main = document.getElementById('cert-main');
-  const states = main.querySelectorAll('.cert-state');
-  const show = (name) => {
-    states.forEach((s) => {
-      s.hidden = s.dataset.state !== name;
-    });
-    main.setAttribute('aria-busy', name === 'loading' ? 'true' : 'false');
-  };
+function slugFromLocation() {
+  const parts = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+  return parts[0] === 'certificados' && parts[1]
+    ? decodeURIComponent(parts[1])
+    : new URLSearchParams(window.location.search).get('id');
+}
 
-  if (!slug) {
-    show('not-found');
+function formatDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  } catch { return iso; }
+}
+function regCode(id) {
+  const h = (id || '').replace(/-/g, '').toUpperCase();
+  return h ? `${h.slice(0, 4)}-${h.slice(-4)}` : '—';
+}
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+function canonicalize(v) {
+  if (Array.isArray(v)) return '[' + v.map(canonicalize).join(',') + ']';
+  if (v && typeof v === 'object') {
+    return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canonicalize(v[k])).join(',') + '}';
+  }
+  return JSON.stringify(v);
+}
+
+function initTilt() {
+  if (RM || matchMedia('(pointer: coarse)').matches) return;
+  const stage = $('stage'), frame = $('frame');
+  stage.addEventListener('pointermove', (e) => {
+    const r = stage.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - .5;
+    const py = (e.clientY - r.top) / r.height - .5;
+    frame.style.setProperty('--ry', (px * 18).toFixed(2) + 'deg');
+    frame.style.setProperty('--rx', (-py * 14).toFixed(2) + 'deg');
+    frame.style.setProperty('--sc', '1.03');
+  });
+  stage.addEventListener('pointerleave', () => {
+    frame.style.setProperty('--ry', '0deg');
+    frame.style.setProperty('--rx', '0deg');
+    frame.style.setProperty('--sc', '1');
+  });
+}
+
+function setCheck(id, state) {
+  const el = $(id);
+  el.className = 'check is-' + state;
+  el.querySelector('.ic').textContent = state === 'ok' ? '✓' : state === 'warn' ? '!' : '✕';
+}
+
+async function runVerification(cert) {
+  const c1 = !!(cert && cert.id && cert.slug);
+  await sleep(500);
+  setCheck('c1', c1 ? 'ok' : 'fail');
+
+  const c2 = !!(cert.aluno_nome && cert.ciclo && cert.titulo);
+  await sleep(560);
+  setCheck('c2', c2 ? 'ok' : 'fail');
+
+  const c3 = !cert.revogado_em;
+  await sleep(440);
+  setCheck('c3', c3 ? 'ok' : 'fail');
+
+  await sleep(220);
+
+  const allOk = c1 && c2 && c3;
+  const v = $('verdict'), pill = $('pill');
+  if (allOk) {
+    v.className = 'verdict is-ok';
+    $('vmark').textContent = '✓';
+    $('vtitle').textContent = 'Credencial autêntica';
+    $('vsub').textContent = 'Conteúdo íntegro e registro válido junto à Liga Acadêmica IbTech.';
+    pill.className = 'pill ok';
+    $('pillText').textContent = 'Autêntica';
+    $('aura').classList.add('is-ok');
+    $('glow').classList.add('is-ok');
   } else {
-    show('loading');
+    v.className = 'verdict is-fail';
+    $('vmark').textContent = '✕';
+    $('vtitle').textContent = 'Credencial não verificada';
+    $('vsub').textContent = 'Não foi possível confirmar o registro desta credencial.';
+    pill.className = 'pill fail';
+    $('pillText').textContent = 'Inválida';
+  }
+}
 
-    /* ── 2. Buscar credencial ── */
-    const { data, error } = await supabase
-      .from('certificados')
-      .select('*')
-      .eq('slug', slug)
-      .maybeSingle();
+async function renderCert(cert) {
+  $('certName').textContent = cert.aluno_nome;
+  $('league').textContent = cert.titulo || 'IbTech Star';
+  $('period').textContent = `Ciclo ${cert.ciclo} · Trilha ${cert.trilha}`;
+  $('kicker').textContent = `— ${cert.titulo || 'Honraria do Ciclo'}`;
+  $('certText').innerHTML = (cert.descricao || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  $('reg').textContent = regCode(cert.id);
+  $('issueDate').textContent = formatDate(cert.emitido_em);
 
-    if (error || !data) {
-      console.error('[cert] erro ao buscar', error);
-      show('not-found');
-    } else if (data.revogado_em) {
-      bindRevoked(data);
-      show('revoked');
-    } else {
-      bindFound(data);
-      show('found');
-    }
+  $('mDate').textContent = formatDate(cert.emitido_em);
+  $('mId').textContent = cert.id;
+  $('mCrit').textContent = cert.descricao || 'Honraria pelo desempenho e esforço no ciclo.';
+
+  if (cert.polygon_tx_hash) {
+    $('lStatus').textContent = 'Ancorada permanentemente';
+    $('lNet').textContent = 'Polygon';
+    if (cert.polygon_block) $('lBlock').textContent = '#' + Number(cert.polygon_block).toLocaleString('pt-BR');
+    $('lTx').textContent = cert.polygon_tx_hash;
+    document.querySelector('[data-c="tx"]').hidden = false;
   }
 
-  /* ── 3. Bind helpers ── */
+  const canon = canonicalize({
+    id: cert.id, slug: cert.slug, aluno_nome: cert.aluno_nome,
+    titulo: cert.titulo, ciclo: cert.ciclo, trilha: cert.trilha,
+    descricao: cert.descricao || '', emitido_em: cert.emitido_em,
+  });
+  $('lHash').textContent = await sha256Hex(canon);
 
-  function bindFound(c) {
-    const root = main.querySelector('[data-state="found"]');
+  document.title = `${cert.aluno_nome} — ${cert.titulo} · Liga IbTech`;
+  setMeta('og:title', `${cert.aluno_nome} — ${cert.titulo}`);
+  setMeta('og:description', `${cert.titulo} concedida pela Liga Acadêmica IbTech no Ciclo ${cert.ciclo}.`);
 
-    root.querySelector('[data-bind="aluno_nome"]').textContent = c.aluno_nome;
-    root.querySelector('[data-bind="titulo"]').textContent = c.titulo || 'IbTech Star';
-    root.querySelector('[data-bind="ciclo"]').textContent = c.ciclo;
-    root.querySelector('[data-bind="trilha"]').textContent = c.trilha;
-    root.querySelector('[data-bind="emitido_em"]').textContent = formatDate(c.emitido_em);
-    root.querySelector('[data-bind="id"]').textContent = c.id;
+  const url = `${window.location.origin}/certificados/${cert.slug}`;
+  $('urlPre').textContent = url;
 
-    if (c.descricao) {
-      const el = root.querySelector('[data-bind="descricao"]');
-      el.textContent = c.descricao;
-      el.hidden = false;
-    }
+  const liUrl = new URL('https://www.linkedin.com/profile/add');
+  liUrl.searchParams.set('startTask', 'CERTIFICATION_NAME');
+  liUrl.searchParams.set('name', `${cert.titulo} — ${cert.trilha} · Ciclo ${cert.ciclo}`);
+  liUrl.searchParams.set('organizationName', 'Liga Acadêmica IbTech');
+  const d = new Date(cert.emitido_em);
+  liUrl.searchParams.set('issueYear', String(d.getUTCFullYear()));
+  liUrl.searchParams.set('issueMonth', String(d.getUTCMonth() + 1));
+  liUrl.searchParams.set('certUrl', url);
+  liUrl.searchParams.set('certId', cert.id);
+  $('liButton').href = liUrl.toString();
 
-    const projetoBlock = root.querySelector('[data-bind="projeto"]');
-    const projetoLinks = [
-      ['projeto_site_url', c.projeto_site_url],
-      ['projeto_repo', c.projeto_repo],
-      ['projeto_revisao_url', c.projeto_revisao_url],
-    ].filter(([_, v]) => !!v);
+  $('copyButton').addEventListener('click', async () => {
+    const btn = $('copyButton'); const orig = btn.textContent;
+    try { await navigator.clipboard.writeText(url); btn.textContent = 'Copiado ✓'; }
+    catch { btn.textContent = 'Erro — copie à mão'; }
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
 
-    if (projetoLinks.length) {
-      projetoBlock.hidden = false;
-      projetoLinks.forEach(([key, url]) => {
-        const el = projetoBlock.querySelector(`[data-bind="${key}"]`);
-        if (el) {
-          el.href = url;
-          el.hidden = false;
-        }
-      });
-    }
-
-    /* ── 4. Botão copiar URL ── */
-    const url = window.location.origin + '/certificados/' + c.slug;
-    const urlEl = document.getElementById('cert-share-url');
-    urlEl.textContent = url;
-    document.getElementById('cert-self-link').href = url;
-
-    const copyBtn = document.getElementById('cert-copy-btn');
-    const original = copyBtn.textContent;
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(url);
-        copyBtn.textContent = 'Copiado ✓';
-      } catch (e) {
-        copyBtn.textContent = 'Erro — copie à mão';
-      } finally {
-        setTimeout(() => { copyBtn.textContent = original; }, 2000);
-      }
-    });
-
-    /* ── 5. Botão LinkedIn pré-preenchido ── */
-    const issue = new Date(c.emitido_em);
-    const liUrl = new URL('https://www.linkedin.com/profile/add');
-    liUrl.searchParams.set('startTask', 'CERTIFICATION_NAME');
-    liUrl.searchParams.set('name', `${c.titulo} — ${c.trilha} · Ciclo ${c.ciclo}`);
-    liUrl.searchParams.set('organizationName', 'Liga Acadêmica IbTech');
-    liUrl.searchParams.set('issueYear', String(issue.getUTCFullYear()));
-    liUrl.searchParams.set('issueMonth', String(issue.getUTCMonth() + 1));
-    liUrl.searchParams.set('certUrl', url);
-    liUrl.searchParams.set('certId', c.id);
-    document.getElementById('cert-linkedin-btn').href = liUrl.toString();
-
-    /* ── 6. SEO dinâmico ── */
-    document.title = `${c.aluno_nome} — ${c.titulo} · Liga IbTech`;
-    setMeta('og:title', `${c.aluno_nome} — ${c.titulo}`);
-    setMeta('og:description', `${c.titulo} concedida pela Liga Acadêmica IbTech no Ciclo ${c.ciclo} (Trilha ${c.trilha}).`);
-  }
-
-  function bindRevoked(c) {
-    const root = main.querySelector('[data-state="revoked"]');
-    root.querySelector('[data-bind="revogado_em"]').textContent = formatDate(c.revogado_em);
-    document.title = 'Credencial revogada · Liga IbTech';
-  }
-
-  function formatDate(iso) {
+  if (window.qrcode) {
     try {
-      const d = new Date(iso);
-      return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-    } catch (e) {
-      return iso;
-    }
+      const qr = window.qrcode(0, 'M'); qr.addData(url); qr.make();
+      $('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 });
+    } catch {}
   }
 
-  function setMeta(prop, value) {
-    let el = document.querySelector(`meta[property="${prop}"]`);
-    if (!el) {
-      el = document.createElement('meta');
-      el.setAttribute('property', prop);
-      document.head.appendChild(el);
-    }
-    el.setAttribute('content', value);
-  }
+  document.querySelectorAll('.copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const map = { tx: 'lTx', hash: 'lHash', id: 'mId' };
+      const text = $(map[btn.dataset.c]).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const t = btn.textContent; btn.textContent = 'copiado';
+        setTimeout(() => { btn.textContent = t; }, 1200);
+      } catch {}
+    });
+  });
+}
+
+function setMeta(prop, value) {
+  let el = document.querySelector(`meta[property="${prop}"]`);
+  if (!el) { el = document.createElement('meta'); el.setAttribute('property', prop); document.head.appendChild(el); }
+  el.setAttribute('content', value);
+}
+
+const cert = await loadCert();
+if (!cert) {
+  document.querySelector('.shell').hidden = true;
+  $('errorState').hidden = false;
+  document.title = 'Credencial não encontrada · Liga IbTech';
+} else {
+  await renderCert(cert);
+  initTilt();
+  runVerification(cert);
+}
 </script>
 </body>
 </html>
