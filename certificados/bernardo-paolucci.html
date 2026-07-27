@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bernardo Paolucci — IbTech Star · Liga IbTech</title>
-<script>window.CERT_DATA_PRELOAD = {"id": "dfe383cd-51ed-4d89-8318-f3e9bc664044", "slug": "bernardo-paolucci", "aluno_nome": "Bernardo Paolucci", "aluno_email": null, "aluno_github": null, "aluno_linkedin": null, "projeto_titulo": "Projeto 01 — Cartão de Visita", "projeto_repo": "https://github.com/bpaolucci/ibtech-projeto01-BernardoPaolucci", "projeto_site_url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/joshazze/ibtech-frontend-2026-1/aluno/bernardo-paolucci/sites/bernardo-paolucci/index.html", "projeto_revisao_url": "https://github.com/joshazze/ibtech-frontend-2026-1/blob/aluno/bernardo-paolucci/projeto01-cartao-visita/bernardo-paolucci.md", "ciclo": "2026.1", "trilha": "Frontend", "edicao": 1, "titulo": "IbTech Star", "descricao": "Por construir um cartão Batman/Gotham que combina padrão ouro de prefers-color-scheme na primeira visita, canvas reativo ao tema e um easter egg com mutação de paleta CSS via Web Audio API.", "conteudo_hash": null, "ipfs_cid": null, "polygon_tx_hash": null, "polygon_block": null, "pdf_path": null, "metadata_path": null, "emitido_em": "2026-05-28T20:15:56.138496+00:00", "revogado_em": null};</script>
+<title>Credencial — Liga Acadêmica IbTech</title>
 <meta name="description" content="Credencial verificável emitida pela Liga Acadêmica IbTech do Ibmec BH.">
 <meta property="og:type" content="profile">
+<script>window.CERT_DATA_PRELOAD = {"id": "dfe383cd-51ed-4d89-8318-f3e9bc664044", "slug": "bernardo-paolucci", "aluno_nome": "Bernardo Paolucci", "aluno_email": null, "aluno_github": null, "aluno_linkedin": null, "projeto_titulo": "Projeto 01 — Cartão de Visita", "projeto_repo": "https://github.com/bpaolucci/ibtech-projeto01-BernardoPaolucci", "projeto_site_url": "https://htmlpreview.github.io/?https://raw.githubusercontent.com/joshazze/ibtech-frontend-2026-1/aluno/bernardo-paolucci/sites/bernardo-paolucci/index.html", "projeto_revisao_url": "https://github.com/joshazze/ibtech-frontend-2026-1/blob/aluno/bernardo-paolucci/projeto01-cartao-visita/bernardo-paolucci.md", "ciclo": "2026.1", "trilha": "Frontend", "edicao": 1, "titulo": "IbTech Star", "descricao": "Por construir um cartão Batman/Gotham que combina padrão ouro de prefers-color-scheme na primeira visita, canvas reativo ao tema e um easter egg com mutação de paleta CSS via Web Audio API.", "conteudo_hash": null, "ipfs_cid": null, "polygon_tx_hash": null, "polygon_block": null, "pdf_path": null, "metadata_path": null, "emitido_em": "2026-05-28T20:15:56.138496+00:00", "revogado_em": null};</script>
 <link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,25 +156,6 @@
     </div>
   </section>
 
-  <!-- 04 COMPARTILHAR -->
-  <section class="actions">
-    <div class="seclabel">04 <b>Compartilhar</b></div>
-    <div class="card actions-card">
-      <div class="actions-row">
-        <div class="qr" id="qr" aria-hidden="true"></div>
-        <div class="qr-hint">Aponte a câmera para abrir esta verificação.</div>
-        <div class="btns">
-          <a class="btn primary" id="liButton" target="_blank" rel="noopener noreferrer">Adicionar ao LinkedIn</a>
-          <button class="btn ghost" id="copyButton">Copiar Credential URL</button>
-          <button class="btn ghost" onclick="window.print()">Baixar PDF</button>
-        </div>
-      </div>
-      <div class="url-row">
-        <code class="url-pre" id="urlPre"></code>
-      </div>
-    </div>
-  </section>
-
   <footer class="sitefoot">
     Credencial emitida pela Liga Acadêmica IbTech · Ibmec BH<br>
     Registro permanente no banco da Liga · Ancoragem blockchain prevista para a próxima fase
@@ -192,7 +173,6 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script type="module">
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, RM ? 0 : ms));
@@ -392,34 +372,6 @@ async function renderCert(cert) {
   document.title = `${cert.aluno_nome} — ${cert.titulo} · Liga IbTech`;
   setMeta('og:title', `${cert.aluno_nome} — ${cert.titulo}`);
   setMeta('og:description', `${cert.titulo} concedida pela Liga Acadêmica IbTech no Ciclo ${cert.ciclo}.`);
-
-  const url = `${window.location.origin}/certificados/${cert.slug}`;
-  $('urlPre').textContent = url;
-
-  const liUrl = new URL('https://www.linkedin.com/profile/add');
-  liUrl.searchParams.set('startTask', 'CERTIFICATION_NAME');
-  liUrl.searchParams.set('name', `${cert.titulo} — ${cert.trilha} · Ciclo ${cert.ciclo}`);
-  liUrl.searchParams.set('organizationName', 'Liga Acadêmica IbTech');
-  const d = new Date(cert.emitido_em);
-  liUrl.searchParams.set('issueYear', String(d.getUTCFullYear()));
-  liUrl.searchParams.set('issueMonth', String(d.getUTCMonth() + 1));
-  liUrl.searchParams.set('certUrl', url);
-  liUrl.searchParams.set('certId', cert.id);
-  $('liButton').href = liUrl.toString();
-
-  $('copyButton').addEventListener('click', async () => {
-    const btn = $('copyButton'); const orig = btn.textContent;
-    try { await navigator.clipboard.writeText(url); btn.textContent = 'Copiado ✓'; }
-    catch { btn.textContent = 'Erro — copie à mão'; }
-    setTimeout(() => { btn.textContent = orig; }, 2000);
-  });
-
-  if (window.qrcode) {
-    try {
-      const qr = window.qrcode(0, 'M'); qr.addData(url); qr.make();
-      $('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 });
-    } catch {}
-  }
 
   document.querySelectorAll('.copy').forEach((btn) => {
     btn.addEventListener('click', async () => {
