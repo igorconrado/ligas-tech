@@ -287,10 +287,9 @@ body {
   margin-top: 2cqw;
 }
 .sig { flex: 1; }
-.sig-line {
-  border-top: 1px solid var(--ln);
-  padding-top: 1.2cqw;
-}
+/* credencial e digital: nao ha o que assinar, entao o cargo e o nome
+   aparecem sem a linha de assinatura de documento impresso */
+.sig-line { padding-top: 1.2cqw; }
 .sig-role {
   font-family: var(--mono);
   font-size: 1.2cqw;
