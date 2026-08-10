@@ -1,0 +1,791 @@
+/* ============================================================
+   CERTIFICADO-IBBOT.CSS
+   Páginas públicas das credenciais da Liga Acadêmica IbBot
+   /certificados/ibbot-conclusao-<slug>
+   /certificados/ibbot-star-<slug>
+   Tema preto + vermelho (identidade da IbBot), derivado do
+   certificado-conclusao.css da Trilha Frontend (grafite + azure)
+   Gerado por ~/cert-build/regen/recolor_ibbot.py, não editar à mão:
+   mexer no tema da Trilha e rodar o script de novo.
+
+   Os nomes de variável seguem os do tema original (--gold e família)
+   pra manter o diff legível entre os três temas. Aqui --gold é o
+   vermelho #E10600 da Liga.
+
+   O estado de falha usa ardósia fria (#9AA4B2), não vermelho: numa
+   página inteira vermelha, um ✕ vermelho leria como marca, não como
+   alerta.
+   ============================================================ */
+
+:root {
+  --bg:        #060606;
+  --bg2:       #0E0E10;
+  --bg3:       #141416;
+  --bg4:       #1B1B1E;
+  --ink:       #EDEDEF;
+  --dim:       #C9C9CF;
+  --faint:     #8A8A92;
+
+  /* Vermelho da IbBot ocupando o lugar do azure da Trilha, que por sua vez
+     ocupava o lugar do dourado da honraria IbTech Star. Mesmos nomes de
+     variavel nos tres temas pra o diff continuar legivel. */
+  --gold:        #E10600;
+  --gold-rich:   #B30500;
+  --gold-deep:   #FF8A80;
+  --gold-soft:   #FF3B33;
+  --gold-pale:   rgba(255, 138, 128, .35);
+  --ivory:       #171012;
+
+  --hair:    rgba(225, 6, 0, .12);
+  --hair-2:  rgba(225, 6, 0, .26);
+  --panel:   rgba(255, 255, 255, .03);
+  --panel-2: rgba(255, 255, 255, .06);
+
+  --ok:   #E10600;
+  --warn: #FFB020;
+  --fail: #9AA4B2;
+
+  --display: 'Space Grotesk', system-ui, sans-serif;
+  --serif:   'Space Grotesk', system-ui, sans-serif;
+  --mono:    'Space Mono', ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); }
+body {
+  font-family: var(--serif);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 0 22px 80px;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Atmosfera dourada ──────────────────────────────────────── */
+
+.aura {
+  position: fixed; top: -12%; left: 50%; width: 1100px; height: 1100px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255, 90, 80, .45), rgba(225, 6, 0, 0) 62%);
+  filter: blur(38px);
+  pointer-events: none; z-index: 0;
+  animation: breathe 9s ease-in-out infinite;
+}
+.aura.is-ok {
+  background: radial-gradient(circle, rgba(255, 90, 80, .65), rgba(140, 4, 0, 0) 62%);
+}
+@keyframes breathe {
+  0%, 100% { opacity: .55; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;   transform: translateX(-50%) scale(1.05); }
+}
+
+.grain {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.shell { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+
+/* ── Topbar ─────────────────────────────────────────────────── */
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 26px 2px;
+  animation: rise .8s .05s both;
+}
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand-mark {
+  height: 26px; width: auto;
+  filter: brightness(0) saturate(100%) invert(20%) sepia(75%) saturate(750%) hue-rotate(15deg);
+}
+.brand b {
+  font-family: var(--display);
+  font-weight: 700; font-size: 18px;
+  letter-spacing: .04em;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+}
+
+.pill {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase;
+  padding: 8px 14px; border-radius: 100px;
+  border: 1px solid var(--hair-2); background: var(--panel); color: var(--faint);
+  backdrop-filter: blur(8px);
+}
+.pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.pill.scan .dot { background: var(--gold); animation: blink 1s infinite; }
+.pill.ok { color: var(--gold-deep); border-color: var(--gold); background: rgba(255, 90, 80, .22); }
+.pill.ok .dot { background: var(--gold); box-shadow: 0 0 10px var(--gold-soft); }
+.pill.fail { color: var(--fail); border-color: rgba(154, 164, 178, .4); background: rgba(154, 164, 178, .08); }
+.pill.fail .dot { background: var(--fail); }
+@keyframes blink { 50% { opacity: .25; } }
+
+/* ── Palco e cert (3D tilt) ─────────────────────────────────── */
+
+.stage {
+  perspective: 1100px;
+  padding: 30px 0 46px;
+  animation: rise 1s .12s both;
+}
+.cert-frame {
+  --rx: 0deg; --ry: 0deg; --sc: 1;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--sc));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.cert-glow {
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 var(--gold-pale) inset,
+    0 30px 80px -30px rgba(140, 4, 0, .55),
+    0 0 0 1px var(--hair-2),
+    0 0 80px -20px rgba(255, 90, 80, .6);
+  transition: box-shadow .6s ease;
+}
+.cert-glow.is-ok {
+  box-shadow:
+    0 1px 0 var(--gold-pale) inset,
+    0 30px 80px -30px rgba(140, 4, 0, .65),
+    0 0 0 1px var(--gold),
+    0 0 100px -16px rgba(255, 90, 80, .85);
+}
+
+.cert {
+  container-type: inline-size;
+  position: relative;
+  width: 100%; aspect-ratio: 1.414 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  padding: 5.6cqw 6.4cqw;
+  background:
+    linear-gradient(180deg, var(--ivory) 0%, var(--bg2) 60%, var(--bg3) 100%);
+  color: var(--ink);
+  --cl: var(--faint);
+  --ln: var(--hair-2);
+  --ac: var(--gold-soft);
+  --bd: var(--dim);
+}
+/* moldura dupla dourada interna */
+.cert::before {
+  content: '';
+  position: absolute; inset: 12px;
+  border: 0.5px solid rgba(225, 6, 0, .42);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Campo de sparkles — populado dinamicamente pelo JS (~90 estrelas) */
+.sparkle-field {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cert-sparkle {
+  position: absolute;
+  color: var(--gold);
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(255, 90, 80, .9))
+          drop-shadow(0 0 14px rgba(225, 6, 0, .35));
+}
+@keyframes sparkleA {
+  0%, 100% { opacity: 0;    transform: scale(.25) rotate(0deg); }
+  45%      { opacity: 1;    transform: scale(1.15) rotate(150deg); }
+  60%      { opacity: .55;  transform: scale(.95) rotate(220deg); }
+}
+@keyframes sparkleB {
+  0%, 100% { opacity: 0;    transform: scale(.35); }
+  50%      { opacity: .92;  transform: scale(1.05); }
+}
+@keyframes sparkleC {
+  0%, 100% { opacity: 0;    transform: scale(.3) rotate(0deg); }
+  35%      { opacity: .9;   transform: scale(1)  rotate(90deg); }
+  65%      { opacity: .7;   transform: scale(.85) rotate(140deg); }
+}
+
+.cert-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 4cqw; position: relative;
+}
+.cert-brand { display: flex; align-items: center; gap: 1.6cqw; }
+.cert-brand-mark {
+  height: 4.2cqw;
+  filter: brightness(0) saturate(100%) invert(20%) sepia(75%) saturate(750%) hue-rotate(15deg);
+}
+.cert-wordmark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 3.4cqw;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.cert-divider {
+  width: 1px; height: 3.4cqw;
+  background: var(--ln);
+}
+.cert-league {
+  font-family: var(--mono);
+  font-size: 1.4cqw;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ac);
+  font-weight: 700;
+}
+.cert-period {
+  font-family: var(--mono);
+  font-size: 1.4cqw;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cl);
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.cert-body {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative;
+}
+.cert-kicker {
+  font-family: var(--mono);
+  font-size: 1.7cqw;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ac);
+  font-weight: 700;
+  margin-bottom: 1.5cqw;
+}
+.cert-to {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 2.3cqw;
+  color: var(--cl);
+  margin-bottom: .6cqw;
+  font-weight: 400;
+}
+.cert-name {
+  font-family: var(--display);
+  font-size: 6.6cqw;
+  font-weight: 700;
+  margin: 0 0 2.6cqw;
+  letter-spacing: .015em;
+  line-height: 1.04;
+  background: linear-gradient(180deg, #3A0D0A 0%, #5C1410 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(255, 236, 234, .5);
+}
+.cert-text {
+  font-family: var(--serif);
+  font-size: 2.1cqw;
+  line-height: 1.6;
+  color: var(--bd);
+  max-width: 82%;
+  font-weight: 400;
+}
+.cert-text strong {
+  color: var(--ac);
+  font-weight: 600;
+}
+
+.cert-foot {
+  display: flex; align-items: flex-end; gap: 4cqw;
+  margin-top: 2cqw;
+}
+.sig { flex: 1; }
+/* credencial e digital: nao ha o que assinar, entao o cargo e o nome
+   aparecem sem a linha de assinatura de documento impresso */
+.sig-line { padding-top: 1.2cqw; }
+.sig-role {
+  font-family: var(--mono);
+  font-size: 1.2cqw;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cl);
+  font-weight: 500;
+}
+.sig-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 2.2cqw;
+  margin-top: .4cqw;
+  color: var(--ink);
+  font-weight: 500;
+}
+.cert-reg {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 1.2cqw;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cl);
+  line-height: 1.9;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cert-reg b {
+  color: var(--ac);
+  font-weight: 700;
+}
+
+/* ── Seções ─────────────────────────────────────────────────── */
+
+section { animation: rise .9s both; }
+.verify  { animation-delay: .2s; }
+.ledger  { animation-delay: .28s; }
+.meta    { animation-delay: .36s; }
+.actions { animation-delay: .44s; }
+
+.seclabel {
+  display: flex; align-items: center; gap: 14px;
+  margin: 44px 0 18px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.seclabel::after { content: ""; flex: 1; height: 1px; background: var(--hair-2); }
+.seclabel b { color: var(--gold-deep); font-weight: 500; }
+
+.card {
+  border: 1px solid var(--hair);
+  background: var(--panel);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+
+/* ── Verificação ─────────────────────────────────────────────── */
+
+.checks { padding: 8px 22px; }
+.check {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 0;
+  font-size: 14.5px;
+  font-family: var(--serif);
+  color: var(--faint);
+  border-bottom: 1px solid var(--hair);
+}
+.check:last-child { border-bottom: 0; }
+.check .ic {
+  width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  border: 1px solid var(--hair-2); background: var(--bg2); color: var(--faint);
+  transition: all .4s ease;
+}
+.check.is-scanning .ic {
+  border-color: var(--gold);
+  color: var(--gold-deep);
+  animation: scan 1s ease-in-out infinite;
+}
+@keyframes scan {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(225, 6, 0, .55); }
+  50%      { box-shadow: 0 0 0 6px rgba(225, 6, 0, 0); }
+}
+.check.is-ok { color: var(--ink); }
+.check.is-ok .ic {
+  border-color: var(--gold);
+  background: rgba(255, 90, 80, .35);
+  color: var(--gold-deep);
+}
+.check.is-fail { color: var(--ink); }
+.check.is-fail .ic {
+  border-color: rgba(154, 164, 178, .5);
+  background: rgba(154, 164, 178, .12);
+  color: var(--fail);
+}
+.check .ctext { flex: 1; font-size: 15px; }
+.check .ctag {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 2px;
+}
+
+.verdict {
+  margin-top: 14px;
+  padding: 22px;
+  border-radius: 14px;
+  border: 1px solid var(--hair);
+  background: var(--panel);
+  display: flex; align-items: center; gap: 16px;
+  transition: all .5s ease;
+  backdrop-filter: blur(8px);
+}
+.verdict .vmark {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700;
+  background: rgba(255, 236, 234, .8);
+  border: 1px solid var(--hair-2);
+  color: var(--faint);
+}
+.verdict .vtitle {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--ink);
+}
+.verdict .vsub {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--dim);
+  margin-top: 2px;
+}
+.verdict.is-ok {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(255, 90, 80, .25), rgba(225, 6, 0, .08));
+  box-shadow: 0 0 50px -16px rgba(225, 6, 0, .55);
+}
+.verdict.is-ok .vmark {
+  background: rgba(255, 90, 80, .55);
+  color: var(--gold-deep);
+  border-color: var(--gold);
+  animation: pop .6s ease;
+}
+.verdict.is-ok .vtitle { color: var(--gold-deep); }
+.verdict.is-fail { border-color: rgba(154, 164, 178, .45); background: rgba(154, 164, 178, .08); }
+.verdict.is-fail .vmark { background: rgba(154, 164, 178, .15); color: var(--fail); }
+.verdict.is-fail .vtitle { color: var(--fail); }
+@keyframes pop {
+  0%   { transform: scale(.3); opacity: 0; }
+  60%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* ── Ledger ─────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--hair-2);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--hair-2);
+}
+.cell {
+  background: var(--bg2);
+  padding: 18px 22px;
+}
+.cell.wide { grid-column: 1 / -1; }
+.cell .k {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 500;
+}
+.cell .v {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cell .hash {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--gold-deep);
+  word-break: break-all;
+  line-height: 1.65;
+  font-weight: 500;
+}
+
+.copy {
+  background: var(--bg);
+  border: 1px solid var(--hair-2);
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 500;
+  transition: all .2s;
+}
+.copy:hover {
+  color: var(--gold-deep);
+  border-color: var(--gold);
+  background: var(--ivory);
+}
+
+/* ── Issuer ─────────────────────────────────────────────────── */
+
+.issuer { display: flex; align-items: center; gap: 14px; }
+.issuer img {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--ivory);
+  padding: 6px;
+  flex-shrink: 0;
+  border: 1px solid var(--hair-2);
+  filter: brightness(0) saturate(100%) invert(20%) sepia(75%) saturate(750%) hue-rotate(15deg);
+}
+.issuer .iname {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .03em;
+  color: var(--ink);
+}
+.issuer a {
+  font-family: var(--mono);
+  color: var(--gold-deep);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-decoration: none;
+  margin-top: 2px;
+  display: inline-block;
+}
+.issuer a:hover { text-decoration: underline; text-decoration-color: var(--gold); }
+
+.crit {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--dim);
+  font-style: italic;
+}
+
+/* ── Ações + QR ─────────────────────────────────────────────── */
+
+.actions-card { padding: 22px; }
+.actions-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.qr {
+  width: 108px;
+  height: 108px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--bg2);
+  flex-shrink: 0;
+  border: 1px solid var(--hair-2);
+}
+.qr svg { width: 100%; height: 100%; display: block; }
+.qr-hint {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--faint);
+  max-width: 160px;
+  line-height: 1.5;
+  font-style: italic;
+}
+.btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid var(--hair-2);
+  transition: all .2s;
+}
+.btn.primary {
+  background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 100%);
+  color: #2A0A08;
+  border-color: var(--gold-rich);
+  box-shadow: 0 1px 0 var(--gold-pale) inset, 0 4px 14px -4px rgba(225, 6, 0, .5);
+}
+.btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 0 var(--gold-pale) inset, 0 8px 20px -4px rgba(225, 6, 0, .7);
+}
+.btn.ghost {
+  background: var(--bg2);
+  color: var(--gold-deep);
+}
+.btn.ghost:hover {
+  border-color: var(--gold);
+  background: var(--ivory);
+}
+
+.url-row { margin-top: 16px; }
+.url-pre {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--hair);
+  border-radius: 6px;
+  padding: 12px 14px;
+  word-break: break-all;
+  user-select: all;
+  font-weight: 500;
+}
+
+/* ── Sitefoot ───────────────────────────────────────────────── */
+
+.sitefoot {
+  margin-top: 50px;
+  padding-top: 22px;
+  border-top: 1px solid var(--hair-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  color: var(--faint);
+  text-align: center;
+  line-height: 1.9;
+  animation: rise .9s .5s both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Mobile ─────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  body { padding: 0 14px 60px; }
+  .topbar { padding: 20px 2px; }
+  .grid { grid-template-columns: 1fr; }
+  .cert-text { max-width: 100%; }
+  .cert { padding: 6cqw 6cqw; }
+  .actions-row { gap: 16px; }
+  .qr { width: 96px; height: 96px; }
+}
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+  .cert-sparkle { opacity: .6; }
+}
+
+/* ── Print (PDF) ────────────────────────────────────────────── */
+
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  body { background: #fff; padding: 0; }
+  .aura, .grain, .topbar,
+  .verify, .ledger, .meta, .actions,
+  .sitefoot, .seclabel { display: none !important; }
+  .shell { max-width: none; }
+  .stage { padding: 0; perspective: none; }
+  .cert-frame { transform: none !important; }
+  .cert-glow { box-shadow: none; border-radius: 0; }
+  .cert { aspect-ratio: auto; height: 100vh; border-radius: 0; }
+  .cert::before { inset: 24px; border-color: rgba(225, 6, 0, .55); }
+}
+
+
+/* ============================================================
+   OVERRIDES DO TEMA DE CONCLUSAO
+   O que nao dava pra resolver so trocando variavel: superficies
+   claras chumbadas, gradiente do nome, filtro do logo e impressao.
+   ============================================================ */
+
+/* Atmosfera: halo azure frio no lugar da aura dourada */
+.aura {
+  background: radial-gradient(circle, rgba(225, 6, 0, .28), rgba(225, 6, 0, 0) 62%);
+}
+.aura.is-ok {
+  background: radial-gradient(circle, rgba(225, 6, 0, .42), rgba(140, 4, 0, 0) 64%);
+}
+.grain { mix-blend-mode: overlay; opacity: .05; }
+
+/* Marca: logo em branco puro (o filtro sepia do tema dourado nao serve aqui) */
+.brand-mark,
+.cert-brand-mark,
+.issuer img { filter: brightness(0) invert(1); }
+.issuer img { background: rgba(255, 255, 255, .05); }
+
+/* Corpo do certificado: chapa grafite com veio azure no topo */
+.cert {
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgba(225, 6, 0, .16), transparent 60%),
+    linear-gradient(180deg, #1A1214 0%, #120C0D 55%, #08090C 100%);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cert::before { border-color: rgba(225, 6, 0, .30); }
+
+/* Faixa vermelha da Liga como assinatura de marca no topo da chapa */
+.cert::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--red, #E10600) 0%, #FF6B60 55%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Nome: branco caindo pra azure, sem o relevo creme do tema claro */
+.cert-name {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FF9E96 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 34px rgba(225, 6, 0, .22);
+  text-transform: none;
+  letter-spacing: -.01em;
+}
+
+/* Chip do projeto que originou o certificado */
+.cert-project {
+  align-self: flex-start;
+  margin-top: 3.2cqw;
+  padding: .9cqw 1.5cqw;
+  font-family: var(--mono);
+  font-size: 1.25cqw;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  border: 1px solid rgba(225, 6, 0, .22);
+  border-radius: 100px;
+  background: rgba(225, 6, 0, .06);
+}
+.cert-project:empty { display: none; }
+
+/* Sparkles: bem mais discretos que na honraria */
+.cert-sparkle {
+  color: rgba(255, 138, 128, .75);
+  filter: drop-shadow(0 0 6px rgba(225, 6, 0, .55));
+}
+
+/* Superficies que eram claras */
+.verdict .vmark { background: rgba(255, 255, 255, .05); }
+.btn.primary { color: #04121C; }
+.btn.ghost:hover { background: rgba(225, 6, 0, .08); }
+.copy:hover { background: rgba(225, 6, 0, .10); }
+.qr { background: #FFFFFF; padding: 8px; }
+.url-pre { background: rgba(255, 255, 255, .03); }
+.cell { background: rgba(255, 255, 255, .02); }
+.check .ic { background: rgba(255, 255, 255, .03); }
+
+/* Impressao: mantem a chapa escura em vez de imprimir branco */
+@media print {
+  body { background: #08090C; }
+  .cert::before { border-color: rgba(225, 6, 0, .45); }
+}
