@@ -1,38 +1,42 @@
 /* ============================================================
-   CERTIFICADO.CSS
-   Página pública de credencial — /certificados/<slug>
-   Tema branco creme + dourado, aura angelical
+   CERTIFICADO-CONCLUSAO.CSS
+   Página pública do certificado de conclusão da Trilha
+   /certificados/conclusao-<slug>
+   Tema grafite + azure (identidade da Liga), derivado do
+   certificado.css da honraria IbTech Star (branco + dourado)
    Estrutura: topbar + palco 3D + verificação + ledger + meta + ações
    ============================================================ */
 
 :root {
-  --bg:        #FBF7EE;
-  --bg2:       #FFFFFF;
-  --bg3:       #F4EFE0;
-  --bg4:       #EBE3CC;
-  --ink:       #1A1411;
-  --dim:       #5C4F3E;
-  --faint:     #8B7B62;
+  --bg:        #060606;
+  --bg2:       #0E0E10;
+  --bg3:       #141416;
+  --bg4:       #1B1B1E;
+  --ink:       #EDEDEF;
+  --dim:       #C9C9CF;
+  --faint:     #8A8A92;
 
-  --gold:        #C9A227;
-  --gold-rich:   #B8881A;
-  --gold-deep:   #8A6C00;
-  --gold-soft:   #E6CC72;
-  --gold-pale:   #F4D77A;
-  --ivory:       #FFF8E6;
+  /* Azure da Liga ocupando o lugar do dourado do certificado de honraria.
+     Os nomes das variaveis seguem os do tema original pra manter o diff legivel. */
+  --gold:        #00A6FF;
+  --gold-rich:   #0086D6;
+  --gold-deep:   #7FD4FF;
+  --gold-soft:   #38B6FF;
+  --gold-pale:   rgba(127, 212, 255, .35);
+  --ivory:       #12161B;
 
-  --hair:    rgba(201, 162, 39, .14);
-  --hair-2:  rgba(201, 162, 39, .28);
-  --panel:   rgba(255, 255, 255, .55);
-  --panel-2: rgba(255, 255, 255, .85);
+  --hair:    rgba(0, 166, 255, .12);
+  --hair-2:  rgba(0, 166, 255, .26);
+  --panel:   rgba(255, 255, 255, .03);
+  --panel-2: rgba(255, 255, 255, .06);
 
-  --ok:   #B8881A;
-  --warn: #C9A227;
-  --fail: #B23030;
+  --ok:   #00A6FF;
+  --warn: #FFB020;
+  --fail: #E10600;
 
-  --display: 'Cinzel', serif;
-  --serif:   'Cormorant Garamond', serif;
-  --mono:    'JetBrains Mono', ui-monospace, monospace;
+  --display: 'Space Grotesk', system-ui, sans-serif;
+  --serif:   'Space Grotesk', system-ui, sans-serif;
+  --mono:    'Space Mono', ui-monospace, monospace;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,13 +55,13 @@ body {
 .aura {
   position: fixed; top: -12%; left: 50%; width: 1100px; height: 1100px;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(244, 215, 122, .45), rgba(201, 162, 39, 0) 62%);
+  background: radial-gradient(circle, rgba(86, 198, 255, .45), rgba(0, 166, 255, 0) 62%);
   filter: blur(38px);
   pointer-events: none; z-index: 0;
   animation: breathe 9s ease-in-out infinite;
 }
 .aura.is-ok {
-  background: radial-gradient(circle, rgba(244, 215, 122, .65), rgba(184, 136, 26, 0) 62%);
+  background: radial-gradient(circle, rgba(86, 198, 255, .65), rgba(0, 118, 190, 0) 62%);
 }
 @keyframes breathe {
   0%, 100% { opacity: .55; transform: translateX(-50%) scale(1); }
@@ -102,9 +106,9 @@ body {
 }
 .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
 .pill.scan .dot { background: var(--gold); animation: blink 1s infinite; }
-.pill.ok { color: var(--gold-deep); border-color: var(--gold); background: rgba(244, 215, 122, .22); }
+.pill.ok { color: var(--gold-deep); border-color: var(--gold); background: rgba(86, 198, 255, .22); }
 .pill.ok .dot { background: var(--gold); box-shadow: 0 0 10px var(--gold-soft); }
-.pill.fail { color: var(--fail); border-color: rgba(178, 48, 48, .4); background: rgba(178, 48, 48, .08); }
+.pill.fail { color: var(--fail); border-color: rgba(225, 6, 0, .4); background: rgba(225, 6, 0, .08); }
 .pill.fail .dot { background: var(--fail); }
 @keyframes blink { 50% { opacity: .25; } }
 
@@ -125,17 +129,17 @@ body {
   border-radius: 14px;
   box-shadow:
     0 1px 0 var(--gold-pale) inset,
-    0 30px 80px -30px rgba(184, 136, 26, .55),
+    0 30px 80px -30px rgba(0, 118, 190, .55),
     0 0 0 1px var(--hair-2),
-    0 0 80px -20px rgba(244, 215, 122, .6);
+    0 0 80px -20px rgba(86, 198, 255, .6);
   transition: box-shadow .6s ease;
 }
 .cert-glow.is-ok {
   box-shadow:
     0 1px 0 var(--gold-pale) inset,
-    0 30px 80px -30px rgba(184, 136, 26, .65),
+    0 30px 80px -30px rgba(0, 118, 190, .65),
     0 0 0 1px var(--gold),
-    0 0 100px -16px rgba(244, 215, 122, .85);
+    0 0 100px -16px rgba(86, 198, 255, .85);
 }
 
 .cert {
@@ -158,7 +162,7 @@ body {
 .cert::before {
   content: '';
   position: absolute; inset: 12px;
-  border: 0.5px solid rgba(201, 162, 39, .42);
+  border: 0.5px solid rgba(0, 166, 255, .42);
   border-radius: 6px;
   pointer-events: none;
 }
@@ -176,8 +180,8 @@ body {
   color: var(--gold);
   opacity: 0;
   pointer-events: none;
-  filter: drop-shadow(0 0 8px rgba(244, 215, 122, .9))
-          drop-shadow(0 0 14px rgba(201, 162, 39, .35));
+  filter: drop-shadow(0 0 8px rgba(86, 198, 255, .9))
+          drop-shadow(0 0 14px rgba(0, 166, 255, .35));
 }
 @keyframes sparkleA {
   0%, 100% { opacity: 0;    transform: scale(.25) rotate(0deg); }
@@ -374,19 +378,19 @@ section { animation: rise .9s both; }
   animation: scan 1s ease-in-out infinite;
 }
 @keyframes scan {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, .55); }
-  50%      { box-shadow: 0 0 0 6px rgba(201, 162, 39, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 166, 255, .55); }
+  50%      { box-shadow: 0 0 0 6px rgba(0, 166, 255, 0); }
 }
 .check.is-ok { color: var(--ink); }
 .check.is-ok .ic {
   border-color: var(--gold);
-  background: rgba(244, 215, 122, .35);
+  background: rgba(86, 198, 255, .35);
   color: var(--gold-deep);
 }
 .check.is-fail { color: var(--ink); }
 .check.is-fail .ic {
-  border-color: rgba(178, 48, 48, .5);
-  background: rgba(178, 48, 48, .12);
+  border-color: rgba(225, 6, 0, .5);
+  background: rgba(225, 6, 0, .12);
   color: var(--fail);
 }
 .check .ctext { flex: 1; font-size: 15px; }
@@ -432,18 +436,18 @@ section { animation: rise .9s both; }
 }
 .verdict.is-ok {
   border-color: var(--gold);
-  background: linear-gradient(180deg, rgba(244, 215, 122, .25), rgba(201, 162, 39, .08));
-  box-shadow: 0 0 50px -16px rgba(201, 162, 39, .55);
+  background: linear-gradient(180deg, rgba(86, 198, 255, .25), rgba(0, 166, 255, .08));
+  box-shadow: 0 0 50px -16px rgba(0, 166, 255, .55);
 }
 .verdict.is-ok .vmark {
-  background: rgba(244, 215, 122, .55);
+  background: rgba(86, 198, 255, .55);
   color: var(--gold-deep);
   border-color: var(--gold);
   animation: pop .6s ease;
 }
 .verdict.is-ok .vtitle { color: var(--gold-deep); }
-.verdict.is-fail { border-color: rgba(178, 48, 48, .45); background: rgba(178, 48, 48, .08); }
-.verdict.is-fail .vmark { background: rgba(178, 48, 48, .15); color: var(--fail); }
+.verdict.is-fail { border-color: rgba(225, 6, 0, .45); background: rgba(225, 6, 0, .08); }
+.verdict.is-fail .vmark { background: rgba(225, 6, 0, .15); color: var(--fail); }
 .verdict.is-fail .vtitle { color: var(--fail); }
 @keyframes pop {
   0%   { transform: scale(.3); opacity: 0; }
@@ -597,11 +601,11 @@ section { animation: rise .9s both; }
   background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 100%);
   color: #2A1F0A;
   border-color: var(--gold-rich);
-  box-shadow: 0 1px 0 var(--gold-pale) inset, 0 4px 14px -4px rgba(201, 162, 39, .5);
+  box-shadow: 0 1px 0 var(--gold-pale) inset, 0 4px 14px -4px rgba(0, 166, 255, .5);
 }
 .btn.primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 1px 0 var(--gold-pale) inset, 0 8px 20px -4px rgba(201, 162, 39, .7);
+  box-shadow: 0 1px 0 var(--gold-pale) inset, 0 8px 20px -4px rgba(0, 166, 255, .7);
 }
 .btn.ghost {
   background: var(--bg2);
@@ -683,5 +687,94 @@ section { animation: rise .9s both; }
   .cert-frame { transform: none !important; }
   .cert-glow { box-shadow: none; border-radius: 0; }
   .cert { aspect-ratio: auto; height: 100vh; border-radius: 0; }
-  .cert::before { inset: 24px; border-color: rgba(201, 162, 39, .55); }
+  .cert::before { inset: 24px; border-color: rgba(0, 166, 255, .55); }
+}
+
+
+/* ============================================================
+   OVERRIDES DO TEMA DE CONCLUSAO
+   O que nao dava pra resolver so trocando variavel: superficies
+   claras chumbadas, gradiente do nome, filtro do logo e impressao.
+   ============================================================ */
+
+/* Atmosfera: halo azure frio no lugar da aura dourada */
+.aura {
+  background: radial-gradient(circle, rgba(0, 166, 255, .28), rgba(0, 166, 255, 0) 62%);
+}
+.aura.is-ok {
+  background: radial-gradient(circle, rgba(0, 166, 255, .42), rgba(0, 118, 190, 0) 64%);
+}
+.grain { mix-blend-mode: overlay; opacity: .05; }
+
+/* Marca: logo em branco puro (o filtro sepia do tema dourado nao serve aqui) */
+.brand-mark,
+.cert-brand-mark,
+.issuer img { filter: brightness(0) invert(1); }
+.issuer img { background: rgba(255, 255, 255, .05); }
+
+/* Corpo do certificado: chapa grafite com veio azure no topo */
+.cert {
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgba(0, 166, 255, .16), transparent 60%),
+    linear-gradient(180deg, #14181E 0%, #0C0F13 55%, #08090C 100%);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cert::before { border-color: rgba(0, 166, 255, .30); }
+
+/* Faixa vermelha da Liga como assinatura de marca no topo da chapa */
+.cert::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--red, #E10600) 0%, #00A6FF 55%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Nome: branco caindo pra azure, sem o relevo creme do tema claro */
+.cert-name {
+  background: linear-gradient(180deg, #FFFFFF 0%, #8FD6FF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 34px rgba(0, 166, 255, .22);
+  text-transform: none;
+  letter-spacing: -.01em;
+}
+
+/* Chip do projeto que originou o certificado */
+.cert-project {
+  align-self: flex-start;
+  margin-top: 3.2cqw;
+  padding: .9cqw 1.5cqw;
+  font-family: var(--mono);
+  font-size: 1.25cqw;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  border: 1px solid rgba(0, 166, 255, .22);
+  border-radius: 100px;
+  background: rgba(0, 166, 255, .06);
+}
+.cert-project:empty { display: none; }
+
+/* Sparkles: bem mais discretos que na honraria */
+.cert-sparkle {
+  color: rgba(127, 212, 255, .75);
+  filter: drop-shadow(0 0 6px rgba(0, 166, 255, .55));
+}
+
+/* Superficies que eram claras */
+.verdict .vmark { background: rgba(255, 255, 255, .05); }
+.btn.primary { color: #04121C; }
+.btn.ghost:hover { background: rgba(0, 166, 255, .08); }
+.copy:hover { background: rgba(0, 166, 255, .10); }
+.qr { background: #FFFFFF; padding: 8px; }
+.url-pre { background: rgba(255, 255, 255, .03); }
+.cell { background: rgba(255, 255, 255, .02); }
+.check .ic { background: rgba(255, 255, 255, .03); }
+
+/* Impressao: mantem a chapa escura em vez de imprimir branco */
+@media print {
+  body { background: #08090C; }
+  .cert::before { border-color: rgba(0, 166, 255, .45); }
 }
