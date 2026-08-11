@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#060606">
+  <title>perfil-tech — IbBot &amp; IbTech · Ibmec BH</title>
+  <meta name="description" content="Nove perguntas, três missões e a gente descobre onde você se encaixa nas ligas de tecnologia do Ibmec BH.">
+  <link rel="icon" type="image/x-icon" href="/assets/icons/Documento-removebg-preview.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/pages/perfil-tech.css">
+</head>
+
+<body class="pt-body">
+
+  <div class="pt-app">
+    <div class="term">
+
+      <!-- Barra da janela -->
+      <div class="term-barra">
+        <span class="term-luzes" aria-hidden="true">
+          <i class="luz r"></i><i class="luz a"></i><i class="luz g"></i>
+        </span>
+        <span class="term-titulo">perfil-tech — ibmec-bh</span>
+        <a class="term-sair" href="/" aria-label="Voltar para o site">✕</a>
+      </div>
+
+      <!-- Corpo -->
+      <div class="term-corpo" id="term-corpo">
+
+        <!-- ── TELA 1 · BOOT + INÍCIO ────────────────────────────────── -->
+        <section class="tela" id="tela-inicio">
+          <div class="fluxo" id="boot"></div>
+
+          <div class="ini" id="ini" hidden>
+            <div class="caixa">
+              <div class="caixa-topo"><span class="asterisco">✻</span> perfil-tech v1.0</div>
+              <img class="caixa-logo" src="/assets/icons/Documento-removebg-preview.png"
+                alt="IbBot &amp; IbTech" width="120" height="30">
+              <h1 class="caixa-titulo">QUAL É O SEU<br><span class="grad">PERFIL TECH</span>?</h1>
+              <p class="caixa-corpo">
+                Nove perguntas, três missões e a gente te diz em qual das duas ligas
+                você se encaixa — e por quê.
+              </p>
+              <div class="caixa-meta">9 perguntas · 3 missões · 6 perfis · ~3 min</div>
+            </div>
+
+            <canvas class="mascotes" id="mascotes-inicio" width="600" height="56"
+              aria-label="Mascotes da IbBot e da IbTech"></canvas>
+
+            <button class="cmd" id="btn-comecar" type="button">
+              <span class="cmd-seta">❯</span> iniciar<span class="cursor"></span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ── TELA 2 · IDENTIFICAÇÃO ────────────────────────────────── -->
+        <section class="tela" id="tela-identificacao" hidden>
+          <div class="fluxo">
+            <div class="t-linha t-comando"><span class="t-cifrao">$ </span>perfil-tech --registrar</div>
+            <div class="t-linha t-fraco">preencha os dois campos pra liberar as missões</div>
+          </div>
+
+          <form class="form" id="id-form" novalidate>
+            <label class="campo" for="i-nome">
+              <span class="campo-rotulo"><span class="t-seta">❯</span> nome</span>
+              <input class="campo-input" id="i-nome" name="nome" type="text" autocomplete="given-name"
+                enterkeyhint="next" maxlength="80" placeholder="digite aqui" spellcheck="false">
+            </label>
+
+            <label class="campo" for="i-curso">
+              <span class="campo-rotulo"><span class="t-seta">❯</span> curso</span>
+              <select class="campo-input" id="i-curso" name="curso">
+                <option value="">selecione</option>
+              </select>
+            </label>
+
+            <p class="erro" id="id-erro" role="alert" hidden></p>
+
+            <button class="cmd" id="btn-jogar" type="submit">
+              <span class="cmd-seta">❯</span> começar missões<span class="cursor"></span>
+            </button>
+
+            <p class="nota">
+              guardamos só nome e curso pra saber quem passou pela bancada. nada é publicado.
+            </p>
+          </form>
+        </section>
+
+        <!-- ── TELA 3 · JOGO ─────────────────────────────────────────── -->
+        <section class="tela" id="tela-jogo" hidden>
+          <div class="palco" id="palco"></div>
+        </section>
+
+        <!-- ── TELA 4 · RESULTADO ────────────────────────────────────── -->
+        <section class="tela" id="tela-resultado" hidden>
+          <div class="fluxo" id="res-fluxo"></div>
+
+          <div class="res-card" id="res-card">
+            <div class="res-topo">
+              <span class="res-kicker" id="res-kicker">perfil identificado</span>
+              <canvas class="res-mascote" id="res-mascote" width="96" height="92" aria-hidden="true"></canvas>
+            </div>
+            <div class="res-arquetipo" id="res-arquetipo"></div>
+            <div class="res-tagline" id="res-tagline"></div>
+            <div class="res-tracos" id="res-tracos"></div>
+            <p class="res-desc" id="res-desc"></p>
+
+            <div class="res-liga">
+              <span class="res-liga-label">liga sugerida</span>
+              <strong class="res-liga-nome" id="res-liga-nome"></strong>
+              <span class="res-liga-chamada" id="res-liga-chamada"></span>
+              <span class="res-liga-encontro" id="res-liga-encontro"></span>
+            </div>
+
+            <div class="res-mix">
+              <div class="res-mix-label">// também tem de você</div>
+              <div id="res-mix-lista"></div>
+            </div>
+          </div>
+
+          <form class="res-contato" id="res-contato">
+            <span class="campo-rotulo"><span class="t-seta">❯</span> quer o convite do próximo processo seletivo?</span>
+            <div class="res-contato-linha">
+              <input class="campo-input" id="i-contato" type="text" maxlength="80" enterkeyhint="send"
+                placeholder="@seu.insta ou e-mail" spellcheck="false">
+              <button class="cmd cmd-curto" id="btn-contato" type="submit">enviar</button>
+            </div>
+            <p class="erro" id="contato-erro" role="alert" hidden></p>
+            <p class="ok" id="contato-ok" hidden>fechado. a gente te chama. ✓</p>
+          </form>
+
+          <button class="cmd" id="btn-salvar" type="button">
+            <span class="cmd-seta">❯</span> salvar meu card<span class="cursor"></span>
+          </button>
+          <p class="nota" id="salvar-nota" hidden></p>
+
+          <div class="res-ctas" id="res-ctas"></div>
+        </section>
+
+      </div>
+
+      <!-- Linha de status -->
+      <div class="term-status">
+        <span class="st-esq" id="st-esq">pronto</span>
+        <span class="st-dir" id="st-dir">ibbot &amp; ibtech</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="/assets/js/pages/perfil-tech.js"></script>
+</body>
+
+</html>
