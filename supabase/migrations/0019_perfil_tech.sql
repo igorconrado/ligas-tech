@@ -111,4 +111,4 @@ GRANT EXECUTE ON FUNCTION public.perfil_tech_contato(uuid, text) TO anon, authen
 -- FROM perfil_tech_respostas WHERE contato IS NOT NULL
 -- ORDER BY criado_em DESC;
 
--- Aplicada em prod em __/__/2026 por ___
+-- Aplicada em prod em 13/08/2026 por Isaac
