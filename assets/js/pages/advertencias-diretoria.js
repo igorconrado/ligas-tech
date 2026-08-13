@@ -2,7 +2,7 @@
 import { shell } from '/assets/js/ui/shell.js';
 import { openModal, closeModal, initModalEscape } from '/assets/js/components/modal.js';
 import { getMembrosLiga } from '/assets/js/supabase/membros.js';
-import { registrarAdvertencia, getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
+import { registrarAdvertencia, getTodasAdvertencias, deletarAdvertencia } from '/assets/js/supabase/advertencias.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
@@ -31,7 +31,10 @@ function renderizar(advertencias) {
       <td><span class="pill ${adv.tipo === 'grave' ? 'adv' : 'warn'}">${adv.tipo}</span></td>
       <td>${adv.descricao}</td>
       <td>${new Date(adv.criado_em).toLocaleDateString('pt-BR')}</td>
-      <td><button class="btn-sm ghost" onclick="verAdvertencia('${adv.id}')">Ver</button></td>
+      <td>
+        <button class="btn-sm ghost" onclick="verAdvertencia('${adv.id}')">Ver</button>
+        <button class="btn-sm ghost" style="color:var(--red);margin-left:6px" onclick="handleRemoverAdvertencia('${adv.id}', '${(adv.membros?.nome || '').replace(/'/g, "\\'")}')">Remover</button>
+      </td>
     </tr>
   `).join('');
 }
@@ -90,8 +93,28 @@ async function handleSalvarAdvertencia() {
   }
 }
 
+async function handleRemoverAdvertencia(advertenciaId, nome) {
+  const ok = await confirmDialog({
+    title: 'Remover advertência?',
+    message: `A advertência de ${nome || 'membro'} será removida permanentemente.`,
+    confirmLabel: 'Remover',
+    danger: true,
+  });
+  if (!ok) return;
+
+  try {
+    await deletarAdvertencia(advertenciaId);
+    renderizar(await getTodasAdvertencias(ligaId));
+    toast.success('Advertência removida');
+  } catch (e) {
+    console.error('Erro ao remover advertência:', e);
+    toast.error(e.message || 'Erro ao remover advertência');
+  }
+}
+
 window.openAdvModal = openAdvModal;
 window.handleSalvarAdvertencia = handleSalvarAdvertencia;
+window.handleRemoverAdvertencia = handleRemoverAdvertencia;
 window.closeModal = closeModal;
 window.verAdvertencia = (id) => console.log('ver advertência', id);
 

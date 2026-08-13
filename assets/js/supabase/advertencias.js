@@ -17,6 +17,12 @@ export async function registrarAdvertencia(membroId, tipo, descricao) {
   if (error) throw error;
 }
 
+// Diretoria: remover advertência
+export async function deletarAdvertencia(advertenciaId) {
+  const { error } = await supabase.from('advertencias').delete().eq('id', advertenciaId);
+  if (error) throw error;
+}
+
 // Diretoria: listar advertências de um membro
 export async function getAdvertenciasMembro(membroId) {
   const { data, error } = await supabase
