@@ -114,10 +114,10 @@ export async function completarOnboarding(dados) {
       .update(payload)
       .eq('usuario_id', user.id));
   } else {
-    // Busca liga_id pré-atribuída ou usa IbTech como padrão
+    // Busca liga_id e cargo pré-atribuídos; liga cai pra IbTech como padrão
     const { data: emailData } = await supabase
       .from('emails_autorizados')
-      .select('liga_id')
+      .select('liga_id, cargo')
       .eq('email', user.email)
       .maybeSingle();
 
@@ -128,9 +128,11 @@ export async function completarOnboarding(dados) {
       liga_id = ibtech?.id || null;
     }
 
+    const cargo = emailData?.cargo || 'membro';
+
     ({ error } = await supabase
       .from('membros')
-      .insert({ ...payload, usuario_id: user.id, ativo: true, liga_id }));
+      .insert({ ...payload, usuario_id: user.id, ativo: true, liga_id, cargo }));
 
     // Sempre sincroniza liga_id em usuarios
     await supabase.from('usuarios').update({ liga_id }).eq('id', user.id);

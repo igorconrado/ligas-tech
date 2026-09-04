@@ -54,6 +54,7 @@ async function handleCadastrarMembro() {
   const nome = $('novo-nome')?.value?.trim();
   const email = $('novo-email')?.value?.trim();
   const ligaNome = $('nova-liga')?.value;
+  const cargo = $('novo-cargo')?.value || 'membro';
   if (!nome || !email || !ligaNome) { toast.error('Preencha todos os campos.'); return; }
   if (!email.endsWith('@alunos.ibmec.edu.br')) { toast.error('Use o email @alunos.ibmec.edu.br'); return; }
   const matricula = email.replace('@alunos.ibmec.edu.br', '');
@@ -64,7 +65,7 @@ async function handleCadastrarMembro() {
 
     const { error } = await supabase
       .from('emails_autorizados')
-      .insert({ email, nome, matricula, liga_id });
+      .insert({ email, nome, matricula, liga_id, cargo });
     if (error) throw error;
     closeModal('modal-novo-membro');
     await carregar();
