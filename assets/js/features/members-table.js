@@ -32,6 +32,9 @@ function ligaPill(liga) {
 }
 
 function progressCell(valor) {
+  if (valor === null || valor === undefined) {
+    return '<span style="color:var(--muted);font-family:var(--font-mono)">—</span>';
+  }
   return `<div class="prog-wrap"><div class="prog-bar"><div class="prog-fill ${valor >= 75 ? 'g' : 'r'}" style="width:${valor}%"></div></div><span class="prog-val">${valor}%</span></div>`;
 }
 

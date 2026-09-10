@@ -62,10 +62,10 @@ function renderPresenca() {
   presenceMembers = members.map(m => m.name);
   grid.innerHTML = presenceMembers.map((name, i) => {
     const on = presentSet.has(i);
-    return `<div class="member-chip ${on ? 'present' : ''}" onclick="togglePresenca(${i})">
+    return `<button type="button" class="member-chip ${on ? 'present' : ''}" aria-pressed="${on}" onclick="togglePresenca(${i})">
       <div class="check ${on ? 'on' : 'off'}">${on ? '✓' : ''}</div>
       <span class="chip-name">${name}</span>
-    </div>`;
+    </button>`;
   }).join('');
   $('presenca-count').textContent = presentSet.size;
   $('presenca-total').textContent = presenceMembers.length;
@@ -96,7 +96,7 @@ async function savePresenca() {
     console.error('Erro ao salvar presença:', e);
     toast.error('Erro ao salvar presença.');
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Salvar'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar presenças'; }
   }
 }
 
@@ -260,9 +260,9 @@ function renderEditPresencaGrid() {
     const cor = on ? 'var(--green)' : 'var(--muted)';
     const borderCor = on ? 'var(--green)44' : 'var(--border2)';
     const icon = on ? '✓' : '✗';
-    return `<div onclick="toggleEditPresenca('${m.id}')" style="cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;background:var(--bg3);border:1px solid ${borderCor};border-radius:4px;padding:5px 10px;font-size:11px;font-family:var(--font-body);user-select:none">
+    return `<button type="button" aria-pressed="${on}" onclick="toggleEditPresenca('${m.id}')" style="cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;background:var(--bg3);color:var(--text);border:1px solid ${borderCor};border-radius:4px;padding:5px 10px;font-size:11px;font-family:var(--font-body);user-select:none">
       <span style="color:${cor};font-weight:700;font-size:13px">${icon}</span>${m.name}
-    </div>`;
+    </button>`;
   }).join('');
 }
 
@@ -344,6 +344,8 @@ async function handleAbrirChamada() {
 }
 
 async function handleFecharChamada(encontroId) {
+  const targetEncontroId = encontroId || encontroAtivoId;
+  if (!targetEncontroId) { toast.error('Nenhuma chamada aberta.'); return; }
   const ok = await confirmDialog({
     title: 'Encerrar chamada?',
     message: 'Presenças não registradas vão ficar em branco. Você pode corrigi-las depois.',
@@ -352,9 +354,9 @@ async function handleFecharChamada(encontroId) {
   if (!ok) return;
   const btn = $('btn-abrir-chamada');
   if (btn) { btn.disabled = true; btn.textContent = 'Encerrando...'; }
-  closeModal('qr-modal');
   try {
-    await fecharChamada(encontroId);
+    await fecharChamada(targetEncontroId);
+    closeModal('qr-modal');
     if (window._chamadaChannel) { window._chamadaChannel.unsubscribe(); window._chamadaChannel = null; }
     chamadaAberta = false;
     encontroAtivoId = null;

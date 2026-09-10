@@ -8,6 +8,8 @@ import { toast } from '/assets/js/ui/toast.js';
 await shell.mount({ activeRoute: '/membros/entregas', pageTitle: 'Minhas Entregas' });
 
 const $ = (id) => document.getElementById(id);
+let tarefasCache = [];
+let tarefaSelecionadaId = null;
 
 function fmtDate(d) {
   if (!d) return '—';
@@ -39,6 +41,11 @@ function renderEntregas(aulas) {
     return;
   }
 
+  tarefasCache = aulasComPrazo;
+  if (!tarefasCache.some(a => a.id === tarefaSelecionadaId && a.statusEntrega !== 'entregue')) {
+    tarefaSelecionadaId = tarefasCache.find(a => a.statusEntrega !== 'entregue')?.id || null;
+  }
+
   tbody.innerHTML = aulasComPrazo.map(a => {
     let pillClass, pillLabel;
     if (a.statusEntrega === 'entregue') { pillClass = 'ok'; pillLabel = 'Entregue'; }
@@ -47,15 +54,18 @@ function renderEntregas(aulas) {
     const repo = a.entrega?.repo_url
       ? `<a href="${a.entrega.repo_url}" target="_blank" style="color:var(--blue);font-family:var(--font-mono);font-size:11px;text-decoration:none">${a.entrega.repo_url.replace('https://github.com/', '')} ↗</a>`
       : '<span style="color:var(--muted);font-size:11px">—</span>';
+    const acao = a.statusEntrega !== 'entregue'
+      ? `<button type="button" class="btn-sm ${a.id === tarefaSelecionadaId ? 'b' : 'ghost'} entrega-select" data-aula-id="${a.id}">${a.id === tarefaSelecionadaId ? 'Selecionada' : 'Enviar'}</button>`
+      : '';
     return `<tr>
       <td style="font-weight:500">Tarefa ${String(a.numero).padStart(2, '0')} — ${a.titulo}</td>
       <td class="${getPrazoClass(a.prazo_entrega, a.statusEntrega)}">${fmtDate(a.prazo_entrega)}</td>
       <td>${repo}</td>
-      <td><span class="pill ${pillClass}">${pillLabel}</span></td>
+      <td><span class="pill ${pillClass}">${pillLabel}</span>${acao ? `<div style="margin-top:.5rem">${acao}</div>` : ''}</td>
     </tr>`;
   }).join('');
 
-  const pendente = aulasComPrazo.find(a => a.statusEntrega !== 'entregue');
+  const pendente = aulasComPrazo.find(a => a.id === tarefaSelecionadaId && a.statusEntrega !== 'entregue');
   if (box && pendente) {
     box.style.display = '';
     $('entrega-title').textContent = `Enviar entrega — Tarefa ${String(pendente.numero).padStart(2, '0')}`;
@@ -69,6 +79,17 @@ function renderEntregas(aulas) {
     $('entrega-feedback').style.display = 'none';
   } else if (box) {
     box.style.display = 'none';
+  }
+}
+
+function selecionarTarefa(aulaId, moveFocus = true) {
+  const tarefa = tarefasCache.find(a => a.id === aulaId && a.statusEntrega !== 'entregue');
+  if (!tarefa) return;
+  tarefaSelecionadaId = aulaId;
+  renderEntregas(tarefasCache);
+  if (moveFocus) {
+    $('entrega-box')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    requestAnimationFrame(() => $('repo-input')?.focus());
   }
 }
 
@@ -104,6 +125,10 @@ async function submitEntrega() {
 }
 
 document.getElementById('btn-submit-entrega')?.addEventListener('click', submitEntrega);
+document.getElementById('tbody-entregas')?.addEventListener('click', e => {
+  const button = e.target.closest('.entrega-select');
+  if (button) selecionarTarefa(button.dataset.aulaId);
+});
 
 // Initial load
 const tbody = $('tbody-entregas');

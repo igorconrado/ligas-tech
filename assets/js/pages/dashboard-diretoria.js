@@ -9,6 +9,7 @@ import { getTodasAulas, getEntregasAula } from '/assets/js/supabase/aulas.js';
 import { getEncontros, getPresencasEncontro } from '/assets/js/supabase/presenca.js';
 import { getTodasAdvertencias } from '/assets/js/supabase/advertencias.js';
 import { renderOverviewTable } from '/assets/js/features/members-table.js';
+import { hydrateMemberMetrics } from '/assets/js/features/member-metrics.js';
 import { renderEmptyState, icons } from '/assets/js/ui/empty-state.js';
 import { skeletonText, skeletonTableRows } from '/assets/js/ui/skeleton.js';
 
@@ -44,21 +45,19 @@ async function atualizarMetricas() {
     $('metric-membros-sub').textContent = Object.entries(porLiga).map(([n, c]) => `${c} ${n}`).join(' · ') || '—';
 
     // 2. Presença média
-    const presencasPorEnc = encontros.length
-      ? await Promise.all(encontros.map(e => getPresencasEncontro(e.id)))
+    const hoje = new Date();
+    hoje.setHours(23, 59, 59, 999);
+    const encontrosRealizados = encontros.filter(e => new Date(`${e.data}T12:00:00`) <= hoje);
+    const presencasPorEnc = encontrosRealizados.length
+      ? await Promise.all(encontrosRealizados.map(e => getPresencasEncontro(e.id)))
       : [];
-    const porMembro = {};
-    presencasPorEnc.flat().forEach(p => {
-      porMembro[p.membro_id] = porMembro[p.membro_id] || { presentes: 0, total: 0 };
-      porMembro[p.membro_id].total++;
-      if (p.status === 'presente') porMembro[p.membro_id].presentes++;
-    });
-    const taxas = Object.values(porMembro).filter(v => v.total > 0).map(v => v.presentes / v.total);
-    const presencaMedia = taxas.length ? Math.round((taxas.reduce((a,b) => a+b, 0) / taxas.length) * 100) : 0;
-    $('metric-presenca-media').textContent = `${presencaMedia}%`;
+    const totalPossivel = encontrosRealizados.length * membros.length;
+    const totalPresentes = presencasPorEnc.flat().filter(p => p.status === 'presente').length;
+    const presencaMedia = totalPossivel ? Math.round((totalPresentes / totalPossivel) * 100) : null;
+    $('metric-presenca-media').textContent = presencaMedia === null ? '—' : `${presencaMedia}%`;
 
     // 3. Entregas pendentes
-    const aulasElegiveis = aulas.filter(a => a.publicada && a.prazo_entrega);
+    const aulasElegiveis = aulas.filter(a => a.tipo === 'tarefa' && a.publicada && a.prazo_entrega);
     const entregasPorAula = aulasElegiveis.length
       ? await Promise.all(aulasElegiveis.map(a => getEntregasAula(a.id)))
       : [];
@@ -83,7 +82,9 @@ async function renderizarUltimasPresencas() {
     const [encontros, membros] = await Promise.all([getEncontros(ligaId), getMembrosLiga(ligaId)]);
     const ligaNome = perfil?.ligas?.nome || '—';
     const totalMembros = membros.length;
-    const ultimos = encontros.slice(0, 3);
+    const hoje = new Date();
+    hoje.setHours(23, 59, 59, 999);
+    const ultimos = encontros.filter(e => new Date(`${e.data}T12:00:00`) <= hoje).slice(0, 3);
     if (!ultimos.length) {
       renderEmptyState(tbody, {
         icon: icons.clock,
@@ -116,7 +117,7 @@ async function renderizarEntregasAtrasadas() {
     const [aulas, membros] = await Promise.all([getTodasAulas(ligaId), getMembrosLiga(ligaId)]);
     const now = new Date();
     const atrasadas = aulas
-      .filter(a => a.publicada && a.prazo_entrega && new Date(a.prazo_entrega) < now)
+      .filter(a => a.tipo === 'tarefa' && a.publicada && a.prazo_entrega && new Date(`${a.prazo_entrega}T23:59:59`) < now)
       .sort((a, b) => new Date(b.prazo_entrega) - new Date(a.prazo_entrega));
     if (!atrasadas.length) {
       renderEmptyState(tbody, {
@@ -164,10 +165,11 @@ async function renderizarOverview() {
   tbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
   try {
     const data = await getMembrosLiga(ligaId);
-    const members = data.map(m => ({
+    const baseMembers = data.map(m => ({
       id: m.id, name: m.nome, liga: m.ligas?.nome || '—',
-      presenca: 0, entregas: '—', status: 'ok', adv: 0,
+      cargo: m.cargo || 'membro',
     }));
+    const members = await hydrateMemberMetrics(ligaId, baseMembers);
     renderOverviewTable(tbl, members);
   } catch (e) {
     console.error('Erro ao carregar overview:', e);
@@ -176,8 +178,9 @@ async function renderizarOverview() {
 
 // Panel "Visão geral dos membros" tem botão "Anotar" que chama openAdvModal.
 // Na página de overview, esse modal não existe — redireciona pra /diretoria/advertencias.
-window.openAdvModal = () => {
-  window.location.href = '/membros/diretoria/advertencias';
+window.openAdvModal = (membroId) => {
+  const query = membroId ? `?membro=${encodeURIComponent(membroId)}` : '';
+  window.location.href = `/membros/diretoria/advertencias${query}`;
 };
 
 await atualizarMetricas();

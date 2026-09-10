@@ -134,19 +134,21 @@ function renderStep(i) {
   });
   let contentHtml = '';
   if (s.content === 'nome') {
-    contentHtml = '<input class="ob-input" id="ob-nome" placeholder="Seu nome completo">';
+    contentHtml = '<label class="sr-only" for="ob-nome">Seu nome completo</label><input class="ob-input" id="ob-nome" placeholder="Seu nome completo" autocomplete="name">';
   } else if (s.content === 'links') {
     contentHtml = `
-      <input class="ob-input" id="ob-linkedin" placeholder="linkedin.com/in/usuario (opcional)" type="url">
-      <input class="ob-input" id="ob-github" placeholder="github.com/usuario (opcional)" type="url">`;
+      <label class="sr-only" for="ob-linkedin">Perfil do LinkedIn, opcional</label>
+      <input class="ob-input" id="ob-linkedin" placeholder="linkedin.com/in/usuario (opcional)" type="url" autocomplete="url">
+      <label class="sr-only" for="ob-github">Perfil do GitHub, opcional</label>
+      <input class="ob-input" id="ob-github" placeholder="github.com/usuario (opcional)" type="url" autocomplete="url">`;
   }
   $('ob-content').innerHTML = `
     <div class="ob-slide">
       <div class="ob-kicker">${s.kicker}</div>
-      <div class="ob-title">${s.title}</div>
+    <div class="ob-title" id="ob-dialog-title">${s.title}</div>
       <div class="ob-sub">${s.sub}</div>
       ${contentHtml ? `<div class="ob-content">${contentHtml}</div>` : ''}
-      <div id="ob-error" style="display:none;color:rgba(255,120,120,.8);font-size:12px;margin-bottom:.75rem"></div>
+      <div id="ob-error" role="alert" aria-live="polite" style="display:none;color:rgba(255,120,120,.8);font-size:12px;margin-bottom:.75rem"></div>
       <div class="ob-actions">
         <button class="ob-skip" onclick="skipOnboarding()">Pular</button>
         <button class="ob-next" onclick="nextStep()">${s.next}</button>

@@ -85,6 +85,8 @@ function show(type, msg) {
 
   const el = document.createElement('div');
   el.className = 'ligas-toast';
+  el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  el.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
   el.style.borderLeftColor = COLORS[type] || '#888';
   el.textContent = msg;
   container.appendChild(el);

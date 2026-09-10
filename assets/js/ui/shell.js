@@ -76,6 +76,16 @@ function readInitialSidebarState() {
   }
 }
 
+function associateFormLabels(root = document) {
+  root.querySelectorAll('.form-group').forEach((group, index) => {
+    const label = group.querySelector('label:not([for])');
+    const control = group.querySelector('input:not([type="hidden"]), select, textarea');
+    if (!label || !control) return;
+    if (!control.id) control.id = `form-control-${index}`;
+    label.setAttribute('for', control.id);
+  });
+}
+
 function buildSidebar(nav, activeRoute, homeHref, initialState, isDiretoriaUser, isDiretoriaRoute, memberCargo) {
   const showDiretoriaLink = (isDiretoriaUser || memberCargo === 'diretor') && !isDiretoriaRoute;
   const extraLink = showDiretoriaLink
@@ -221,6 +231,7 @@ async function mount({ activeRoute, pageTitle } = {}) {
 
   if (skipLink) skipLink.after(shellWrap);
   else parent.prepend(shellWrap);
+  associateFormLabels(document);
 
   // Notificações (apenas área de membro)
   if (showNotif && usuario?.membros?.liga_id) {

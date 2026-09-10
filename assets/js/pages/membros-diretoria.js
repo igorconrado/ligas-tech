@@ -5,6 +5,7 @@ import { supabase } from '/assets/js/supabase/client.js';
 import { getMembrosLiga, atualizarMembroDiretoria } from '/assets/js/supabase/membros.js';
 import { registrarAdvertencia } from '/assets/js/supabase/advertencias.js';
 import { renderMembrosTable } from '/assets/js/features/members-table.js';
+import { hydrateMemberMetrics } from '/assets/js/features/member-metrics.js';
 import { skeletonTableRows } from '/assets/js/ui/skeleton.js';
 import { toast } from '/assets/js/ui/toast.js';
 import { confirmDialog } from '/assets/js/ui/confirm.js';
@@ -25,11 +26,11 @@ async function carregar() {
   tbl.innerHTML = `<tbody>${skeletonTableRows(5, 7)}</tbody>`;
   try {
     const data = await getMembrosLiga(ligaId);
-    members = data.map(m => ({
+    const baseMembers = data.map(m => ({
       id: m.id, name: m.nome, liga: m.ligas?.nome || '—',
       cargo: m.cargo || 'membro',
-      presenca: 0, entregas: '—', status: 'ok', adv: 0,
     }));
+    members = await hydrateMemberMetrics(ligaId, baseMembers);
     render();
   } catch (e) {
     console.error('Erro ao carregar membros:', e);
@@ -43,7 +44,7 @@ function render() {
   );
   renderMembrosTable($('membros-tbl'), filtered);
   const countEl = $('membros-count');
-  if (countEl) countEl.textContent = filtered.length ? `(${filtered.length})` : '';
+  if (countEl) countEl.textContent = `(${filtered.length})`;
 }
 
 $('filter-search').addEventListener('input', (e) => { filterText = e.target.value.toLowerCase(); render(); });

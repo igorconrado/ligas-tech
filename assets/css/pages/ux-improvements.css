@@ -220,7 +220,7 @@ nav.sidebar-nav .nav-badge {
 .panel-title  { font-size: var(--fs-body-s); letter-spacing: 1.2px; }
 
 .tbl th { font-size: var(--fs-micro); letter-spacing: 1.2px; color: rgba(255,255,255,0.27); padding: var(--sp-3) var(--sp-3); }
-.tbl td { padding: var(--sp-3) var(--sp-3); font-size: var(--fs-label); color: rgba(255,255,255,0.7); border-bottom: 1px solid rgba(255,255,255,0.04); }
+.tbl td { padding: var(--sp-3) var(--sp-3); font-size: 13px; color: rgba(255,255,255,0.7); border-bottom: 1px solid rgba(255,255,255,0.04); }
 .tbl tr:last-child td { border-bottom: none; }
 .tbl tr:hover td { background: rgba(255,255,255,0.022); }
 

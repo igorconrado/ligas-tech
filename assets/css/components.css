@@ -197,6 +197,7 @@ footer {
   border: none;
   cursor: pointer;
   transition: all .15s;
+  min-height: 36px;
 }
 
 .btn-sm.r     { background: var(--red); color: #fff; }
@@ -244,6 +245,7 @@ footer {
 }
 
 .modal-overlay.open { display: flex; }
+body.modal-open { overflow: hidden; }
 
 .modal-box {
   background: var(--bg2);
@@ -267,6 +269,8 @@ footer {
   cursor: pointer;
   transition: color .2s;
   padding: 4px 8px;
+  width: 36px;
+  height: 36px;
 }
 
 .modal-close:hover { color: var(--text); }
@@ -285,7 +289,7 @@ footer {
 
 .form-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--muted);
@@ -522,7 +526,7 @@ footer {
    -------------------------------- */
 .tbl { width: 100%; border-collapse: collapse; }
 .tbl th { font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: .5rem .75rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.tbl td { padding: .625rem .75rem; border-bottom: 1px solid var(--border); font-size: 12px; }
+.tbl td { padding: .625rem .75rem; border-bottom: 1px solid var(--border); font-size: 13px; }
 .tbl tr:last-child td { border-bottom: none; }
 .tbl tr:hover td { background: var(--bg3); }
 .tbl-clickable { cursor: pointer; }

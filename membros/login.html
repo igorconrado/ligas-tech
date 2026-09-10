@@ -53,13 +53,13 @@
       <!-- STEP 1: Email -->
       <div id="step-email">
         <div class="form-group">
-          <label class="form-label">Email institucional</label>
+          <label class="form-label" for="input-email">Email institucional</label>
           <input class="form-input" type="email" id="input-email"
                  placeholder="matricula@alunos.ibmec.edu.br"
                  autocomplete="email">
           <span class="login-hint">Apenas emails @alunos.ibmec.edu.br</span>
         </div>
-        <div class="form-error" id="err-email" style="display:none"></div>
+        <div class="form-error" id="err-email" role="alert" aria-live="polite" style="display:none"></div>
         <button class="login-btn" id="btn-continuar" onclick="handleContinuar()">
           Continuar →
         </button>
@@ -80,18 +80,18 @@
         <div class="login-email-display" id="display-email-criar"></div>
         <p class="login-sub">Primeiro acesso. Crie sua senha para entrar.</p>
         <div class="form-group" style="margin-bottom:.75rem">
-          <label class="form-label">Criar senha</label>
+          <label class="form-label" for="input-senha-criar">Criar senha</label>
           <input class="form-input" type="password" id="input-senha-criar"
                  placeholder="Mínimo 8 caracteres"
                  autocomplete="new-password">
         </div>
         <div class="form-group" style="margin-bottom:1.25rem">
-          <label class="form-label">Confirmar senha</label>
+          <label class="form-label" for="input-senha-criar2">Confirmar senha</label>
           <input class="form-input" type="password" id="input-senha-criar2"
                  placeholder="Repita a senha"
                  autocomplete="new-password">
         </div>
-        <div class="form-error" id="err-criar" style="display:none"></div>
+        <div class="form-error" id="err-criar" role="alert" aria-live="polite" style="display:none"></div>
         <button class="login-btn" id="btn-criar" onclick="handleCriar()">
           Criar conta e entrar →
         </button>
@@ -102,12 +102,12 @@
       <div id="step-logar" style="display:none">
         <div class="login-email-display" id="display-email-logar"></div>
         <div class="form-group" style="margin-bottom:1.25rem">
-          <label class="form-label">Senha</label>
+          <label class="form-label" for="input-senha-logar">Senha</label>
           <input class="form-input" type="password" id="input-senha-logar"
                  placeholder="••••••••"
                  autocomplete="current-password">
         </div>
-        <div class="form-error" id="err-logar" style="display:none"></div>
+        <div class="form-error" id="err-logar" role="alert" aria-live="polite" style="display:none"></div>
         <button class="login-btn" id="btn-logar" onclick="handleLogar()">
           Entrar →
         </button>
@@ -118,12 +118,12 @@
       <div id="step-loading" style="display:none">
         <div class="login-loading">
           <div class="login-spinner"></div>
-          <span id="loading-text">Verificando...</span>
+          <span id="loading-text" role="status" aria-live="polite">Verificando...</span>
         </div>
       </div>
 
       <div class="login-footer">
-        Problemas pra acessar? Fale com a diretoria.<br>
+        Problemas pra acessar? <a href="/contato">Fale com a diretoria</a>.<br>
         <a href="/">← Voltar pro site</a>
       </div>
     </div>

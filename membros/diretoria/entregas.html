@@ -23,12 +23,27 @@
 <main id="main-content" class="content" style="padding: var(--sp-6) var(--sp-7); max-width: 1200px">
   <div class="panel-full">
     <div class="panel-head">
-      <div class="panel-title">Entregas por aula</div>
-      <select id="filter-entregas-aula" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:5px 10px;border-radius:3px;font-size:11px;outline:none;font-family:var(--font-body)">
-        <option value="">Todas as aulas</option>
-      </select>
+      <div>
+        <div class="panel-title">Entregas por tarefa</div>
+        <div id="entregas-summary" style="font-size:12px;color:var(--muted);margin-top:.25rem" aria-live="polite"></div>
+      </div>
+      <div class="panel-actions" style="display:flex;gap:.5rem;align-items:center">
+        <label class="sr-only" for="filter-entregas-aula">Filtrar por tarefa</label>
+        <select id="filter-entregas-aula" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:3px;font-size:12px;outline:none;font-family:var(--font-body)">
+          <option value="">Todas as tarefas</option>
+        </select>
+        <label class="sr-only" for="filter-entregas-status">Filtrar por status</label>
+        <select id="filter-entregas-status" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:7px 10px;border-radius:3px;font-size:12px;outline:none;font-family:var(--font-body)">
+          <option value="">Todos os status</option>
+          <option value="pendente">Pendentes</option>
+          <option value="atrasada">Atrasadas</option>
+          <option value="entregue">Entregues</option>
+        </select>
+      </div>
     </div>
-    <table class="tbl" id="entregas-tbl"></table>
+    <table class="tbl" id="entregas-tbl">
+      <caption class="sr-only">Situação das entregas de cada membro por tarefa</caption>
+    </table>
   </div>
 </main>
 <script type="module" src="/assets/js/pages/entregas-diretoria.js"></script>

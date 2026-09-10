@@ -33,16 +33,17 @@
 
   <div class="presenca-box" style="margin-bottom:1.25rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:1rem 1.25rem">
     <div style="font-size:13px;font-weight:500;margin-bottom:.625rem">Registrar presença</div>
-    <div class="otp-wrap">
-      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-1" oninput="otpNext(this, 'otp-2')">
-      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-2" oninput="otpNext(this, 'otp-3')" onkeydown="otpPrev(event, 'otp-1')">
-      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-3" oninput="otpNext(this, 'otp-4')" onkeydown="otpPrev(event, 'otp-2')">
-      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-4" oninput="otpNext(this, 'otp-5')" onkeydown="otpPrev(event, 'otp-3')">
-      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-5" oninput="otpNext(this, 'otp-6')" onkeydown="otpPrev(event, 'otp-4')">
-      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" id="otp-6" onkeydown="otpPrev(event, 'otp-5')" oninput="otpFinal(this)">
+    <div class="otp-wrap" role="group" aria-label="Código de presença com seis dígitos">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code" aria-label="Dígito 1 de 6" id="otp-1" oninput="otpNext(this, 'otp-2')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Dígito 2 de 6" id="otp-2" oninput="otpNext(this, 'otp-3')" onkeydown="otpPrev(event, 'otp-1')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Dígito 3 de 6" id="otp-3" oninput="otpNext(this, 'otp-4')" onkeydown="otpPrev(event, 'otp-2')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Dígito 4 de 6" id="otp-4" oninput="otpNext(this, 'otp-5')" onkeydown="otpPrev(event, 'otp-3')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Dígito 5 de 6" id="otp-5" oninput="otpNext(this, 'otp-6')" onkeydown="otpPrev(event, 'otp-4')">
+      <input class="otp-input" type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" aria-label="Dígito 6 de 6" id="otp-6" onkeydown="otpPrev(event, 'otp-5')" oninput="otpFinal(this)">
     </div>
-    <p class="otp-hint">O código é exibido pela diretoria no início de cada encontro</p>
-    <div id="presenca-feedback" style="display:none;margin-top:.5rem;font-family:var(--font-mono);font-size:11px"></div>
+    <p class="otp-hint">Digite ou cole o código exibido pela diretoria no início do encontro.</p>
+    <button class="btn-sm b" id="btn-registrar-presenca" type="button" style="margin-top:.75rem">Registrar presença</button>
+    <div id="presenca-feedback" role="status" aria-live="polite" style="display:none;margin-top:.5rem;font-family:var(--font-mono);font-size:11px"></div>
   </div>
 
   <div class="presenca-timeline" id="presenca-timeline"></div>
@@ -50,6 +51,7 @@
 </main>
 <script>
 function otpNext(el, nextId) {
+  el.value = el.value.replace(/\D/g, '');
   el.classList.toggle('filled', el.value !== '');
   if (el.value && nextId) document.getElementById(nextId)?.focus();
 }
@@ -57,13 +59,20 @@ function otpPrev(event, prevId) {
   if (event.key === 'Backspace' && !event.target.value) document.getElementById(prevId)?.focus();
 }
 function otpFinal(el) {
+  el.value = el.value.replace(/\D/g, '');
   el.classList.toggle('filled', el.value !== '');
-  const codigo = ['otp-1','otp-2','otp-3','otp-4','otp-5','otp-6']
-    .map(id => document.getElementById(id)?.value || '').join('');
-  if (codigo.length === 6 && typeof registrarPresencaCodigo === 'function') {
-    registrarPresencaCodigo(codigo);
-  }
 }
+
+document.querySelector('.otp-wrap')?.addEventListener('paste', event => {
+  const digits = event.clipboardData?.getData('text').replace(/\D/g, '').slice(0, 6) || '';
+  if (!digits) return;
+  event.preventDefault();
+  digits.split('').forEach((digit, index) => {
+    const input = document.getElementById(`otp-${index + 1}`);
+    if (input) { input.value = digit; input.classList.add('filled'); }
+  });
+  document.getElementById(`otp-${Math.min(digits.length + 1, 6)}`)?.focus();
+});
 </script>
 <script type="module" src="/assets/js/pages/encontros-membro.js"></script>
 </body>

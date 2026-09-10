@@ -101,6 +101,7 @@
   font-size: var(--fs-label);
   font-weight: 500;
   text-decoration: none;
+  min-height: 36px;
   transition: background var(--dur-fast), color var(--dur-fast), border-left-color var(--dur-fast);
 }
 .sidebar__item:hover {
@@ -329,6 +330,45 @@
   .sidebar__toggle { display: none; }
   .sidebar { width: var(--sidebar-width) !important; }
   .sidebar__label, .sidebar__group-label { display: inherit !important; }
+  .sidebar__item, .sidebar__logout, .sidebar__version { min-height: 44px; }
+}
+
+@media (max-width: 768px) {
+  .shell__main > .content,
+  .shell__main > #main-content {
+    padding: var(--sp-5) var(--sp-4) !important;
+    width: 100%;
+    max-width: none !important;
+  }
+
+  .topbar { padding: 0 var(--sp-3); }
+  .topbar__title { font-size: var(--fs-body); }
+
+  .panel-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .panel-actions {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .panel-actions > input,
+  .panel-actions > select,
+  .panel-actions > button { width: 100% !important; min-height: 44px; }
+
+  .panel-body,
+  .panel-full { overflow-x: auto; }
+
+  .panel-body > .tbl { min-width: 520px; }
+  .panel-full > .tbl { min-width: 680px; }
+}
+
+@media (max-width: 480px) {
+  .metrics { grid-template-columns: 1fr; }
+  .panel-actions { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -122,6 +122,8 @@ const tbody = $('adv-tbl');
 tbody.innerHTML = skeletonTableRows(4, 5);
 try {
   renderizar(await getTodasAdvertencias(ligaId));
+  const membroInicial = new URLSearchParams(window.location.search).get('membro');
+  if (membroInicial) await openAdvModal(membroInicial);
 } catch (e) {
   console.error('Erro ao carregar advertências:', e);
 }

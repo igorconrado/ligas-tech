@@ -74,8 +74,11 @@ async function handleRegistrarPresenca(codigoParam) {
 
   try {
     otpIds.forEach(id => { const inp = $(id); if (inp) inp.disabled = true; });
+    const button = $('btn-registrar-presenca');
+    if (button) { button.disabled = true; button.textContent = 'Registrando...'; }
     await registrarPresenca(codigo);
     toast.success('Presença registrada!');
+    if (button) button.textContent = 'Presença registrada';
     const presencas = await getMinhasPresencas();
     renderPresencas(presencas);
   } catch (e) {
@@ -83,11 +86,14 @@ async function handleRegistrarPresenca(codigoParam) {
     fb.style.color = 'rgba(255,120,120,.8)';
     fb.textContent = e.message || 'Erro ao registrar presença.';
     otpIds.forEach(id => { const inp = $(id); if (inp) { inp.disabled = false; inp.value = ''; inp.classList.remove('filled'); } });
+    const button = $('btn-registrar-presenca');
+    if (button) { button.disabled = false; button.textContent = 'Registrar presença'; }
     $('otp-1')?.focus();
   }
 }
 
 window.registrarPresencaCodigo = handleRegistrarPresenca;
+$('btn-registrar-presenca')?.addEventListener('click', () => handleRegistrarPresenca());
 
 // Initial load
 const timeline = $('presenca-timeline');
