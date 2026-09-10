@@ -135,7 +135,7 @@
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   background: var(--bg);
 }
 .tick-item {
@@ -286,66 +286,6 @@
 .acc-r { color: var(--red); }
 .acc-b { color: var(--blue); }
 
-/* Roadmap */
-.roadmap {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.phase-card {
-  background: var(--bg2);
-  padding: 1.5rem 1.25rem;
-  position: relative;
-  transition: background .2s;
-}
-
-.phase-card:hover { background: var(--bg3); }
-
-.phase-num {
-  font-family: var(--font-display);
-  font-size: 52px;
-  color: rgba(255,255,255,.04);
-  line-height: 1;
-  margin-bottom: .5rem;
-}
-
-.phase-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  margin-bottom: .5rem;
-}
-
-.phase-label.r   { color: var(--red); }
-.phase-label.b   { color: var(--blue); }
-.phase-label.dim { color: var(--muted); }
-
-.phase-title { font-size: 13px; font-weight: 600; margin-bottom: .4rem; line-height: 1.3; }
-.phase-desc  { font-size: 12px; font-weight: 300; color: var(--mid); line-height: 1.5; }
-
-.phase-status {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.phase-status.active {
-  background: var(--red);
-  box-shadow: 0 0 6px var(--red);
-  animation: pulse 2s ease infinite;
-}
-
-.phase-status.upcoming { background: rgba(255,255,255,.12); }
-
 /* Diretoria */
 .dir-groups {
   display: flex;
@@ -387,17 +327,12 @@
   .hero-ctas { justify-content: flex-start; }
 
   /* Ticker */
-  .ticker { grid-template-columns: repeat(3, 1fr); }
+  .ticker { grid-template-columns: repeat(2, 1fr); }
   .tick-item { padding: 1.5rem 1.25rem; }
-  .tick-item:nth-child(4),
-  .tick-item:nth-child(5) { display: none; }
 
   /* Split ligas */
   .split-grid { grid-template-columns: 1fr; margin: 0 -1.25rem; }
   .split-card { padding: 2.5rem 1.75rem; min-height: 320px; }
-
-  /* Roadmap */
-  .roadmap { grid-template-columns: repeat(2, 1fr); }
 
   /* Manifesto */
   .manifesto-section { padding: 2.5rem 0; }
@@ -405,9 +340,7 @@
 }
 
 @media (max-width: 480px) {
-  .roadmap { grid-template-columns: 1fr; }
   .ticker { grid-template-columns: repeat(2, 1fr); }
-  .tick-item:nth-child(3) { display: none; }
   .tick-item { padding: 1.25rem 1rem; }
   .split-card { padding: 2rem 1.25rem; min-height: 260px; }
   .dir-group-grid { grid-template-columns: 1fr; }

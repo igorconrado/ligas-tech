@@ -2,7 +2,7 @@
 import { animateCounters } from '/assets/js/components/counter.js';
 
 // Contadores animados
-animateCounters({ n1: 26, n2: 2, n3: 9, n4: 5, n5: 8 }, 1400, 400);
+animateCounters({ n1: 26, n2: 2, n3: 9, n4: 8 }, 1400, 400);
 
 // Dados da diretoria — agrupados por cúpula
 const diretoria = [
